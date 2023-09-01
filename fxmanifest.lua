@@ -1,45 +1,54 @@
 fx_version 'cerulean'
+game 'gta5'
 use_experimental_fxv2_oal 'yes'
 lua54 'yes'
-game 'gta5'
 description 'ES Extended'
-version '2.0'
+
+version '2.0.0'
 
 shared_scripts {
 	'locale.lua',
 	'locales/*.lua',
+
 	'config.lua',
 	'config.weapons.lua',
 }
 
 server_scripts {
 	'@oxmysql/lib/MySQL.lua',
+	'config.logs.lua',
 	'server/common.lua',
+	'server/modules/callback.lua',
 	'server/classes/player.lua',
+	'server/classes/overrides/*.lua',
 	'server/functions.lua',
+	'server/onesync.lua',
 	'server/paycheck.lua',
+
 	'server/main.lua',
 	'server/commands.lua',
 
-	'common/modules/math.lua',
-	'common/modules/table.lua',
-	'common/functions.lua'
+	'common/modules/*.lua',
+	'common/functions.lua',
+	'server/modules/actions.lua'
 }
 
 client_scripts {
 	'client/common.lua',
-	'client/entityiter.lua',
 	'client/functions.lua',
 	'client/wrapper.lua',
-	'client/main.lua',
+	'client/modules/callback.lua',
 
+	'client/main.lua',
+	
+	'common/modules/*.lua',
+	'common/functions.lua',
+
+	'common/functions.lua',
+	'client/modules/actions.lua',
 	'client/modules/death.lua',
 	'client/modules/scaleform.lua',
-	'client/modules/streaming.lua',
-
-	'common/modules/math.lua',
-	'common/modules/table.lua',
-	'common/functions.lua'
+	'client/modules/streaming.lua'
 }
 
 ui_page {
@@ -65,15 +74,8 @@ files {
 	'html/img/accounts/money.png'
 }
 
-exports {
-	'getSharedObject'
-}
-
-server_exports {
-	'getSharedObject'
-}
-
 dependencies {
+	'/native:0x6AE51D4B',
 	'oxmysql',
-	'spawnmanager'
+	'spawnmanager',
 }
