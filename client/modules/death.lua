@@ -1,34 +1,16 @@
-Citizen.CreateThread(function()
-	local isDead = false
-
-	while true do
-		Citizen.Wait(0)
-		local letSleep = 0
-		local player = PlayerId()
-
-		if NetworkIsPlayerActive(player) then
-			local playerPed = PlayerPedId()
-
-			if IsPedFatallyInjured(playerPed) and not isDead then
-				letSleep = false
-				isDead = true
-
-				local killerEntity, deathCause = GetPedSourceOfDeath(playerPed), GetPedCauseOfDeath(playerPed)
-				local killerClientId = NetworkGetPlayerIndexFromPed(killerEntity)
-
-				if killerEntity ~= playerPed and killerClientId and NetworkIsPlayerActive(killerClientId) then
-					PlayerKilledByPlayer(GetPlayerServerId(killerClientId), killerClientId, deathCause)
-				else
-					PlayerKilled(deathCause)
-				end
-
-			elseif not IsPedFatallyInjured(playerPed) and isDead then
-				letSleep = false
-				isDead = false
-			end
-		end
-		if letSleep then
-			Citizen.Wait(500)
+AddEventHandler('gameEventTriggered', function(event, data)
+	if event ~= 'CEventNetworkEntityDamage' then return end
+	local victim, victimDied = data[1], data[4]
+	if not IsPedAPlayer(victim) then return end
+	local player = PlayerId()
+	local playerPed = PlayerPedId()
+	if victimDied and NetworkGetPlayerIndexFromPed(victim) == player and (IsPedDeadOrDying(victim, true) or IsPedFatallyInjured(victim))  then
+		local killerEntity, deathCause = GetPedSourceOfDeath(playerPed), GetPedCauseOfDeath(playerPed)
+		local killerClientId = NetworkGetPlayerIndexFromPed(killerEntity)
+		if killerEntity ~= playerPed and killerClientId and NetworkIsPlayerActive(killerClientId) then
+			PlayerKilledByPlayer(GetPlayerServerId(killerClientId), killerClientId, deathCause)
+		else
+			PlayerKilled(deathCause)
 		end
 	end
 end)
