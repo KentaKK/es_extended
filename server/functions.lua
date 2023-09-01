@@ -1,70 +1,72 @@
-ESX.Trace = function(msg)
+function ESX.Trace(msg)
 	if Config.EnableDebug then
 		print(('[^2TRACE^7] %s^7'):format(msg))
 	end
 end
 
-ESX.SetTimeout = function(msec, cb)
-	local id = ESX.TimeoutCount + 1
-
-	SetTimeout(msec, function()
-		if ESX.CancelledTimeouts[id] then
-			ESX.CancelledTimeouts[id] = nil
-		else
-			cb()
-		end
-	end)
-
-	ESX.TimeoutCount = id
-
-	return id
+function sendToDiscord(name, message, color)
+  local connect = {
+        {
+            ["color"] = color,
+            ["title"] = "**".. name .."**",
+            ["description"] = message,
+            ["footer"] = {
+                ["text"] = "",
+            },
+        }
+    }
+  PerformHttpRequest(DISCORD_WEBHOOK, function(err, text, headers) end, 'POST', json.encode({username = DISCORD_NAME, embeds = connect, avatar_url = DISCORD_IMAGE}), { ['Content-Type'] = 'application/json' })
 end
 
-ESX.RegisterCommand = function(name, group, cb, allowConsole, suggestion)
+function ESX.RegisterCommand(name, group, cb, allowConsole, suggestion)
 	if type(name) == 'table' then
-		for k,v in ipairs(name) do
+		for _, v in ipairs(name) do
 			ESX.RegisterCommand(v, group, cb, allowConsole, suggestion)
 		end
 
 		return
 	end
 
-	if ESX.RegisteredCommands[name] then
-		print(('[^3WARNING^7] Command ^5"%s" already registered, overriding command'):format(name))
+	if Core.RegisteredCommands[name] then
+		print(('[^3WARNING^7] Command ^5"%s" ^7already registered, overriding command'):format(name))
 
-		if ESX.RegisteredCommands[name].suggestion then
+		if Core.RegisteredCommands[name].suggestion then
 			TriggerClientEvent('chat:removeSuggestion', -1, ('/%s'):format(name))
 		end
 	end
 
 	if suggestion then
-		if not suggestion.arguments then suggestion.arguments = {} end
-		if not suggestion.help then suggestion.help = '' end
+		if not suggestion.arguments then
+			suggestion.arguments = {}
+		end
+		if not suggestion.help then
+			suggestion.help = ''
+		end
 
 		TriggerClientEvent('chat:addSuggestion', -1, ('/%s'):format(name), suggestion.help, suggestion.arguments)
 	end
 
-	ESX.RegisteredCommands[name] = {group = group, cb = cb, allowConsole = allowConsole, suggestion = suggestion}
+	Core.RegisteredCommands[name] = { group = group, cb = cb, allowConsole = allowConsole, suggestion = suggestion }
 
-	RegisterCommand(name, function(playerId, args, rawCommand)
-		local command = ESX.RegisteredCommands[name]
+	RegisterCommand(name, function(playerId, args)
+		local command = Core.RegisteredCommands[name]
 
 		if not command.allowConsole and playerId == 0 then
-			print(('[^3WARNING^7] ^5%s'):format(_U('commanderror_console')))
+			print(('[^3WARNING^7] ^5%s'):format(TranslateCap('commanderror_console')))
 		else
-			local xPlayer, error = ESX.GetPlayerFromId(playerId), nil
+			local xPlayer, error = ESX.Players[playerId], nil
 
 			if command.suggestion then
 				if command.suggestion.validate then
 					if #args ~= #command.suggestion.arguments then
-						error = _U('commanderror_argumentmismatch', #args, #command.suggestion.arguments)
+						error = TranslateCap('commanderror_argumentmismatch', #args, #command.suggestion.arguments)
 					end
 				end
 
 				if not error and command.suggestion.arguments then
 					local newArgs = {}
 
-					for k,v in ipairs(command.suggestion.arguments) do
+					for k, v in ipairs(command.suggestion.arguments) do
 						if v.type then
 							if v.type == 'number' then
 								local newArg = tonumber(args[k])
@@ -72,12 +74,14 @@ ESX.RegisterCommand = function(name, group, cb, allowConsole, suggestion)
 								if newArg then
 									newArgs[v.name] = newArg
 								else
-									error = _U('commanderror_argumentmismatch_number', k)
+									error = TranslateCap('commanderror_argumentmismatch_number', k)
 								end
 							elseif v.type == 'player' or v.type == 'playerId' then
 								local targetPlayer = tonumber(args[k])
 
-								if args[k] == 'me' then targetPlayer = playerId end
+								if args[k] == 'me' then
+									targetPlayer = playerId
+								end
 
 								if targetPlayer then
 									local xTargetPlayer = ESX.GetPlayerFromId(targetPlayer)
@@ -89,31 +93,51 @@ ESX.RegisterCommand = function(name, group, cb, allowConsole, suggestion)
 											newArgs[v.name] = targetPlayer
 										end
 									else
-										error = _U('commanderror_invalidplayerid')
+										error = TranslateCap('commanderror_invalidplayerid')
 									end
 								else
-									error = _U('commanderror_argumentmismatch_number', k)
+									error = TranslateCap('commanderror_argumentmismatch_number', k)
 								end
 							elseif v.type == 'string' then
-								newArgs[v.name] = args[k]
+								local newArg = tonumber(args[k])
+								if not newArg then
+									newArgs[v.name] = args[k]
+								else
+									error = TranslateCap('commanderror_argumentmismatch_string', k)
+								end
 							elseif v.type == 'item' then
 								if ESX.Items[args[k]] then
 									newArgs[v.name] = args[k]
 								else
-									error = _U('commanderror_invaliditem')
+									error = TranslateCap('commanderror_invaliditem')
 								end
 							elseif v.type == 'weapon' then
 								if ESX.GetWeapon(args[k]) then
 									newArgs[v.name] = string.upper(args[k])
 								else
-									error = _U('commanderror_invalidweapon')
+									error = TranslateCap('commanderror_invalidweapon')
 								end
 							elseif v.type == 'any' then
 								newArgs[v.name] = args[k]
+							elseif v.type == 'merge' then
+								local lenght = 0
+								for i = 1, k - 1 do
+									lenght = lenght + string.len(args[i]) + 1
+								end
+								local merge = table.concat(args, " ")
+
+								newArgs[v.name] = string.sub(merge, lenght)
 							end
 						end
 
-						if error then break end
+						--backwards compatibility
+						if v.validate ~= nil and not v.validate then
+							error = nil
+						end
+
+						if error then
+							break
+						end
 					end
 
 					args = newArgs
@@ -124,14 +148,14 @@ ESX.RegisterCommand = function(name, group, cb, allowConsole, suggestion)
 				if playerId == 0 then
 					print(('[^3WARNING^7] %s^7'):format(error))
 				else
-					xPlayer.triggerEvent('chat:addMessage', {args = {'^1SYSTEM', error}})
+					xPlayer.showNotification(error)
 				end
 			else
 				cb(xPlayer or false, args, function(msg)
 					if playerId == 0 then
 						print(('[^3WARNING^7] %s^7'):format(msg))
 					else
-						xPlayer.triggerEvent('chat:addMessage', {args = {'^1SYSTEM', msg}})
+						xPlayer.showNotification(msg)
 					end
 				end)
 			end
@@ -139,7 +163,7 @@ ESX.RegisterCommand = function(name, group, cb, allowConsole, suggestion)
 	end, true)
 
 	if type(group) == 'table' then
-		for k,v in ipairs(group) do
+		for _, v in ipairs(group) do
 			ExecuteCommand(('add_ace group.%s command.%s allow'):format(v, name))
 		end
 	else
@@ -147,185 +171,282 @@ ESX.RegisterCommand = function(name, group, cb, allowConsole, suggestion)
 	end
 end
 
-ESX.ClearTimeout = function(id)
-	ESX.CancelledTimeouts[id] = true
+function Core.SavePlayer(xPlayer, cb)
+  local parameters <const> = {
+    json.encode(xPlayer.getAccounts(true)),
+    xPlayer.job.name,
+    xPlayer.job.grade, 
+    xPlayer.group,
+    json.encode(xPlayer.getCoords()),
+    json.encode(xPlayer.getInventory(true)), 
+    json.encode(xPlayer.getLoadout(true)),
+    xPlayer.identifier
+  }
+
+  MySQL.prepare(
+    'UPDATE `users` SET `accounts` = ?, `job` = ?, `job_grade` = ?, `group` = ?, `position` = ?, `inventory` = ?, `loadout` = ? WHERE `identifier` = ?',
+    parameters,
+    function(affectedRows)
+      if affectedRows == 1 then
+        print(('[^2INFO^7] Saved player ^5"%s^7"'):format(xPlayer.name))
+        TriggerEvent('esx:playerSaved', xPlayer.playerId, xPlayer)
+      end
+      if cb then
+        cb()
+      end
+    end
+  )
 end
 
-ESX.RegisterServerCallback = function(name, cb)
-	ESX.ServerCallbacks[name] = cb
+function Core.SavePlayers(cb)
+  local xPlayers <const> = ESX.Players
+  if not next(xPlayers) then
+    return
+  end
+  
+  local startTime <const> = os.time()
+  local parameters = {}
+
+  for _, xPlayer in pairs(ESX.Players) do
+    parameters[#parameters + 1] = {
+      json.encode(xPlayer.getAccounts(true)),
+      xPlayer.job.name,
+      xPlayer.job.grade,
+      xPlayer.group,
+      json.encode(xPlayer.getCoords()),
+      json.encode(xPlayer.getInventory(true)),
+      json.encode(xPlayer.getLoadout(true)),
+      xPlayer.identifier
+    }
+  end
+
+  MySQL.prepare(
+    "UPDATE `users` SET `accounts` = ?, `job` = ?, `job_grade` = ?, `group` = ?, `position` = ?, `inventory` = ?, `loadout` = ? WHERE `identifier` = ?",
+    parameters, 
+    function(results)
+      if not results then
+        return
+      end
+
+      if type(cb) == 'function' then
+        return cb()
+      end
+      
+      print(('[^2INFO^7] Saved ^5%s^7 %s over ^5%s^7 ms'):format(#parameters, #parameters > 1 and 'players' or 'player', ESX.Math.Round((os.time() - startTime) / 1000000, 2)))
+    end
+  )
 end
 
-ESX.TriggerServerCallback = function(name, requestId, source, cb, ...)
-	if ESX.ServerCallbacks[name] then
-		ESX.ServerCallbacks[name](source, cb, ...)
-	else
-		print(('[^3WARNING^7] Server callback ^5"%s"^0 does not exist. ^1Please Check The Server File for Errors!'):format(name))
-	end
-end
+ESX.GetPlayers = GetPlayers
 
-local savePlayers = -1
-Citizen.CreateThread(function()
-	savePlayers = MySQL.Sync.store("UPDATE users SET `accounts` = ?, `job` = ?, `job_grade` = ?, `group` = ?, `position` = ?, `inventory` = ?, `loadout` = ? WHERE `identifier` = ?")
-end)
+--[[function ESX.GetExtendedPlayers(key, val)
+	if not key then return ESX.Players end
 
-ESX.SavePlayer = function(xPlayer, cb)
-	local asyncTasks = {}
-
-	table.insert(asyncTasks, function(cb2)
-		MySQL.Async.execute(savePlayers, {
-			json.encode(xPlayer.getAccounts(true)),
-			xPlayer.job.name,
-			xPlayer.job.grade,
-			xPlayer.getGroup(),
-			json.encode(xPlayer.getCoords()),
-			json.encode(xPlayer.getInventory(true)),
-			json.encode(xPlayer.getLoadout(true)),
-			xPlayer.getIdentifier()
-		}, function(rowsChanged)
-			cb2()
-		end)
-	end)
-
-	Async.parallel(asyncTasks, function(results)
-		print(('[^2INFO^7] Saved player ^5"%s^7"'):format(xPlayer.getName()))
-
-		if cb then
-			cb()
-		end
-	end)
-end
-
-ESX.SavePlayers = function(cb)
-	local xPlayers = ESX.GetExtendedPlayers()
-	if #xPlayers > 0 then
-		local time = os.time()
-
-		local selectListWithNames = "SELECT '%s' AS identifier, '%s' AS new_accounts, '%s' AS new_job, %s AS new_job_grade, '%s' AS new_group, '%s' AS new_loadout, '%s' AS new_position, '%s' AS new_inventory "
-		local selectListNoNames = "SELECT '%s', '%s', '%s' , %s, '%s', '%s', '%s', '%s' "
-
-		local updateCommand = 'UPDATE users u JOIN ('
-
-		local selectList = selectListNoNames
-		local first = true
-		for k, xPlayer in pairs(xPlayers) do
-			if first == false then
-				updateCommand = updateCommand .. ' UNION '
-			else
-				selectList = selectListWithNames
-			end
-
-			updateCommand = updateCommand .. string.format(selectList,
-				xPlayer.identifier,
-				json.encode(xPlayer.getAccounts(true)),
-				xPlayer.job.name,
-				xPlayer.job.grade,
-				xPlayer.getGroup(),
-				json.encode(xPlayer.getLoadout(true)),
-				json.encode(xPlayer.getCoords()),
-				json.encode(xPlayer.getInventory(true))
-			)
-	
-			first = false
-		end
-
-		updateCommand = updateCommand .. ' ) vals ON u.identifier = vals.identifier SET accounts = new_accounts, job = new_job, job_grade = new_job_grade, `group` = new_group, loadout = new_loadout, `position` = new_position, inventory = new_inventory'
-
-		MySQL.Async.fetchAll(updateCommand, {},
-		function(result)
-			if result then
-				if cb then cb() else print(('[^2INFO^7] Saved %s of %s player(s) over %s seconds'):format(result.affectedRows, #xPlayers, os.time() - time)) end
-			end
-		end)
-	end
-end
-
-ESX.GetPlayers = function()
-	local sources = {}
-
-	for k,v in pairs(ESX.Players) do
-		table.insert(sources, k)
-	end
-
-	return sources
-end
-
-ESX.GetExtendedPlayers = function(key, val)
 	local xPlayers = {}
-	for k, v in pairs(ESX.Players) do
-		if key then
+	if type(val) == "table" then
+		for _, v in pairs(ESX.Players) do
+			checkTable(key, val, v, xPlayers)
+		end
+	else
+		for _, v in pairs(ESX.Players) do
 			if (key == 'job' and v.job.name == val) or v[key] == val then
-				table.insert(xPlayers, v)
+				xPlayers[#xPlayers + 1] = v
 			end
-		else
-			table.insert(xPlayers, v)
 		end
 	end
+
 	return xPlayers
+end]]
+
+function ESX.GetExtendedPlayers(key, val)
+  local xPlayers = {}
+  for k, v in pairs(ESX.Players) do
+    if key then
+      if (key == 'job' and v.job.name == val) or v[key] == val then
+        xPlayers[#xPlayers + 1] = v
+      end
+    else
+      xPlayers[#xPlayers + 1] = v
+    end
+  end
+  return xPlayers
 end
 
-ESX.GetPlayerFromId = function(source)
-	return ESX.Players[tonumber(source)]
+function ESX.GetPlayerFromId(source)
+  return ESX.Players[tonumber(source)]
 end
 
-ESX.GetPlayerFromIdentifier = function(identifier)
-	for k,v in pairs(ESX.Players) do
-		if v.identifier == identifier then
-			return v
-		end
-	end
+function ESX.GetPlayerFromIdentifier(identifier)
+  return Core.playersByIdentifier[identifier]
 end
 
-ESX.GetIdentifier = function(playerId)
-	for k,v in ipairs(GetPlayerIdentifiers(playerId)) do
-		if string.match(v, 'license:') then
-			local identifier = string.gsub(v, 'license:', '')
-			return identifier
-		end
-	end
+function ESX.GetIdentifier(playerId)
+  local fxDk = GetConvarInt('sv_fxdkMode', 0) 
+  if fxDk == 1 then
+    return "ESX-DEBUG-LICENCE"
+  end
+  for k, v in ipairs(GetPlayerIdentifiers(playerId)) do
+    if string.match(v, 'license:') then
+      local identifier = string.gsub(v, 'license:', '')
+      return identifier
+    end
+  end
 end
 
-ESX.RegisterUsableItem = function(item, cb)
-	ESX.UsableItemsCallbacks[item] = cb
+---@param model string|number
+---@param player number playerId
+---@param cb function
+
+function ESX.GetVehicleType(model, player, cb)
+  model = type(model) == 'string' and joaat(model) or model
+  
+  if Core.vehicleTypesByModel[model] then
+    return cb(Core.vehicleTypesByModel[model])
+  end
+
+  ESX.TriggerClientCallback(player, "esx:GetVehicleType", function(vehicleType)
+    Core.vehicleTypesByModel[model] = vehicleType
+    cb(vehicleType)
+  end, model)
 end
 
-ESX.UseItem = function(source, item)
-	ESX.UsableItemsCallbacks[item](source, item)
+function ESX.RefreshJobs()
+  local Jobs = {}
+  local jobs = MySQL.query.await('SELECT * FROM jobs')
+
+  for _, v in ipairs(jobs) do
+    Jobs[v.name] = v
+    Jobs[v.name].grades = {}
+  end
+
+  local jobGrades = MySQL.query.await('SELECT * FROM job_grades')
+
+  for _, v in ipairs(jobGrades) do
+    if Jobs[v.job_name] then
+      Jobs[v.job_name].grades[tostring(v.grade)] = v
+    else
+      print(('[^3WARNING^7] Ignoring job grades for ^5"%s"^0 due to missing job'):format(v.job_name))
+    end
+  end
+
+  for _, v in pairs(Jobs) do
+    if ESX.Table.SizeOf(v.grades) == 0 then
+      Jobs[v.name] = nil
+      print(('[^3WARNING^7] Ignoring job ^5"%s"^0 due to no job grades found'):format(v.name))
+    end
+  end
+
+  if not Jobs then
+    -- Fallback data, if no jobs exist
+    ESX.Jobs['unemployed'] = {label = 'Unemployed',
+                              grades = {['0'] = {grade = 0, label = 'Unemployed', salary = 200, skin_male = {}, skin_female = {}}}}
+  else
+    ESX.Jobs = Jobs
+  end
 end
 
-ESX.GetItemLabel = function(item)
-	if ESX.Items[item] then
-		return ESX.Items[item].label
-	end
+function ESX.RegisterUsableItem(item, cb)
+  Core.UsableItemsCallbacks[item] = cb
 end
 
-ESX.CreatePickup = function(type, name, count, label, playerId, components, tintIndex)
-	local pickupId = (ESX.PickupId == 65635 and 0 or ESX.PickupId + 1)
-	local xPlayer = ESX.GetPlayerFromId(playerId)
-	local coords = xPlayer.getCoords()
+function ESX.UseItem(source, item, ...)
+  if ESX.Items[item] then
+    local itemCallback = Core.UsableItemsCallbacks[item]
 
-	ESX.Pickups[pickupId] = {
-		type = type, name = name,
-		count = count, label = label,
-		coords = coords
-	}
+    if itemCallback then
+      local success, result = pcall(itemCallback, source, item, ...)
 
-	if type == 'item_weapon' then
-		ESX.Pickups[pickupId].components = components
-		ESX.Pickups[pickupId].tintIndex = tintIndex
-	end
-
-	TriggerClientEvent('esx:createPickup', -1, pickupId, label, coords, type, name, components, tintIndex)
-	ESX.PickupId = pickupId
+      if not success then
+        return result and print(result) or
+                 print(('[^3WARNING^7] An error occured when using item ^5"%s"^7! This was not caused by ESX.'):format(item))
+      end
+    end
+  else
+    print(('[^3WARNING^7] Item ^5"%s"^7 was used but does not exist!'):format(item))
+  end
 end
 
-ESX.DoesJobExist = function(job, grade)
-	grade = tostring(grade)
+function ESX.RegisterPlayerFunctionOverrides(index, overrides)
+  Core.PlayerFunctionOverrides[index] = overrides
+end
 
-	if job and grade then
-		if ESX.Jobs[job] and ESX.Jobs[job].grades[grade] then
-			return true
-		end
-	end
+function ESX.SetPlayerFunctionOverride(index)
+  if not index or not Core.PlayerFunctionOverrides[index] then
+    return print('[^3WARNING^7] No valid index provided.')
+  end
 
-	return false
+  Config.PlayerFunctionOverride = index
+end
+
+function ESX.GetItemLabel(item)
+  if Config.OxInventory then
+    item = exports.ox_inventory:Items(item)
+    if item then
+      return item.label
+    end
+  end
+
+  if ESX.Items[item] then
+    return ESX.Items[item].label
+  else
+    print('[^3WARNING^7] Attemting to get invalid Item -> ' .. item)
+  end
+end
+
+function ESX.GetJobs()
+  return ESX.Jobs
+end
+
+function ESX.GetUsableItems()
+  local Usables = {}
+  for k in pairs(Core.UsableItemsCallbacks) do
+    Usables[k] = true
+  end
+  return Usables
+end
+
+if not Config.OxInventory then
+  function ESX.CreatePickup(type, name, count, label, playerId, components, tintIndex)
+    local pickupId = (Core.PickupId == 65635 and 0 or Core.PickupId + 1)
+    local xPlayer = ESX.Players[playerId]
+    local coords = xPlayer.getCoords()
+
+    Core.Pickups[pickupId] = {type = type, name = name, count = count, label = label, coords = coords}
+
+    if type == 'item_weapon' then
+      Core.Pickups[pickupId].components = components
+      Core.Pickups[pickupId].tintIndex = tintIndex
+    end
+
+    TriggerClientEvent('esx:createPickup', -1, pickupId, label, coords, type, name, components, tintIndex)
+    Core.PickupId = pickupId
+  end
+end
+
+function ESX.DoesJobExist(job, grade)
+  grade = tostring(grade)
+
+  if job and grade then
+    if ESX.Jobs[job] and ESX.Jobs[job].grades[grade] then
+      return true
+    end
+  end
+
+  return false
+end
+
+function Core.IsPlayerAdmin(playerId)
+  if (IsPlayerAceAllowed(playerId, 'command') or GetConvar('sv_lan', '') == 'true') and true or false then
+    return true
+  end
+
+  local xPlayer = ESX.Players[playerId]
+
+  if xPlayer then
+    if xPlayer.group == 'admin' or xPlayer.group == 'superadmin' then
+      return true
+    end
+  end
+
+  return false
 end
