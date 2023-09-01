@@ -1,33 +1,19 @@
-fx_version 'adamant'
-
+fx_version 'cerulean'
+use_experimental_fxv2_oal 'yes'
+lua54 'yes'
 game 'gta5'
-
 description 'ES Extended'
-
-version 'legacy'
+version '2.0'
 
 shared_scripts {
 	'locale.lua',
-	'locales/de.lua',
-	'locales/es.lua',
-	'locales/br.lua',
-	'locales/fr.lua',
-	'locales/en.lua',
-	'locales/fi.lua',
-	'locales/sv.lua',
-	'locales/pl.lua',
-	'locales/cs.lua',
-	'locales/sc.lua',
-	'locales/tc.lua',
-
+	'locales/*.lua',
 	'config.lua',
 	'config.weapons.lua',
 }
 
 server_scripts {
-	'@async/async.lua',
-	'@mysql-async/lib/MySQL.lua',
-
+	'@oxmysql/lib/MySQL.lua',
 	'server/common.lua',
 	'server/classes/player.lua',
 	'server/functions.lua',
@@ -88,7 +74,6 @@ server_exports {
 }
 
 dependencies {
-	'mysql-async',
-	'async',
-	'spawnmanager',
+	'oxmysql',
+	'spawnmanager'
 }
