@@ -7,24 +7,13 @@ ESX.UI = {}
 ESX.UI.Menu = {}
 ESX.UI.Menu.RegisteredTypes = {}
 ESX.UI.Menu.Opened = {}
-
-local isDebug = false
-local MAX_DEFORM_ITERATIONS = 50
-local DEFORMATION_DAMAGE_THRESHOLD = 0.05
-
 ESX.Game = {}
 ESX.Game.Utils = {}
-
 ESX.Scaleform = {}
 ESX.Scaleform.Utils = {}
-
 ESX.Streaming = {}
 local GU = {}
 GU.Time = 0
-
-exports("GetVehicleDeformation", GetVehicleDeformation)
-exports("SetVehicleDeformation", SetVehicleDeformation)
--- DEFORMATION
 
 AddStateBagChangeHandler('deformation' --[[key filter]], nil --[[bag filter]], function(bagName, key, value, _unused, replicated)
 	Wait(100)
@@ -32,33 +21,17 @@ AddStateBagChangeHandler('deformation' --[[key filter]], nil --[[bag filter]], f
 	if not value or entity == 0 then return end
 	local ent = Entity(entity).state
 	local plate = GetVehicleNumberPlateText(entity)
-	SetVehicleDeformation(entity,value)
-end)
-
-exports('phonecheck2', function()
-    for k, v in ipairs(ESX.PlayerData.inventory) do
-        if v.count > 0 then
-            if v.name == 'phone' then
-               return true
-            else
-               --ESX.ShowNotification('Nincs nálad telefon')
-               --return false
-            end
-        else
-            --ESX.ShowNotification('Nincs nálad telefon')
-            --return false
-        end
-    end
+	SetVehicleDeformation(entity, value)
 end)
 
 exports('phonecheck', function()
     local count = exports.ox_inventory:Search('count', 'phone')
-        if count >= 1 then
-            return true
-        elseif count <= 0 then
-            ESX.ShowNotification('Nincs nálad ~g~telefon')
-            return false
-        end
+    if count >= 1 then
+        return true
+    elseif count <= 0 then
+        ESX.ShowNotification('Nincs nálad ~g~telefon')
+        return false
+    end
 end)
 
 local entityEnumerator = {
@@ -203,7 +176,7 @@ end
 
 function ESX.ShowFloatingHelpNotification(msg, coords)
 	AddTextEntry('esxFloatingHelpNotification', msg)
-	SetFloatingHelpTextWorldPosition(1, coords)
+	SetFloatingHelpTextWorldPosition(1, coords.x, coords.y, coords.z)
 	SetFloatingHelpTextStyle(1, 1, 2, -1, 3, 0)
 	BeginTextCommandDisplayHelp('esxFloatingHelpNotification')
 	EndTextCommandDisplayHelp(2, false, false, -1)
@@ -414,8 +387,6 @@ function ESX.Game.GetPedMugshot(ped, transparent)
 end
 
 ESX.Game.Teleport = function(entity, coords, cb)
-	--local vector = type(coords) == "vector4" and coords or type(coords) == "vector3" and vector4(coords, 0.0) or vec(coords.x, coords.y, coords.z, coords.heading or 0.0)
-
 	if DoesEntityExist(entity) then
 		RequestCollisionAtCoord(coords.x, coords.y, coords.z)
 		while not HasCollisionLoadedAroundEntity(entity) do
@@ -451,11 +422,9 @@ ESX.Game.SpawnObject = function(object, coords, cb, networked)
         end, object, coords, 0.0)
     else 
         local model = type(object) == 'number' and object or joaat(object)
-        local vector = type(coords) == "vector3" and coords or vec(coords.x, coords.y, coords.z)
         CreateThread(function()
             ESX.Streaming.RequestModel(model)
-
-            local obj = CreateObject(model, vector.xyz, networked, false, true)
+            local obj = CreateObject(model, coords.x, coords.y, coords.z, networked, false, true)
             if cb then
                 cb(obj)
             end
@@ -753,358 +722,6 @@ function ESX.Game.GetVehicleInDirection()
     end
 
     return nil
-end
-
-SetVehicleDeformation = function(vehicle, deformationPoints, callback)
-    assert(vehicle ~= nil and DoesEntityExist(vehicle), "Parameter \"vehicle\" must be a valid vehicle entity!")
-    assert(deformationPoints ~= nil and type(deformationPoints) == "table", "Parameter \"deformationPoints\" must be a table!")
-    CreateThread(function()
-		local min, max = GetModelDimensions(GetEntityModel(vehicle))
-        local damageMult = #(max - min) * 3.5		-- might need some more experimentation
-
-        local printMsg = false
-		for i, def in ipairs(deformationPoints) do
-			def[1] = vector3(Round(def[1].x,2), Round(def[1].y,2), Round(def[1].z,2))
-		end
-		local deform = true
-		local iteration = 0
-		while (deform and iteration < MAX_DEFORM_ITERATIONS) do
-			deform = false
-			for i, def in ipairs(deformationPoints) do
-				if (#(GetVehicleDeformationAtPos(vehicle, def[1])) < Round(def[2]*0.99,2)) then
-					SetVehicleDamage(vehicle, def[1] * 2.0, Round(def[2] * damageMult,2), 1000.0, true)
-					deform = true
-				end
-			end
-			iteration = iteration + 1
-			Citizen.Wait(100)
-		end
-        if (callback) then
-		    callback()
-        end
-	end)
-end
-
-GetVehicleDeformation = function(vehicle)
-    assert(vehicle ~= nil and DoesEntityExist(vehicle), "Parameter \"vehicle\" must be a valid vehicle entity!")
-	local min, max = GetModelDimensions(GetEntityModel(vehicle))
-	local X = Round((max.x - min.x) * 0.5, 2)
-	local Y = Round((max.y - min.y) * 0.5, 2)
-	local Z = Round((max.z - min.z) * 0.5, 2)
-	local halfY = Round(Y * 0.5, 2)
-	local positions = {
-		vector3(-X, Y,  0.0),
-		vector3(-X, Y,  Z),
-
-		vector3(0.0, Y,  0.0),
-		vector3(0.0, Y,  Z),
-
-		vector3(X, Y,  0.0),
-		vector3(X, Y,  Z),
-
-
-		vector3(-X, halfY,  0.0),
-		vector3(-X, halfY,  Z),
-
-                --új
-	        vector3(-X, halfY + (halfY / 2),  0.0),
-		vector3(-X, halfY + (halfY / 2),  Z),
-
-		vector3(-X, halfY - (halfY / 2),  0.0),
-		vector3(-X, halfY - (halfY / 2),  Z),
-                --
-
-		vector3(0.0, halfY,  0.0),
-		vector3(0.0, halfY,  Z),
-
-		vector3(X, halfY,  0.0),
-		vector3(X, halfY,  Z),
-       
-                --új
-	        vector3(X, halfY + (halfY / 2),  0.0),
-		vector3(X, halfY + (halfY / 2),  Z),
-
-		vector3(X, halfY - (halfY / 2),  0.0),
-		vector3(X, halfY - (halfY / 2),  Z),
-                --
-
-		vector3(-X, 0.0,  0.0),
-		vector3(-X, 0.0,  Z),
-
-		vector3(0.0, 0.0,  0.0),
-		vector3(0.0, 0.0,  Z),
-
-		vector3(X, 0.0,  0.0),
-		vector3(X, 0.0,  Z),
-
-
-		vector3(-X, -halfY,  0.0),
-		vector3(-X, -halfY,  Z),
-
-	        vector3(-X, -(halfY + (halfY / 2)),  0.0),
-		vector3(-X, -(halfY + (halfY / 2)),  Z),
-
-		vector3(-X, -(halfY - (halfY / 2)),  0.0),
-		vector3(-X, -(halfY - (halfY / 2)),  Z),
-
-		vector3(0.0, -halfY,  0.0),
-		vector3(0.0, -halfY,  Z),
-
-		vector3(0.0, -(halfY + (halfY / 2)),  0.0),
-		vector3(0.0, -(halfY + (halfY / 2)),  Z),
-
-		vector3(0.0, -(halfY - (halfY / 2)),  0.0),
-		vector3(0.0, -(halfY - (halfY / 2)),  Z),
-
-		vector3(X, -halfY,  0.0),
-		vector3(X, -halfY,  Z),
-
-		vector3(X, -(halfY + (halfY / 2)),  0.0),
-		vector3(X, -(halfY + (halfY / 2)),  Z),
-
-		vector3(X, -(halfY - (halfY / 2)),  0.0),
-		vector3(X, -(halfY - (halfY / 2)),  Z),
-
-
-		vector3(-X, -Y,  0.0),
-		vector3(-X, -Y,  Z),
-
-		vector3(0.0, -Y,  0.0),
-		vector3(0.0, -Y,  Z),
-
-		vector3(X, -Y,  0.0),
-		vector3(X, -Y,  Z),
-
-
-		vector3(-(X / 2), Y,  0.0),
-		vector3(-(X / 2), Y,  Z),
-
-		vector3((X / 2), Y,  0.0),
-		vector3((X / 2), Y,  Z),
-
-		vector3(-(X / 2), halfY,  0.0),
-		vector3(-(X / 2), halfY,  Z),
-
-		vector3(-(X / 2), halfY + (halfY / 2),  0.0),
-		vector3(-(X / 2), halfY + (halfY / 2),  Z),
-
-		vector3(-(X / 2), halfY - (halfY / 2),  0.0),
-		vector3(-(X / 2), halfY - (halfY / 2),  Z),
-		vector3((X / 2), halfY + (halfY / 2),  0.0),
-		vector3((X / 2), halfY + (halfY / 2),  Z),
-
-		vector3((X / 2), halfY - (halfY / 2),  0.0),
-		vector3((X / 2), halfY - (halfY / 2),  Z),
-
-		vector3(-(X / 2), 0.0,  0.0),
-		vector3(-(X / 2), 0.0,  Z),
-
-		vector3(-(X / 2), -halfY,  0.0),
-		vector3(-(X / 2), -halfY,  Z),
-
-		vector3(-(X / 2), -(halfY + (halfY / 2)),  0.0),
-		vector3(-(X / 2), -(halfY + (halfY / 2)),  Z),
-
-		vector3(-(X / 2), -(halfY - (halfY / 2)),  0.0),
-		vector3(-(X / 2), -(halfY - (halfY / 2)),  Z),
-
-		vector3((X / 2), -halfY,  0.0),
-		vector3((X / 2), -halfY,  Z),
-
-		vector3((X / 2), -(halfY + (halfY / 2)),  0.0),
-		vector3((X / 2), -(halfY + (halfY / 2)),  Z),
-
-		vector3((X / 2), -(halfY - (halfY / 2)),  0.0),
-		vector3((X / 2), -(halfY - (halfY / 2)),  Z),
-
-		vector3(-(X / 2), -Y,  0.0),
-		vector3(-(X / 2), -Y,  Z),
-
-		vector3((X / 2), -Y,  0.0),
-		vector3((X / 2), -Y,  Z),
-		vector3(-X, Y,  -Z),
-
-		vector3(0.0, Y,  -Z),
-
-		vector3(X, Y,  -Z),
-
-		vector3(-X, halfY,  -Z),
-
-		vector3(-X, halfY + (halfY / 2),  -Z),
-
-		vector3(-X, halfY - (halfY / 2),  -Z),
-
-		vector3(0.0, halfY,  -Z),
-
-		vector3(X, halfY + (halfY / 2),  -Z),
-
-		vector3(X, halfY - (halfY / 2),  -Z),
-
-		vector3(-X, 0.0,  -Z),
-
-		vector3(0.0, 0.0,  -Z),
-
-		vector3(X, 0.0,  -Z),
-
-		vector3(-X, -halfY,  -Z),
-
-		vector3(-X, -(halfY + (halfY / 2)),  -Z),
-
-		vector3(-X, -(halfY - (halfY / 2)),  -Z),
-
-		vector3(0.0, -halfY,  -Z),
-
-		vector3(0.0, -(halfY + (halfY / 2)),  -Z),
-
-		vector3(0.0, -(halfY - (halfY / 2)),  -Z),
-
-		vector3(X, -halfY,  -Z),
-
-		vector3(X, -(halfY + (halfY / 2)),  -Z),
-
-		vector3(X, -(halfY - (halfY / 2)),  -Z),
-
-		vector3(-X, -Y,  -Z),
-
-		vector3(0.0, -Y,  -Z),
-
-		vector3(X, -Y,  -Z),
-
-		vector3(-(X / 2), Y,  -Z),
-
-		vector3((X / 2), Y,  -Z),
-
-		vector3(-(X / 2), halfY,  -Z),
-
-		vector3(-(X / 2), halfY + (halfY / 2),  -Z),
-
-		vector3(-(X / 2), halfY - (halfY / 2),  -Z),
-		vector3((X / 2), halfY + (halfY / 2),  -Z),
-
-		vector3((X / 2), halfY - (halfY / 2),  -Z),
-
-		vector3(-(X / 2), 0.0,  -Z),
-
-		vector3(-(X / 2), -halfY,  -Z),
-
-		vector3(-(X / 2), -(halfY + (halfY / 2)),  -Z),
-
-		vector3(-(X / 2), -(halfY - (halfY / 2)),  -Z),
-
-		vector3((X / 2), -halfY,  -Z),
-
-		vector3((X / 2), -(halfY + (halfY / 2)),  -Z),
-
-		vector3((X / 2), -(halfY - (halfY / 2)),  -Z),
-
-
-		vector3(-(X / 2), -Y,  -Z),
-
-		vector3((X / 2), -Y,  -Z),
-	}
-        local deformationPoints = {}
-	for i, pos in ipairs(positions) do
-		local dmg = math.floor(#(GetVehicleDeformationAtPos(vehicle, pos)) * 1000.0) / 1000.0
-		if (dmg > DEFORMATION_DAMAGE_THRESHOLD) then
-			table.insert(deformationPoints, { pos, dmg })
-		end
-	end
-	return deformationPoints
-end
-
-IsDeformationWorse = function(newDef, oldDef)
-  if newDef == nil and oldDef == nil then return false end
-	if (oldDef == nil or #newDef > #oldDef) then
-		return true
-	elseif (#newDef < #oldDef) then
-		return false
-	end
-
-	for i, new in ipairs(newDef) do
-		local found = false
-		for j, old in ipairs(oldDef) do
-			if (new[1] == old[1]) then
-				found = true
-
-				if (new[2] > old[2]) then
-					return true
-				end
-			end
-		end
-
-		if (not found) then
-			return true
-		end
-	end
-
-	return false
-end
-
-GetVehicleOffsetsForDeformation = function(vehicle)
-	local min, max = GetModelDimensions(GetEntityModel(vehicle))
-	local X = Round((max.x - min.x) * 0.5, 2)
-	local Y = Round((max.y - min.y) * 0.5, 2)
-	local Z = Round((max.z - min.z) * 0.5, 2)
-	local halfY = Round(Y * 0.5, 2)
-
-	return {
-		vector3(-X, Y,  0.0),
-		vector3(-X, Y,  Z),
-
-		vector3(0.0, Y,  0.0),
-		vector3(0.0, Y,  Z),
-
-		vector3(X, Y,  0.0),
-		vector3(X, Y,  Z),
-
-
-		vector3(-X, halfY,  0.0),
-		vector3(-X, halfY,  Z),
-
-		vector3(0.0, halfY,  0.0),
-		vector3(0.0, halfY,  Z),
-
-		vector3(X, halfY,  0.0),
-		vector3(X, halfY,  Z),
-
-
-		vector3(-X, 0.0,  0.0),
-		vector3(-X, 0.0,  Z),
-
-		vector3(0.0, 0.0,  0.0),
-		vector3(0.0, 0.0,  Z),
-
-		vector3(X, 0.0,  0.0),
-		vector3(X, 0.0,  Z),
-
-
-		vector3(-X, -halfY,  0.0),
-		vector3(-X, -halfY,  Z),
-
-		vector3(0.0, -halfY,  0.0),
-		vector3(0.0, -halfY,  Z),
-
-		vector3(X, -halfY,  0.0),
-		vector3(X, -halfY,  Z),
-
-
-		vector3(-X, -Y,  0.0),
-		vector3(-X, -Y,  Z),
-
-		vector3(0.0, -Y,  0.0),
-		vector3(0.0, -Y,  Z),
-
-		vector3(X, -Y,  0.0),
-		vector3(X, -Y,  Z),
-	}
-end
-
-function Round(value, numDecimals)
-	return math.floor(value * 10^numDecimals) / 10^numDecimals
-end
-
-function toPercent(v)
-  return math.floor(v * 100) / 1000
 end
 
 ESX.Game.GetVehicleProperties = function(vehicle)
