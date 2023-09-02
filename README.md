@@ -27,6 +27,7 @@ Many more resources are included in this repository, or you can browse the [ESX 
 - Support for the latest weapons and components
 
 #### Features
+- Integrated vehicle deformation
 - Integrated support for identity data
 - Integrated commands from esx_adminplus
 - All players will be saved immediately before a txAdmin scheduled restart
@@ -63,7 +64,7 @@ Many more resources are included in this repository, or you can browse the [ESX 
 ### Requirements
 - All resources from the `core` folder
 - [spawnmanager](https://github.com/citizenfx/cfx-server-data)
-- [mysql-async](https://github.com/brouznouf/fivem-mysql-async/releases/tag/3.3.2)
+- [oxmysql]((https://github.com/overextended/oxmysql))
 
 
 ### Installation
@@ -76,6 +77,7 @@ Many more resources are included in this repository, or you can browse the [ESX 
 ### Conflicts
 * The following resources should not be used with ESX Legacy
 	- essentialmode
+        - mapmanager
 	- basic-gamemode
 	- fivem-map-skater
 	- fivem-map-hipster
@@ -83,7 +85,7 @@ Many more resources are included in this repository, or you can browse the [ESX 
 
 ### Information
 ESX was initially developed by Gizz back in 2017 for his friend as the were creating an FiveM server and there wasn't any economy roleplaying frameworks available. The original code was written within a week or two and later open sourced, it has ever since been improved and parts been rewritten to further improve on it.
-- [ESX Documentation](https://esx-framework.github.io/es_extended/)
+- [ESX Documentation]((https://documentation.esx-framework.org/))
 - [FiveM Native Reference](https://runtime.fivem.net/doc/reference.html)
 
 
@@ -93,7 +95,7 @@ ESX was initially developed by Gizz back in 2017 for his friend as the were crea
 
 es_extended - ESX framework for FiveM
 
-Copyright (C) 2015-2021 Jérémie N'gadi
+Copyright (C) 2015-2023 Jérémie N'gadi
 
 This program Is free software: you can redistribute it And/Or modify it under the terms Of the GNU General Public License As published by the Free Software Foundation, either version 3 Of the License, Or (at your option) any later version.
 
