@@ -29,26 +29,25 @@ Config.EnableDefaultInventory   = false -- Display the default Inventory ( F2 )
 Config.EnableWantedLevel    	= false -- Use Normal GTA wanted Level?
 Config.EnablePVP                = true -- Allow Player to player combat
 Config.NativeNotify             = true -- true = old esx notification
-Config.DisableHealthRegeneration       = true
 Config.DisableVehicleRewards    = true
 Config.LegacyFuel               = true -- true = Using LegacyFuel & you want Fuel to Save.
 Config.Multichar                = false -- Enable support for esx_multicharacter
 Config.Identity                 = false -- Select a characters identity data before they have loaded in (this happens by default with multichar)
-Config.DistanceGive 		= 4.0 -- Max distance when giving items, weapons etc.
+Config.DistanceGive 		    = 4.0 -- Max distance when giving items, weapons etc.
 Config.OnDuty                   = true -- Default state of the on duty system
-Config.NoclipSpeed = 4.0 -- change it to change the speed in noclip
+Config.NoclipSpeed              = 4.0 -- change it to change the speed in noclip
 Config.adminRanks = { -- change this as your server ranking ( default are : superadmin | admin | moderator )
-				'superadmin',
-				'admin',
-				'moderator',
-            }
+	'superadmin',
+	'admin',
+	'moderator',
+}
 Config.admin_groups = {"superadmin"} -- groups that can use admin commands
 
 Config.DisableHealthRegen         = true -- Player will no longer regenerate health
-Config.DisableVehicleRewards      = true -- Disables Player Recieving weapons from vehicles
+Config.DisableVehicleRewards      = false -- Disables Player Recieving weapons from vehicles
 Config.DisableNPCDrops            = true -- stops NPCs from dropping weapons on death
 Config.DisableWeaponWheel         = false -- Disables default weapon wheel
---Config.DisableAimAssist           = false -- disables AIM assist (mainly on controllers)
+Config.DisableAimAssist           = false -- disables AIM assist (mainly on controllers)
 Config.RemoveHudCommonents = {
 	[1] = true, --WANTED_STARS,
 	[2] = true, --WEAPON_ICON
@@ -84,4 +83,3 @@ Config.CustomAIPlates = 'ESX.A111' -- Custom plates for AI vehicles
 --^A will lead to a literal A being emitted.
 --Any other character will lead to said character being emitted.
 -- A string shorter than 8 characters will be padded on the right.
-
