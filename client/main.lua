@@ -62,7 +62,7 @@ AddEventHandler('esx:playerLoaded', function(xPlayer, isNew, skin)
 			elseif skin then
 				TriggerEvent('skinchanger:loadSkin', skin)
 			end
-		    Wait(3200)
+		        Wait(3200)
 			TriggerEvent('esx:loadingScreenOff')
 			ShutdownLoadingScreen()
 			ShutdownLoadingScreenNui()
@@ -80,8 +80,6 @@ AddEventHandler('esx:playerLoaded', function(xPlayer, isNew, skin)
 		NetworkSetFriendlyFireOption(true)
 	end
 
-	local playerId = PlayerId()
-
 	-- RemoveHudCommonents
 	for i = 1, #(Config.RemoveHudCommonents) do
 		if Config.RemoveHudCommonents[i] then
@@ -93,17 +91,18 @@ AddEventHandler('esx:playerLoaded', function(xPlayer, isNew, skin)
 	if Config.DisableNPCDrops then
 		local weaponPickups = { `PICKUP_WEAPON_CARBINERIFLE`, `PICKUP_WEAPON_PISTOL`, `PICKUP_WEAPON_PUMPSHOTGUN` }
 		for i = 1, #weaponPickups do
-			ToggleUsePickupsForPlayer(playerId, weaponPickups[i], false)
+			ToggleUsePickupsForPlayer(PlayerId(), weaponPickups[i], false)
 		end
 	end
 
+	if Config.DisableHealthRegen then
+		SetPlayerHealthRechargeMultiplier(PlayerId(), 0.0)
+	end
 
-	if Config.DisableHealthRegeneration or Config.DisableWeaponWheel or Config.DisableAimAssist or Config.DisableVehicleRewards then
+	if Config.DisableWeaponWheel or Config.DisableAimAssist or Config.DisableVehicleRewards then
 		CreateThread(function()
 			while true do
-				if Config.DisableHealthRegeneration then
-					SetPlayerHealthRechargeMultiplier(playerId, 0.0)
-				end
+				local playerId = PlayerId()
 
 				if Config.DisableWeaponWheel then
 					BlockWeaponWheelThisFrame()
@@ -120,7 +119,7 @@ AddEventHandler('esx:playerLoaded', function(xPlayer, isNew, skin)
 					DisablePlayerVehicleRewards(playerId)
 				end
 
-				Wait(3)
+				Wait(1)
 			end
 		end)
 	end
