@@ -1,39 +1,44 @@
-local MAX_DEFORM_ITERATIONS = 50
+local MAX_DEFORM_ITERATIONS = 82
 local DEFORMATION_DAMAGE_THRESHOLD = 0.05
 
 exports("GetVehicleDeformation", GetVehicleDeformation)
 exports("SetVehicleDeformation", SetVehicleDeformation)
 
+---@param vehicle number|string
+---@param deformationPoints table
+---@param callback function?
 SetVehicleDeformation = function(vehicle, deformationPoints, callback)
     assert(vehicle ~= nil and DoesEntityExist(vehicle), "Parameter \"vehicle\" must be a valid vehicle entity!")
     assert(deformationPoints ~= nil and type(deformationPoints) == "table", "Parameter \"deformationPoints\" must be a table!")
     CreateThread(function()
-		local min, max = GetModelDimensions(GetEntityModel(vehicle))
-        local damageMult = #(max - min) * 3.5		-- might need some more experimentation
+	local min, max = GetModelDimensions(GetEntityModel(vehicle))
+        local damageMult = #(max - min) * 3.5	-- might need some more experimentation
 
         local printMsg = false
 		for i, def in ipairs(deformationPoints) do
-			def[1] = vector3(Round(def[1].x,2), Round(def[1].y,2), Round(def[1].z,2))
+			def[1] = vector3(Round(def[1].x, 2), Round(def[1].y, 2), Round(def[1].z, 2))
 		end
 		local deform = true
 		local iteration = 0
-		while (deform and iteration < MAX_DEFORM_ITERATIONS) do
+		while deform and iteration < MAX_DEFORM_ITERATIONS do
 			deform = false
 			for i, def in ipairs(deformationPoints) do
-				if (#(GetVehicleDeformationAtPos(vehicle, def[1])) < Round(def[2]*0.99,2)) then
-					SetVehicleDamage(vehicle, def[1] * 2.0, Round(def[2] * damageMult,2), 1000.0, true)
+				if #GetVehicleDeformationAtPos(vehicle, def[1].x, def[1].y, def[1].z) < Round(def[2]*0.99,2) then
+					SetVehicleDamage(vehicle, def[1].x * 2.0, def[1].y * 2.0, def[1].z * 2.0, Round(def[2] * damageMult, 2), 1000.0, true)
 					deform = true
 				end
 			end
-			iteration = iteration + 1
-			Citizen.Wait(100)
+			iteration += 1
+			Wait(100)
 		end
         if (callback) then
-		    callback()
+	    callback()
         end
-	end)
+    end)
 end
 
+---@param vehicle number|string
+---@return table 
 GetVehicleDeformation = function(vehicle)
     assert(vehicle ~= nil and DoesEntityExist(vehicle), "Parameter \"vehicle\" must be a valid vehicle entity!")
 	local min, max = GetModelDimensions(GetEntityModel(vehicle))
@@ -51,32 +56,27 @@ GetVehicleDeformation = function(vehicle)
 		vector3(X, Y,  0.0),
 		vector3(X, Y,  Z),
 
-
 		vector3(-X, halfY,  0.0),
 		vector3(-X, halfY,  Z),
-
                 --új
-	        vector3(-X, halfY + (halfY / 2),  0.0),
+	    vector3(-X, halfY + (halfY / 2),  0.0),
 		vector3(-X, halfY + (halfY / 2),  Z),
 
 		vector3(-X, halfY - (halfY / 2),  0.0),
 		vector3(-X, halfY - (halfY / 2),  Z),
                 --
-
 		vector3(0.0, halfY,  0.0),
 		vector3(0.0, halfY,  Z),
 
 		vector3(X, halfY,  0.0),
 		vector3(X, halfY,  Z),
-       
                 --új
-	        vector3(X, halfY + (halfY / 2),  0.0),
+	    vector3(X, halfY + (halfY / 2),  0.0),
 		vector3(X, halfY + (halfY / 2),  Z),
 
 		vector3(X, halfY - (halfY / 2),  0.0),
 		vector3(X, halfY - (halfY / 2),  Z),
                 --
-
 		vector3(-X, 0.0,  0.0),
 		vector3(-X, 0.0,  Z),
 
@@ -86,11 +86,10 @@ GetVehicleDeformation = function(vehicle)
 		vector3(X, 0.0,  0.0),
 		vector3(X, 0.0,  Z),
 
-
 		vector3(-X, -halfY,  0.0),
 		vector3(-X, -halfY,  Z),
 
-	        vector3(-X, -(halfY + (halfY / 2)),  0.0),
+	    vector3(-X, -(halfY + (halfY / 2)),  0.0),
 		vector3(-X, -(halfY + (halfY / 2)),  Z),
 
 		vector3(-X, -(halfY - (halfY / 2)),  0.0),
@@ -114,7 +113,6 @@ GetVehicleDeformation = function(vehicle)
 		vector3(X, -(halfY - (halfY / 2)),  0.0),
 		vector3(X, -(halfY - (halfY / 2)),  Z),
 
-
 		vector3(-X, -Y,  0.0),
 		vector3(-X, -Y,  Z),
 
@@ -123,7 +121,6 @@ GetVehicleDeformation = function(vehicle)
 
 		vector3(X, -Y,  0.0),
 		vector3(X, -Y,  Z),
-
 
 		vector3(-(X / 2), Y,  0.0),
 		vector3(-(X / 2), Y,  Z),
@@ -253,8 +250,8 @@ GetVehicleDeformation = function(vehicle)
 	}
         local deformationPoints = {}
 	for i, pos in ipairs(positions) do
-		local dmg = math.floor(#(GetVehicleDeformationAtPos(vehicle, pos)) * 1000.0) / 1000.0
-		if (dmg > DEFORMATION_DAMAGE_THRESHOLD) then
+		local dmg = math.floor(#(GetVehicleDeformationAtPos(vehicle, pos.x, pos.y, pos.z)) * 1000.0) / 1000.0
+		if dmg > DEFORMATION_DAMAGE_THRESHOLD then
 			table.insert(deformationPoints, { pos, dmg })
 		end
 	end
@@ -289,6 +286,7 @@ IsDeformationWorse = function(newDef, oldDef)
 	return false
 end
 
+---@param vehicle number|string
 GetVehicleOffsetsForDeformation = function(vehicle)
 	local min, max = GetModelDimensions(GetEntityModel(vehicle))
 	local X = Round((max.x - min.x) * 0.5, 2)
