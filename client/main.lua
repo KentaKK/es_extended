@@ -87,6 +87,19 @@ AddEventHandler('esx:playerLoaded', function(xPlayer, isNew, skin)
 		end
 	end
 
+        Wait(5000)
+        local metadata = ESX.PlayerData.metadata
+        if metadata.health then
+            SetEntityHealth(ESX.PlayerData.ped, tonumber(metadata.health))
+            print("Health:", metadata.health)
+        end
+
+        if metadata.armor and metadata.armor > 0 then
+            SetPedArmour(ESX.PlayerData.ped, tonumber(metadata.armor))
+            print("Armor:", metadata.armor)
+        end
+
+
 	-- DisableNPCDrops
 	if Config.DisableNPCDrops then
 		local weaponPickups = { `PICKUP_WEAPON_CARBINERIFLE`, `PICKUP_WEAPON_PISTOL`, `PICKUP_WEAPON_PUMPSHOTGUN` }
