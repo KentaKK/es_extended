@@ -7,7 +7,7 @@ local STEAM_KEY = ""
 local DISCORD_IMAGE = "https://i.imgur.com/D0EYeVO.png" -- default is safe logo
 
 local newPlayer = 'INSERT INTO `users` SET `accounts` = ?, `identifier` = ?, `group` = ?'
-local loadPlayer = 'SELECT `accounts`, `job`, `job_grade`, `group`, `position`, `inventory`, `skin`, `loadout`'
+local loadPlayer = 'SELECT `accounts`, `job`, `job_grade`, `group`, `position`, `inventory`, `skin`, `loadout`, `metadata`'
 
 if Config.Multichar then
     newPlayer = newPlayer .. ', `firstname` = ?, `lastname` = ?, `dateofbirth` = ?, `sex` = ?, `height` = ?'
@@ -96,11 +96,7 @@ function createESXPlayer(identifier, playerId, data)
   end
   myPhoneNumber = getPhoneRandomNumber()
   Wait(300)
-        MySQL.insert("UPDATE users SET phone_number = @myPhoneNumber WHERE identifier = @identifier", { 
-            ['@myPhoneNumber'] = myPhoneNumber,
-            ['@identifier'] = identifier
-        }, function()
-        end)
+  MySQL.prepare('UPDATE `users` SET `phone_number` = ? WHERE `identifier` = ?', { myPhoneNumber, identifier})
 end
 
 function getPhoneRandomNumber()
@@ -129,7 +125,15 @@ if not Config.Multichar then
 end
 
 function loadESXPlayer(identifier, playerId, isNew)
-  local userData = {accounts = {}, inventory = {}, job = {}, loadout = {}, playerName = GetPlayerName(playerId), weight = 0}
+	local userData = {
+		accounts = {},
+		inventory = {},
+		job = {},
+		loadout = {},
+		playerName = GetPlayerName(playerId),
+		weight = 0,
+		metadata = {}
+	}
 
   local result = MySQL.prepare.await(loadPlayer, {identifier})
   local job, grade, jobObject, gradeObject = result.job, tostring(result.job_grade)
@@ -289,8 +293,13 @@ function loadESXPlayer(identifier, playerId, isNew)
     end
   end
 
+  if result.metadata and result.metadata ~= '' then
+	local metadata = json.decode(result.metadata)
+	userData.metadata = metadata
+  end
+
   local xPlayer = CreateExtendedPlayer(playerId, identifier, userData.group, userData.accounts, userData.inventory, userData.weight, userData.job,
-    userData.loadout, userData.playerName, userData.coords)
+    userData.loadout, userData.playerName, userData.coords, userData.metadata)
   ESX.Players[playerId] = xPlayer
   Core.playersByIdentifier[identifier] = xPlayer
 
@@ -307,7 +316,13 @@ function loadESXPlayer(identifier, playerId, isNew)
       xPlayer.set('height', userData.height)
     end
   end
-
+  --saved player health and armor in metadata
+  local ped = GetPlayerPed(xPlayer.source)
+  if ped then
+      xPlayer.setMeta('health', xPlayer.getMeta('health') or GetEntityHealth(ped))
+      xPlayer.setMeta('armor', xPlayer.getMeta('armor') or GetPedArmour(ped))
+      
+  end
   TriggerEvent('esx:playerLoaded', playerId, xPlayer, isNew)
 
   xPlayer.triggerEvent('esx:playerLoaded',
@@ -325,7 +340,8 @@ function loadESXPlayer(identifier, playerId, isNew)
       lastName = xPlayer.get("lastName") or "Doe",
       dateofbirth = xPlayer.get("dateofbirth") or "01/01/2000",
       height = xPlayer.get("height") or 120,
-      dead = false
+      dead = false,
+      metadata = xPlayer.getMeta()
     }, isNew,
     userData.skin)
 
@@ -397,16 +413,6 @@ AddEventHandler('esx:playerLogout', function(playerId, cb)
   end
   TriggerClientEvent("esx:onPlayerLogout", playerId)
 end)
-
---[[RegisterNetEvent('esx:updateCoords')
-AddEventHandler('esx:updateCoords', function()
-  local source = source
-  local xPlayer = ESX.GetPlayerFromId(source)
-
-  if xPlayer then
-    xPlayer.updateCoords()
-  end
-end)]]
 
 if not Config.OxInventory then
   RegisterNetEvent('esx:updateWeaponAmmo')
@@ -579,10 +585,18 @@ if not Config.OxInventory then
 end
 
 ESX.RegisterServerCallback('esx:getPlayerData', function(source, cb)
-  local xPlayer = ESX.GetPlayerFromId(source)
+	local xPlayer = ESX.GetPlayerFromId(source)
 
-  cb({identifier = xPlayer.identifier, accounts = xPlayer.getAccounts(), inventory = xPlayer.getInventory(), job = xPlayer.getJob(),
-      loadout = xPlayer.getLoadout(), money = xPlayer.getMoney(), position = xPlayer.getCoords(true)})
+	cb({
+		identifier = xPlayer.identifier,
+		accounts = xPlayer.getAccounts(),
+		inventory = xPlayer.getInventory(),
+		job = xPlayer.getJob(),
+		loadout = xPlayer.getLoadout(),
+		money = xPlayer.getMoney(),
+		position = xPlayer.getCoords(true),
+		metadata = xPlayer.getMeta()
+	})
 end)
 
 ESX.RegisterServerCallback('esx:isUserAdmin', function(source, cb)
@@ -593,11 +607,19 @@ ESX.RegisterServerCallback('esx:getGameBuild', function(source, cb)
   cb(tonumber(GetConvar("sv_enforceGameBuild", 1604)))
 end)
 
-ESX.RegisterServerCallback('esx:getOtherPlayerData', function(source, cb, target)
-  local xPlayer = ESX.GetPlayerFromId(target)
+ESX.RegisterServerCallback('esx:getOtherPlayerData', function(_, cb, target)
+	local xPlayer = ESX.GetPlayerFromId(target)
 
-  cb({identifier = xPlayer.identifier, accounts = xPlayer.getAccounts(), inventory = xPlayer.getInventory(), job = xPlayer.getJob(),
-      loadout = xPlayer.getLoadout(), money = xPlayer.getMoney(), position = xPlayer.getCoords(true)})
+	cb({
+		identifier = xPlayer.identifier,
+		accounts = xPlayer.getAccounts(),
+		inventory = xPlayer.getInventory(),
+		job = xPlayer.getJob(),
+		loadout = xPlayer.getLoadout(),
+		money = xPlayer.getMoney(),
+		position = xPlayer.getCoords(true),
+		metadata = xPlayer.getMeta()
+	})
 end)
 
 ESX.RegisterServerCallback('esx:getPlayerNames', function(source, cb, players)
