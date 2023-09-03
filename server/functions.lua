@@ -171,7 +171,14 @@ function ESX.RegisterCommand(name, group, cb, allowConsole, suggestion)
 	end
 end
 
+local function updateHealthAndArmorInMetadata(xPlayer)
+    local ped = GetPlayerPed(xPlayer.source)
+    xPlayer.setMeta('health', GetEntityHealth(ped))
+    xPlayer.setMeta('armor',GetPedArmour(ped))
+end
+
 function Core.SavePlayer(xPlayer, cb)
+  updateHealthAndArmorInMetadata(xPlayer)
   local parameters <const> = {
     json.encode(xPlayer.getAccounts(true)),
     xPlayer.job.name,
@@ -180,11 +187,12 @@ function Core.SavePlayer(xPlayer, cb)
     json.encode(xPlayer.getCoords()),
     json.encode(xPlayer.getInventory(true)), 
     json.encode(xPlayer.getLoadout(true)),
+    json.encode(xPlayer.getMeta()),
     xPlayer.identifier
   }
 
   MySQL.prepare(
-    'UPDATE `users` SET `accounts` = ?, `job` = ?, `job_grade` = ?, `group` = ?, `position` = ?, `inventory` = ?, `loadout` = ? WHERE `identifier` = ?',
+    'UPDATE `users` SET `accounts` = ?, `job` = ?, `job_grade` = ?, `group` = ?, `position` = ?, `inventory` = ?, `loadout` = ?, `metadata` = ? WHERE `identifier` = ?',
     parameters,
     function(affectedRows)
       if affectedRows == 1 then
@@ -208,6 +216,7 @@ function Core.SavePlayers(cb)
   local parameters = {}
 
   for _, xPlayer in pairs(ESX.Players) do
+    updateHealthAndArmorInMetadata(xPlayer)
     parameters[#parameters + 1] = {
       json.encode(xPlayer.getAccounts(true)),
       xPlayer.job.name,
@@ -216,12 +225,13 @@ function Core.SavePlayers(cb)
       json.encode(xPlayer.getCoords()),
       json.encode(xPlayer.getInventory(true)),
       json.encode(xPlayer.getLoadout(true)),
+      json.encode(xPlayer.getMeta()),
       xPlayer.identifier
     }
   end
 
   MySQL.prepare(
-    "UPDATE `users` SET `accounts` = ?, `job` = ?, `job_grade` = ?, `group` = ?, `position` = ?, `inventory` = ?, `loadout` = ? WHERE `identifier` = ?",
+    "UPDATE `users` SET `accounts` = ?, `job` = ?, `job_grade` = ?, `group` = ?, `position` = ?, `inventory` = ?, `loadout` = ?, `metadata` = ? WHERE `identifier` = ?",
     parameters, 
     function(results)
       if not results then
