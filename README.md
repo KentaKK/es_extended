@@ -1,19 +1,5 @@
 <h1 align='center'>ESX Legacy</a></h1><p align='center'><b>Re-optimized Script</b></h5>
 
-
-##### ESX is the most popular framework for creating economy-based roleplay servers on FiveM, with many official and community resources designed to utilise the tools provided here. For a taste of what's available:
->	esx_identity: Enables character registration defining a players name, sex, height, and date of birth
-
->	esx_society: Allows job resources to register a society, gaining employee management, society funds, and more
-
->	esx_billing: Allows members of some societies to send fines or bills to other players
-
->	esx_vehicleshop: Allow players to purchase vehicles from a dealership, or setup society support for a player-managed dealership
-
->	esx_ambulancejob: Adds a death and respawn system while allowing players to work as EMS to heal and revive others
-
-Many more resources are included in this repository, or you can browse the [ESX Community Github](https://github.com/esx-community/) or [Cfx.re Releases board](https://forum.cfx.re/tag/esx) for more.
-
 ### Information
 ##### Legacy provides some necessary bug-fixes and improvements to optimise the framework before reaching the end of official support by the development team.
 ##### Most resources designed for 1.2 will have no issues with Legacy, notable exceptions are those which modify spawning/loading behaviour.   There are several minor feature updates which do not impact compatibility with old resources.  
@@ -21,7 +7,7 @@ Many more resources are included in this repository, or you can browse the [ESX 
 
 #### Optimisation
 - Utilise compile-time jenkins hashing over the GetHashKey native
-- Update old MySQL queries to use MySQL.store to improve performance, especially during player saving
+- Update old MySQL queries to use Oxmysql to improve performance, especially during player saving
 - Several loops will now sleep when their tasks are not necessary to perform
 - Improved support when using ESX Identity to reduce events and queries during player login
 - Support for the latest weapons and components
