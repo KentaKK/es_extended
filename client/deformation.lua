@@ -8,8 +8,8 @@ exports("SetVehicleDeformation", SetVehicleDeformation)
 ---@param deformationPoints table
 ---@param callback function?
 SetVehicleDeformation = function(vehicle, deformationPoints, callback)
-    assert(vehicle ~= nil and DoesEntityExist(vehicle), "Parameter \"vehicle\" must be a valid vehicle entity!")
-    assert(deformationPoints ~= nil and type(deformationPoints) == "table", "Parameter \"deformationPoints\" must be a table!")
+    --assert(vehicle ~= nil and DoesEntityExist(vehicle), "Parameter \"vehicle\" must be a valid vehicle entity!")
+    --assert(deformationPoints ~= nil and type(deformationPoints) == "table", "Parameter \"deformationPoints\" must be a table!")
     CreateThread(function()
 	local min, max = GetModelDimensions(GetEntityModel(vehicle))
         local damageMult = #(max - min) * 3.5	-- might need some more experimentation
@@ -32,13 +32,13 @@ SetVehicleDeformation = function(vehicle, deformationPoints, callback)
 			Wait(100)
 		end
         if (callback) then
-	    callback()
+	        callback()
         end
     end)
 end
 
 ---@param vehicle number|string
----@return table 
+---@return table
 GetVehicleDeformation = function(vehicle)
     assert(vehicle ~= nil and DoesEntityExist(vehicle), "Parameter \"vehicle\" must be a valid vehicle entity!")
 	local min, max = GetModelDimensions(GetEntityModel(vehicle))
