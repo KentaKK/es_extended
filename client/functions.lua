@@ -24,6 +24,7 @@ AddStateBagChangeHandler('deformation' --[[key filter]], nil --[[bag filter]], f
 	SetVehicleDeformation(entity, value)
 end)
 
+---@return boolean
 exports('phonecheck', function()
     local count = exports.ox_inventory:Search('count', 'phone')
     if count >= 1 then
@@ -51,7 +52,7 @@ local entityEnumerator = {
         disposeFunc(iter)
         return
       end
-      
+    
       local enum = {handle = iter, destructor = disposeFunc}
       setmetatable(enum, entityEnumerator)
       
@@ -65,7 +66,7 @@ local entityEnumerator = {
       disposeFunc(iter)
     end)
   end
-  
+
 function EnumerateObjects()
   return EnumerateEntities(FindFirstObject, FindNextObject, EndFindObject)
 end
@@ -82,11 +83,12 @@ function EnumeratePickups()
   return EnumerateEntities(FindFirstPickup, FindNextPickup, EndFindPickup)
 end
 
-
+---@return boolean
 function ESX.IsPlayerLoaded()
 	return ESX.PlayerLoaded
 end
 
+---@return any
 function ESX.GetPlayerData()
 	return ESX.PlayerData
 end
@@ -119,6 +121,8 @@ function ESX.SearchInventory(items, count)
     end
 end
 
+---@param key any
+---@param val any
 function ESX.SetPlayerData(key, val)
     local current = ESX.PlayerData[key]
     ESX.PlayerData[key] = val
@@ -129,14 +133,19 @@ function ESX.SetPlayerData(key, val)
     end
 end
 
-function ESX.Progressbar(message,length, Options)
-    exports["esx_progressbar"]:Progressbar(message,length, Options)
+---@param message string
+---@param length any
+---@param Options any
+function ESX.Progressbar(message, length, Options)
+    exports["esx_progressbar"]:Progressbar(message, length, Options)
 end
 
-
+---@param message string
+---@param type any
+---@param length any
 function ESX.ShowNotification(message, type, length)
     if Config.NativeNotify then 
-     BeginTextCommandThefeedPost('STRING')
+    BeginTextCommandThefeedPost('STRING')
     AddTextComponentSubstringPlayerName(message)
     EndTextCommandThefeedPostTicker(0,1)
     else 
@@ -478,7 +487,7 @@ ESX.Game.SpawnVehicle = function(vehicle, coords, heading, cb)
             local xxxx = 0
 			while not HasCollisionLoadedAroundEntity(vehicle) do
                 print("Request Collision: " ..xxxx)
-			    RequestCollisionAtCoord(vector.xyz)
+			    RequestCollisionAtCoord(coords.x, coords.y, coords.z)
                 if xxxx > 40 then
                     break
                 end
@@ -534,8 +543,8 @@ ESX.Game.SpawnLocalVehicle = function(modelName, coords, heading, cb)
 
 		if cb ~= nil then
 			cb(vehicle)
-                        local elapsedTime = (GetGameTimer() - GU.Time)
-                        print(('[^2INFO^7] Spawn time %s ms'):format(elapsedTime))
+                local elapsedTime = (GetGameTimer() - GU.Time)
+                print(('[^2INFO^7] Spawn time %s ms'):format(elapsedTime))
 		end
     end)
 end
@@ -559,18 +568,13 @@ ESX.Game.SpawnPed = function(modelName, coords, heading, cb)
                         local x = 0
 			while not HasCollisionLoadedAroundEntity(ped) do
 			   RequestCollisionAtCoord(coords.x, coords.y, coords.z)
-                           if x > 40 then
-                              break
-                           end
-                        x += 1
+                    if x > 40 then
+                        break
+                    end
+                    x += 1
 			Wait(50)
 			end
 		end
-
-		repeat
-		NetworkRequestControlOfEntity(ped)
-		Wait(0)
-		until NetworkHasControlOfEntity(ped)
 
 		if cb ~= nil then
 			cb(ped)
@@ -709,6 +713,8 @@ function ESX.Game.GetClosestEntity(entities, isPlayerEntities, coords, modelFilt
 	return closestEntity, closestEntityDistance
 end
 
+---@return number
+---@return vector3
 function ESX.Game.GetVehicleInDirection()
     local playerPed = ESX.PlayerData.ped
     local playerCoords = GetEntityCoords(playerPed)
@@ -724,6 +730,8 @@ function ESX.Game.GetVehicleInDirection()
     return nil
 end
 
+---@param vehicle number|string
+---@return table
 ESX.Game.GetVehicleProperties = function(vehicle)
     if not DoesEntityExist(vehicle) then
         return
@@ -893,6 +901,8 @@ ESX.Game.GetVehicleProperties = function(vehicle)
     }
 end
 
+---@param vehicle number|string
+---@param props any
 ESX.Game.SetVehicleProperties = function(vehicle, props)
     if not DoesEntityExist(vehicle) then
         return
@@ -1199,7 +1209,7 @@ ESX.Game.SetVehicleProperties = function(vehicle, props)
 end
 
 function ESX.Game.Utils.DrawText3D(coords, text, size, font)
-    local vector = type(coords) == "vector3" and coords or vec(coords.x, coords.y, coords.z)
+    --local vector = type(coords) == "vector3" and coords or vec(coords.x, coords.y, coords.z)
 
     local camCoords = GetFinalRenderedCamCoord()
     local distance = #(vector - camCoords)
@@ -1222,7 +1232,7 @@ function ESX.Game.Utils.DrawText3D(coords, text, size, font)
     BeginTextCommandDisplayText('STRING')
     SetTextCentre(true)
     AddTextComponentSubstringPlayerName(text)
-    SetDrawOrigin(vector.xyz, 0)
+    SetDrawOrigin(coords.x, coords.y, coords.z, 0)
     EndTextCommandDisplayText(0.0, 0.0)
     ClearDrawOrigin()
 end
