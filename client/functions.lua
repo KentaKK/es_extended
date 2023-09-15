@@ -798,13 +798,11 @@ ESX.Game.GetVehicleProperties = function(vehicle)
             doorsBroken[tostring(doorsId)] = IsVehicleDoorDamaged(vehicle, doorsId)
         end
     end
-
+    local ent = Entity(vehicle).state
     return {
         model = GetEntityModel(vehicle),
         deformat = json.encode(GetVehicleDeformation(vehicle)),
-	stancer = {
-			
-	},
+	stancer = json.encode(ent.stancer),
         wheelData = {
 		frontCamber = exports['vstancer']:GetFrontCamber(vehicle)[1],
 		rearCamber = exports['vstancer']:GetRearCamber(vehicle)[1],
