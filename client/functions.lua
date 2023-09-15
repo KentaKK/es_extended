@@ -802,6 +802,9 @@ ESX.Game.GetVehicleProperties = function(vehicle)
     return {
         model = GetEntityModel(vehicle),
         deformat = json.encode(GetVehicleDeformation(vehicle)),
+	stancer = {
+			
+	},
         wheelData = {
 		frontCamber = exports['vstancer']:GetFrontCamber(vehicle)[1],
 		rearCamber = exports['vstancer']:GetRearCamber(vehicle)[1],
@@ -1193,19 +1196,14 @@ ESX.Game.SetVehicleProperties = function(vehicle, props)
         end
         if props.wheelData then 
             exports['vstancer']:SetFrontCamber(vehicle, props.wheelData["frontCamber"])
-			exports['vstancer']:SetRearCamber(vehicle, props.wheelData["rearCamber"])
-			exports['vstancer']:SetFrontTrackWidth(vehicle, props.wheelData["frontWidth"])
-			exports['vstancer']:SetRearTrackWidth(vehicle, props.wheelData["rearWidth"])
+	    exports['vstancer']:SetRearCamber(vehicle, props.wheelData["rearCamber"])
+	    exports['vstancer']:SetFrontTrackWidth(vehicle, props.wheelData["frontWidth"])
+	    exports['vstancer']:SetRearTrackWidth(vehicle, props.wheelData["rearWidth"])
         end
-
-        --if props.tyreH then
-            --for k, v in pairs(props.tyreH) do
-                --if v then
-                    --BreakOffVehicleWheel(vehicle, tonumber(k), true, true, true, false)
-                    --print(tonumber(k))
-                --end
-            --end
-        --end
+	if props.stancer then
+	    local stancer = json.decode(props.stancer)
+	    Entity(vehicle).state:set('stancer', stancer, true)
+	end
 end
 
 function ESX.Game.Utils.DrawText3D(coords, text, size, font)
