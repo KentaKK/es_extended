@@ -34,6 +34,7 @@ server_scripts {
 }
 
 client_scripts {
+	'client/stancer.lua',
 	'client/deformation.lua',
 	'client/common.lua',
 	'client/functions.lua',
