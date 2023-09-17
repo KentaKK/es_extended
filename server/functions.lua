@@ -131,7 +131,7 @@ function ESX.RegisterCommand(name, group, cb, allowConsole, suggestion)
 						end
 
 						--backwards compatibility
-						if v.validate ~= nil and not v.validate then
+						if not v.validate and not v.type then
 							error = nil
 						end
 
