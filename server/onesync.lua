@@ -65,7 +65,7 @@ ESX.OneSync.SpawnVehicle = function(model, coords, heading, properties, cb)
 	local vehicleProperties = properties
 
 	CreateThread(function()
-                timeStart = os.clock()
+	        local start = os.nanotime()
 		local xPlayer = ESX.OneSync.GetClosestPlayer(coords, 300)
                 local tempVehicle = CreateVehicle(model, 0, 0, 0, 0, true, true)
                 while not DoesEntityExist(tempVehicle) do
@@ -80,9 +80,7 @@ ESX.OneSync.SpawnVehicle = function(model, coords, heading, properties, cb)
 		local networkId = NetworkGetNetworkIdFromEntity(veh)
 		Entity(veh).state:set('VehicleProperties', vehicleProperties, true)
 		cb(networkId)
-                local elapsedTime = os.clock() - timeStart
-                print(('[es_extended] [^2INFO^5] Spawned vehicle %s ms'):format(elapsedTime))
-		--print(('[^1ERROR^7] Tried to spawn invalid vehicle - ^5%s^7!'):format(model))
+		print(('Spawned vehicle (%.4f ms)'):format((os.nanotime() - start) / 1e6))
 	end)
 end
 
