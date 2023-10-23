@@ -44,7 +44,7 @@ local entityEnumerator = {
       enum.handle = nil
     end
   }
-  
+
   local function EnumerateEntities(initFunc, moveFunc, disposeFunc)
     return coroutine.wrap(function()
       local iter, id = initFunc()
@@ -88,7 +88,7 @@ function ESX.IsPlayerLoaded()
 	return ESX.PlayerLoaded
 end
 
----@return any
+---@return table
 function ESX.GetPlayerData()
 	return ESX.PlayerData
 end
@@ -171,6 +171,10 @@ function ESX.ShowAdvancedNotification(sender, subject, msg, textureDict, iconTyp
 	EndTextCommandThefeedPostTicker(flash or false, saveToBrief)
 end
 
+---@param msg string
+---@param thisFrame boolean?
+---@param beep boolean?
+---@param duration number
 function ESX.ShowHelpNotification(msg, thisFrame, beep, duration)
 	AddTextEntry('esxHelpNotification', msg)
 
@@ -413,32 +417,17 @@ end
 
 ESX.Game.SpawnObject = function(object, coords, cb, networked)
     networked = networked == nil and true or networked
-    if networked then 
-        ESX.TriggerServerCallback('esx:Onesync:SpawnObject', function(NetworkID)
-            if cb then
-                local obj = NetworkGetEntityFromNetworkId(NetworkID)
-                local es = 0
-                while not DoesEntityExist(obj) do
-                    obj = NetworkGetEntityFromNetworkId(NetworkID)
-                    Wait(0)
-                    es += 1
-                    if es > 250 then
-                        break
-                    end
-                end
-                cb(obj)
-            end
-        end, object, coords, 0.0)
-    else 
-        local model = type(object) == 'number' and object or joaat(object)
-        CreateThread(function()
-            ESX.Streaming.RequestModel(model)
-            local obj = CreateObject(model, coords.x, coords.y, coords.z, networked, false, true)
-            if cb then
-                cb(obj)
-            end
-        end)
-    end
+    
+    local model = type(object) == 'number' and object or joaat(object)
+    --local vector = type(coords) == "vector3" and coords or vec(coords.x, coords.y, coords.z)
+    CreateThread(function()
+        ESX.Streaming.RequestModel(model)
+
+        local obj = CreateObject(model, coords.x, coords.y, coords.z, networked, false, true)
+        if cb then
+            cb(obj)
+        end
+    end)
 end
 
 function ESX.Game.SpawnLocalObject(object, coords, cb)
@@ -456,8 +445,9 @@ function ESX.Game.DeleteObject(object)
 end
 
 ---@param vehicle number|string
----@param coords any?
----@param cb function?
+---@param coords vector3|vector4|table
+---@param heading number
+---@param cb function
 ESX.Game.SpawnVehicle = function(vehicle, coords, heading, cb)
     local model = type(vehicle) == 'number' and vehicle or joaat(vehicle)
     --local vector = type(coords) == "vector3" and coords or vec(coords.x, coords.y, coords.z)
@@ -495,15 +485,6 @@ ESX.Game.SpawnVehicle = function(vehicle, coords, heading, cb)
 			    Wait(50)
 			end
 		end
-
-        --[[local x2 = 0
-
-		repeat
-	        NetworkRequestControlOfEntity(vehicle)
-		      Wait(50)
-                      x2 += 1
-                      print("Request Control Of Entity: " ..x2)
-		until NetworkHasControlOfEntity(vehicle) or x2 == 40]]
                 
 		if cb ~= nil then
 			cb(vehicle)
@@ -513,6 +494,10 @@ ESX.Game.SpawnVehicle = function(vehicle, coords, heading, cb)
     end)
 end
 
+---@param modelName number|string
+---@param coords vector3|vector4|table
+---@param heading number
+---@param cb function
 ESX.Game.SpawnLocalVehicle = function(modelName, coords, heading, cb)
     local model = (type(modelName) == 'number' and modelName or joaat(modelName))
     CreateThread(function()
@@ -730,6 +715,7 @@ function ESX.Game.GetVehicleInDirection()
     return nil
 end
 
+
 ---@param vehicle number|string
 ---@return table
 ESX.Game.GetVehicleProperties = function(vehicle)
@@ -802,7 +788,7 @@ ESX.Game.GetVehicleProperties = function(vehicle)
     return {
         model = GetEntityModel(vehicle),
         deformat = json.encode(GetVehicleDeformation(vehicle)),
-	stancer = json.encode(ent.stancer),
+	--stancer = json.encode(ent.stancer),
         wheelData = {
 		frontCamber = exports['vstancer']:GetFrontCamber(vehicle)[1],
 		rearCamber = exports['vstancer']:GetRearCamber(vehicle)[1],
@@ -903,7 +889,7 @@ ESX.Game.GetVehicleProperties = function(vehicle)
 end
 
 ---@param vehicle number|string
----@param props any
+---@param props table
 ESX.Game.SetVehicleProperties = function(vehicle, props)
     if not DoesEntityExist(vehicle) then
         return
@@ -1198,17 +1184,17 @@ ESX.Game.SetVehicleProperties = function(vehicle, props)
 	    exports['vstancer']:SetFrontTrackWidth(vehicle, props.wheelData["frontWidth"])
 	    exports['vstancer']:SetRearTrackWidth(vehicle, props.wheelData["rearWidth"])
         end
-	if props.stancer then
+	--[[if props.stancer then
 	    local stancer = json.decode(props.stancer)
 	    Entity(vehicle).state:set('stancer', stancer, true)
-	end
+	end]]
 end
 
 function ESX.Game.Utils.DrawText3D(coords, text, size, font)
-    --local vector = type(coords) == "vector3" and coords or vec(coords.x, coords.y, coords.z)
+    --local vector = type(coords) == "vector3" and coords or vector3(coords.x, coords.y, coords.z)
 
     local camCoords = GetFinalRenderedCamCoord()
-    local distance = #(vector - camCoords)
+    local distance = #(vector3(coords.x, coords.y, coords.z) - camCoords)
 
     if not size then
         size = 1
