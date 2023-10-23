@@ -18,6 +18,11 @@ function sendToDiscord(name, message, color)
   PerformHttpRequest(DISCORD_WEBHOOK, function(err, text, headers) end, 'POST', json.encode({username = DISCORD_NAME, embeds = connect, avatar_url = DISCORD_IMAGE}), { ['Content-Type'] = 'application/json' })
 end
 
+---@param name string
+---@param group string
+---@param cb function
+---@param allowConsole boolean
+---@param suggestion string
 function ESX.RegisterCommand(name, group, cb, allowConsole, suggestion)
 	if type(name) == 'table' then
 		for _, v in ipairs(name) do
@@ -171,21 +176,25 @@ function ESX.RegisterCommand(name, group, cb, allowConsole, suggestion)
 	end
 end
 
+---@param xPlayer table
 local function updateHealthAndArmorInMetadata(xPlayer)
     local ped = GetPlayerPed(xPlayer.source)
     xPlayer.setMeta('health', GetEntityHealth(ped))
     xPlayer.setMeta('armor',GetPedArmour(ped))
 end
 
+---@param xPlayer table
+---@param cb function
 function Core.SavePlayer(xPlayer, cb)
+  local start = os.nanotime()
   updateHealthAndArmorInMetadata(xPlayer)
   local parameters <const> = {
     json.encode(xPlayer.getAccounts(true)),
     xPlayer.job.name,
-    xPlayer.job.grade, 
+    xPlayer.job.grade,
     xPlayer.group,
     json.encode(xPlayer.getCoords()),
-    json.encode(xPlayer.getInventory(true)), 
+    json.encode(xPlayer.getInventory(true)),
     json.encode(xPlayer.getLoadout(true)),
     json.encode(xPlayer.getMeta()),
     xPlayer.identifier
@@ -196,9 +205,9 @@ function Core.SavePlayer(xPlayer, cb)
     parameters,
     function(affectedRows)
       if affectedRows == 1 then
-        print(('[^2INFO^7] Saved player ^5"%s^7"'):format(xPlayer.name))
         TriggerEvent('esx:playerSaved', xPlayer.playerId, xPlayer)
       end
+      print(('[^2INFO^7] Saved player ^5"%s^7, (^5%.4f ms^7)"'):format(xPlayer.name, (os.nanotime() - start) / 1e6))
       if cb then
         cb()
       end
@@ -206,6 +215,7 @@ function Core.SavePlayer(xPlayer, cb)
   )
 end
 
+---@param cb function
 function Core.SavePlayers(cb)
   local xPlayers <const> = ESX.Players
   if not next(xPlayers) then
@@ -268,6 +278,9 @@ ESX.GetPlayers = GetPlayers
 	return xPlayers
 end]]
 
+---@param key string
+---@param val string
+---@return table
 function ESX.GetExtendedPlayers(key, val)
   local xPlayers = {}
   for k, v in pairs(ESX.Players) do
@@ -282,6 +295,8 @@ function ESX.GetExtendedPlayers(key, val)
   return xPlayers
 end
 
+---@param source number
+---@return table
 function ESX.GetPlayerFromId(source)
   return ESX.Players[tonumber(source)]
 end
@@ -306,7 +321,6 @@ end
 ---@param model string|number
 ---@param player number playerId
 ---@param cb function
-
 function ESX.GetVehicleType(model, player, cb)
   model = type(model) == 'string' and joaat(model) or model
   
