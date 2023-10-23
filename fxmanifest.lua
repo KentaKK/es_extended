@@ -9,7 +9,6 @@ version '2.0.0'
 shared_scripts {
 	'locale.lua',
 	'locales/*.lua',
-
 	'config.lua',
 	'config.weapons.lua',
 }
@@ -24,10 +23,8 @@ server_scripts {
 	'server/functions.lua',
 	'server/onesync.lua',
 	'server/paycheck.lua',
-
 	'server/main.lua',
 	'server/commands.lua',
-
 	'common/modules/*.lua',
 	'common/functions.lua',
 	'server/modules/actions.lua'
@@ -40,12 +37,9 @@ client_scripts {
 	'client/functions.lua',
 	'client/wrapper.lua',
 	'client/modules/callback.lua',
-
 	'client/main.lua',
-	
 	'common/modules/*.lua',
 	'common/functions.lua',
-
 	'common/functions.lua',
 	'client/modules/actions.lua',
 	'client/modules/death.lua',
@@ -61,16 +55,12 @@ files {
 	'imports.lua',
 	'locale.js',
 	'html/ui.html',
-
 	'html/css/app.css',
-
 	'html/js/mustache.min.js',
 	'html/js/wrapper.js',
 	'html/js/app.js',
-
 	'html/fonts/pdown.ttf',
 	'html/fonts/bankgothic.ttf',
-
 	'html/img/accounts/bank.png',
 	'html/img/accounts/black_money.png',
 	'html/img/accounts/money.png'
