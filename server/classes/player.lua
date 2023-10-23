@@ -1,15 +1,15 @@
-local _GetPlayerPed = GetPlayerPed;
-local _GetEntityCoords = GetEntityCoords;
-local _ExecuteCommand = ExecuteCommand;
-local _SetEntityCoords = SetEntityCoords;
-local _SetEntityHeading = SetEntityHeading;
-local _TriggerClientEvent = TriggerClientEvent;
-local _DropPlayer = DropPlayer;
-local _TriggerEvent = TriggerEvent;
-local _GiveWeaponToPed = GiveWeaponToPed;
-local _SetPedAmmo = SetPedAmmo;
-local _RemoveWeaponFromPed = RemoveWeaponFromPed;
-local _assert = assert;
+local _GetPlayerPed = GetPlayerPed
+local _GetEntityCoords = GetEntityCoords
+local _ExecuteCommand = ExecuteCommand
+local _SetEntityCoords = SetEntityCoords
+local _SetEntityHeading = SetEntityHeading
+local _TriggerClientEvent = TriggerClientEvent
+local _DropPlayer = DropPlayer
+local _TriggerEvent = TriggerEvent
+local _GiveWeaponToPed = GiveWeaponToPed
+local _SetPedAmmo = SetPedAmmo
+local _RemoveWeaponFromPed = RemoveWeaponFromPed
+local _assert = assert
 
 ---@param playerId number
 ---@param identifier string
@@ -190,7 +190,6 @@ function CreateExtendedPlayer(playerId, identifier, group, accounts, inventory, 
 		end
 
 		return self.inventory
-		
 	end
 
 	---@return table
@@ -538,7 +537,6 @@ function CreateExtendedPlayer(playerId, identifier, group, accounts, inventory, 
 		if weapon then
 			weapon.ammo = ammoCount
 		end
-
 	end
 
 	---@param weaponName string
@@ -568,7 +566,6 @@ function CreateExtendedPlayer(playerId, identifier, group, accounts, inventory, 
 		end
 
 		return 0
-		
 	end
 
 	---@param weaponName string
@@ -587,7 +584,7 @@ function CreateExtendedPlayer(playerId, identifier, group, accounts, inventory, 
 				for _, v2 in ipairs(v.components) do
 					self.removeWeaponComponent(weaponName, v2)
 				end
-				
+
 				local weaponHash = joaat(v.name)
 				_RemoveWeaponFromPed(playerPed, weaponHash)
 				_SetPedAmmo(playerPed, weaponHash, 0)
@@ -652,13 +649,9 @@ function CreateExtendedPlayer(playerId, identifier, group, accounts, inventory, 
 					return true
 				end
 			end
-
 			return false
-		
 		end
-
 		return false
-
 	end
 
 	---@param weaponName string
@@ -669,7 +662,6 @@ function CreateExtendedPlayer(playerId, identifier, group, accounts, inventory, 
 				return true
 			end
 		end
-
 		return false
 	end
 
@@ -681,7 +673,6 @@ function CreateExtendedPlayer(playerId, identifier, group, accounts, inventory, 
 				return (v), (v.count)
 			end
 		end
-
 		return false
 	end
 
@@ -693,7 +684,6 @@ function CreateExtendedPlayer(playerId, identifier, group, accounts, inventory, 
 				return k, v
 			end
 		end
-
 		return nil
 	end
 
