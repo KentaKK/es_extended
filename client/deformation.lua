@@ -258,6 +258,9 @@ GetVehicleDeformation = function(vehicle)
 	return deformationPoints
 end
 
+---@param newDef table
+---@param oldDef table
+---@return boolean
 IsDeformationWorse = function(newDef, oldDef)
   if newDef == nil and oldDef == nil then return false end
 	if (oldDef == nil or #newDef > #oldDef) then
