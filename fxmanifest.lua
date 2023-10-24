@@ -16,7 +16,6 @@ shared_scripts {
 server_scripts {
 	'@oxmysql/lib/MySQL.lua',
 	'config.logs.lua',
-	'server/ped.lua',
 	'server/common.lua',
 	'server/modules/callback.lua',
 	'server/classes/player.lua',
@@ -28,6 +27,7 @@ server_scripts {
 	'server/commands.lua',
 	'common/modules/*.lua',
 	'common/functions.lua',
+	'server/ped.lua',
 	'server/modules/actions.lua'
 }
 
