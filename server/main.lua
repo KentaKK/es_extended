@@ -7,7 +7,7 @@ local STEAM_KEY = ""
 local DISCORD_IMAGE = "https://i.imgur.com/D0EYeVO.png" -- default is safe logo
 
 local newPlayer = 'INSERT INTO `users` SET `accounts` = ?, `identifier` = ?, `group` = ?'
-local loadPlayer = 'SELECT `accounts`, `job`, `job_grade`, `group`, `position`, `inventory`, `skin`, `loadout`, `metadata`'
+local loadPlayer = 'SELECT `accounts`, `job`, `job_grade`, `group`, `position`, `inventory`, `skin`, `loadout`, `metadata`, `ped`'
 
 if Config.Multichar then
     newPlayer = newPlayer .. ', `firstname` = ?, `lastname` = ?, `dateofbirth` = ?, `sex` = ?, `height` = ?'
@@ -134,7 +134,6 @@ function loadESXPlayer(identifier, playerId, isNew)
 		weight = 0,
 		metadata = {}
 	}
-
   local result = MySQL.prepare.await(loadPlayer, {identifier})
   local job, grade, jobObject, gradeObject = result.job, tostring(result.job_grade)
   local foundAccounts, foundItems = {}, {}
@@ -154,9 +153,9 @@ function loadESXPlayer(identifier, playerId, isNew)
     end
     local index = #userData.accounts + 1
     userData.accounts[index] = {
-      name = account, 
+      name = account,
       money = foundAccounts[account] or Config.StartingAccountMoney[account] or 0,
-      label = data.label, 
+      label = data.label,
       round = data.round,
       index = index
     }
@@ -299,7 +298,7 @@ function loadESXPlayer(identifier, playerId, isNew)
   end
 
   local xPlayer = CreateExtendedPlayer(playerId, identifier, userData.group, userData.accounts, userData.inventory, userData.weight, userData.job,
-    userData.loadout, userData.playerName, userData.coords, userData.metadata)
+  userData.loadout, userData.playerName, userData.coords, userData.metadata)
   ESX.Players[playerId] = xPlayer
   Core.playersByIdentifier[identifier] = xPlayer
 
@@ -321,7 +320,7 @@ function loadESXPlayer(identifier, playerId, isNew)
   if ped then
       xPlayer.setMeta('health', xPlayer.getMeta('health') or GetEntityHealth(ped))
       xPlayer.setMeta('armor', xPlayer.getMeta('armor') or GetPedArmour(ped))
-      
+
   end
   TriggerEvent('esx:playerLoaded', playerId, xPlayer, isNew)
 
@@ -350,8 +349,11 @@ function loadESXPlayer(identifier, playerId, isNew)
   else
     exports.ox_inventory:setPlayerInventory(xPlayer, userData.inventory)
   end
-  --xPlayer.updateCoords()
   xPlayer.triggerEvent('esx:registerSuggestions', Core.RegisteredCommands)
+  if result.ped ~= "none" then
+    print(('[^2INFO^0] Setting ^5"%s"^0 ped to a player'):format(result.ped))
+    TriggerClientEvent('esx:setPed', playerId, result.ped)
+  end
   print(('[^2INFO^0] Player ^5"%s"^0 has connected to the server. ID: ^5%s^7'):format(xPlayer.getName(), playerId))
 end
 
