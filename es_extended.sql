@@ -1,1015 +1,1090 @@
-CREATE TABLE `addon_account` (
-  `name` varchar(60) NOT NULL,
-  `label` varchar(100) NOT NULL,
-  `shared` int(11) NOT NULL
-) ENGINE=InnoDB;
-
---
--- Dumping data for table `addon_account`
---
-
-INSERT INTO `addon_account` (`name`, `label`, `shared`) VALUES
-('caution', 'caution', 0),
-('society_ambulance', 'EMS', 1),
-('society_cardealer', 'Cardealer', 1),
-('society_mechanic', 'Mechanic', 1),
-('society_police', 'Police', 1),
-('society_taxi', 'Taxi', 1);
-
+-- --------------------------------------------------------
+-- Host:                         127.0.0.1
+-- Server version:               11.3.0-MariaDB - mariadb.org binary distribution
+-- Server OS:                    Win64
+-- HeidiSQL Version:             12.3.0.6589
 -- --------------------------------------------------------
 
---
--- Table structure for table `addon_account_data`
---
+/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
+/*!40101 SET NAMES utf8 */;
+/*!50503 SET NAMES utf8mb4 */;
+/*!40103 SET @OLD_TIME_ZONE=@@TIME_ZONE */;
+/*!40103 SET TIME_ZONE='+00:00' */;
+/*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
+/*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
+/*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
-CREATE TABLE `addon_account_data` (
-  `id` int(11) NOT NULL,
+
+-- Dumping database structure for es_extended
+CREATE DATABASE IF NOT EXISTS `es_extended` /*!40100 DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci */;
+USE `es_extended`;
+
+-- Dumping structure for table es_extended.users
+CREATE TABLE IF NOT EXISTS `users` (
+  `identifier` varchar(40) NOT NULL,
+  `accounts` longtext DEFAULT NULL,
+  `group` varchar(50) DEFAULT 'user',
+  `inventory` longtext DEFAULT NULL,
+  `job` varchar(20) DEFAULT 'unemployed',
+  `job_grade` int(11) DEFAULT 0,
+  `loadout` varchar(500) DEFAULT NULL,
+  `position` varchar(255) DEFAULT '{"x":-516.86,"y":-253.15,"z":35.65,"heading":209.02}',
+  `skin` longtext DEFAULT NULL,
+  `metadata` longtext DEFAULT NULL,
+  `kinezet` varchar(50) DEFAULT '',
+  `is_dead` tinyint(1) DEFAULT 0,
+  `ped` varchar(50) DEFAULT 'none',
+  `status` longtext DEFAULT NULL,
+  `jail` int(11) NOT NULL DEFAULT 0,
+  `firstname` varchar(50) DEFAULT '',
+  `lastname` varchar(50) DEFAULT '',
+  `dateofbirth` varchar(25) DEFAULT '',
+  `sex` varchar(10) DEFAULT '',
+  `height` varchar(5) DEFAULT '',
+  `skills` longtext DEFAULT NULL,
+  `phone_number` varchar(10) DEFAULT NULL,
+  `tattoos` longtext DEFAULT NULL,
+  `last_house` int(11) DEFAULT 0,
+  `pet` varchar(100) DEFAULT NULL,
+  `drugaddict` decimal(10,0) DEFAULT 0,
+  `rpquestion` varchar(50) DEFAULT 'false',
+  `house` longtext NOT NULL DEFAULT '{"owns":false,"furniture":[],"houseId":0}',
+  `bought_furniture` longtext NOT NULL DEFAULT '{}',
+  `jeton` int(11) DEFAULT NULL,
+  `aranma` longtext DEFAULT '[]',
+  `photo` longtext DEFAULT NULL,
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `disabled` tinyint(1) DEFAULT 0,
+  `last_property` varchar(255) DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT current_timestamp(),
+  `last_seen` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp(),
+  `pincode` int(11) DEFAULT NULL,
+  `wheel` varchar(1) DEFAULT '1',
+  PRIMARY KEY (`identifier`) USING BTREE,
+  UNIQUE KEY `id` (`id`),
+  KEY `status` (`status`(768))
+) ENGINE=InnoDB AUTO_INCREMENT=45 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci ROW_FORMAT=DYNAMIC;
+
+-- Dumping structure for table es_extended.addon_account
+CREATE TABLE IF NOT EXISTS `addon_account` (
+  `name` varchar(60) NOT NULL,
+  `label` varchar(100) NOT NULL,
+  `shared` int(11) NOT NULL,
+  PRIMARY KEY (`name`) USING BTREE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci ROW_FORMAT=DYNAMIC;
+
+-- Dumping structure for table es_extended.addon_account_data
+CREATE TABLE IF NOT EXISTS `addon_account_data` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
   `account_name` varchar(100) DEFAULT NULL,
   `money` int(11) NOT NULL,
-  `owner` varchar(60) DEFAULT NULL
-) ENGINE=InnoDB;
+  `owner` varchar(40) DEFAULT NULL,
+  `black_money` int(255) NOT NULL DEFAULT 0,
+  PRIMARY KEY (`id`) USING BTREE,
+  UNIQUE KEY `index_addon_account_data_account_name_owner` (`account_name`,`owner`) USING BTREE,
+  KEY `index_addon_account_data_account_name` (`account_name`) USING BTREE
+) ENGINE=InnoDB AUTO_INCREMENT=89 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci ROW_FORMAT=DYNAMIC;
 
---
--- Dumping data for table `addon_account_data`
---
+-- Dumping data for table es_extended.addon_account_data: ~87 rows (approximately)
+INSERT INTO `addon_account_data` (`id`, `account_name`, `money`, `owner`, `black_money`) VALUES
+	(1, 'society_afrika', 0, NULL, 0),
+	(2, 'society_ambulance', 58800, NULL, 0),
+	(3, 'society_ballas', 0, NULL, 0),
+	(4, 'society_bennys', 1, NULL, 0),
+	(5, 'society_bloods', 0, NULL, 0),
+	(6, 'society_bratva', 0, NULL, 0),
+	(7, 'society_broavaz', 0, NULL, 0),
+	(8, 'society_cali', 0, NULL, 0),
+	(9, 'society_cardealer', 0, NULL, 0),
+	(10, 'society_casino', -617500, NULL, 0),
+	(11, 'society_cassino', 2297730, NULL, 4479029),
+	(12, 'society_continental', 0, NULL, 0),
+	(13, 'society_cosanostra', 0, NULL, 0),
+	(14, 'society_crips', 0, NULL, 0),
+	(15, 'society_gokart', 0, NULL, 0),
+	(16, 'society_groove', 100000, NULL, 323342),
+	(17, 'society_gruppe', 0, NULL, 0),
+	(18, 'society_homeless', 0, NULL, 0),
+	(19, 'society_inkognito', 0, NULL, 0),
+	(20, 'society_ira', 0, NULL, 0),
+	(21, 'society_kingsman', 0, NULL, 0),
+	(22, 'society_lacosa', 0, NULL, 0),
+	(23, 'society_lostmc', 0, NULL, 0),
+	(24, 'society_mechanic', 0, NULL, 0),
+	(25, 'society_medelin', 0, NULL, 0),
+	(26, 'society_offtaxi', 0, NULL, 0),
+	(27, 'society_onkormanyzat', 0, NULL, 0),
+	(28, 'society_orochi', 0, NULL, 0),
+	(29, 'society_parabellum', 0, NULL, 58448),
+	(30, 'society_peaky', 0, NULL, 0),
+	(31, 'society_playboy', 0, NULL, 0),
+	(32, 'society_police', 3155092, NULL, 0),
+	(33, 'society_resto', 0, NULL, 0),
+	(34, 'society_sheriff', 300, NULL, 0),
+	(35, 'society_sons', 0, NULL, 0),
+	(36, 'society_swat', 0, NULL, 0),
+	(37, 'society_taxi', 0, NULL, 0),
+	(38, 'society_unicorn', 0, NULL, 0),
+	(39, 'society_vagos', 1668399, NULL, 0),
+	(40, 'society_weazelnews', 1, NULL, 0),
+	(41, 'society_yakuza', 0, NULL, 0),
 
-INSERT INTO `addon_account_data` (`id`, `account_name`, `money`, `owner`) VALUES
-(1, 'society_cardealer', 0, NULL),
-(2, 'society_police', 0, NULL),
-(3, 'society_ambulance', 0, NULL),
-(4, 'society_mechanic', 0, NULL),
-(5, 'society_taxi', 0, NULL);
--- --------------------------------------------------------
-
---
--- Table structure for table `addon_inventory`
---
-
-CREATE TABLE `addon_inventory` (
+-- Dumping structure for table es_extended.addon_inventory
+CREATE TABLE IF NOT EXISTS `addon_inventory` (
   `name` varchar(60) NOT NULL,
   `label` varchar(100) NOT NULL,
-  `shared` int(11) NOT NULL
-) ENGINE=InnoDB;
+  `shared` int(11) NOT NULL,
+  PRIMARY KEY (`name`) USING BTREE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci ROW_FORMAT=DYNAMIC;
 
---
--- Dumping data for table `addon_inventory`
---
-
+-- Dumping data for table es_extended.addon_inventory: ~84 rows (approximately)
 INSERT INTO `addon_inventory` (`name`, `label`, `shared`) VALUES
-('society_ambulance', 'EMS', 1),
-('society_cardealer', 'Cardealer', 1),
-('society_mechanic', 'Mechanic', 1),
-('society_police', 'Police', 1),
-('society_taxi', 'Taxi', 1);
+	('housing', 'Housing', 0),
+	('society_afrika', 'Dark Afrika', 1),
+	('society_ambulance', 'Ambulance', 1),
+	('society_ballas', 'ballas', 1),
+	('society_bennys', 'Bennys', 1),
+	('society_bloods', 'Bloods', 1),
+	('society_bratva', 'Bratva', 1),
+	('society_broavaz', 'Broavaz', 1),
+	('society_cali', 'cali', 1),
+	('society_cardealer', 'Concesionnaire', 1),
+	('society_casino', 'Casino', 1),
+	('society_cassino', 'cassino', 1),
+	('society_continental', 'continental', 1),
+	('society_cosanostra', 'Cosa Nostra', 1),
+	('society_crips', 'Crips', 1),
+	('society_eastcustoms', 'East Customs', 1),
+	('society_gokart', 'gokart', 1),
+	('society_groove', 'groove', 1),
+	('society_gruppe', 'gruppe', 1),
+	('society_homeless', 'homeless', 1),
+	('society_inkognito', 'inkognito', 1),
+	('society_ira', 'ira', 1),
+	('society_kingsman', 'kingsman', 1),
+	('society_lacosa', 'lacosa', 1),
+	('society_lostmc', 'lostmc', 1),
+	('society_mechanic', 'Mécano', 1),
+	('society_medelin', 'medelin', 1),
+	('society_offtaxi', 'The Lost MC', 1),
+	('society_onkormanyzat', 'onkormanyzat', 1),
+	('society_orochi', 'orochi', 1),
+	('society_parabellum', 'parabellum', 1),
+	('society_peaky', 'peaky', 1),
+	('society_playboy', 'Playboy', 1),
+	('society_police', 'Police', 1),
+	('society_resto', 'Étterem', 1),
+	('society_sheriff', 'Sheriff', 1),
+	('society_sons', 'sons', 1),
+	('society_swat', 'swat', 1),
+	('society_taxi', 'Taxi', 1),
+	('society_unicorn', 'unicorn', 1),
+	('society_vagos', 'vagos', 1),
+	('society_weazelnews', 'weazelnews', 1),
+	('society_yakuza', 'Yakuza', 1);
 
--- --------------------------------------------------------
-
---
--- Table structure for table `addon_inventory_items`
---
-
-CREATE TABLE `addon_inventory_items` (
-  `id` int(11) NOT NULL,
+-- Dumping structure for table es_extended.addon_inventory_items
+CREATE TABLE IF NOT EXISTS `addon_inventory_items` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
   `inventory_name` varchar(100) NOT NULL,
   `name` varchar(100) NOT NULL,
   `count` int(11) NOT NULL,
-  `owner` varchar(60) DEFAULT NULL
-) ENGINE=InnoDB;
+  `owner` varchar(40) DEFAULT NULL,
+  PRIMARY KEY (`id`) USING BTREE,
+  KEY `index_addon_inventory_items_inventory_name_name` (`inventory_name`,`name`) USING BTREE,
+  KEY `index_addon_inventory_items_inventory_name_name_owner` (`inventory_name`,`name`,`owner`) USING BTREE,
+  KEY `index_addon_inventory_inventory_name` (`inventory_name`) USING BTREE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci ROW_FORMAT=DYNAMIC;
 
--- --------------------------------------------------------
-
---
--- Table structure for table `billing`
---
-
-CREATE TABLE `billing` (
-  `id` int(11) NOT NULL,
-  `identifier` varchar(60) NOT NULL,
-  `sender` varchar(60) NOT NULL,
-  `target_type` varchar(50) NOT NULL,
-  `target` varchar(40) NOT NULL,
-  `label` varchar(255) NOT NULL,
-  `amount` int(11) NOT NULL
-) ENGINE=InnoDB;
-
--- --------------------------------------------------------
-
---
--- Table structure for table `cardealer_vehicles`
---
-
-CREATE TABLE `cardealer_vehicles` (
-  `id` int(11) NOT NULL,
-  `vehicle` varchar(255) NOT NULL,
-  `price` int(11) NOT NULL
-) ENGINE=InnoDB;
-
--- --------------------------------------------------------
-
---
--- Table structure for table `multicharacter_slots`
---
-
-CREATE TABLE `multicharacter_slots` (
-	`identifier` VARCHAR(60) NOT NULL,
-	`slots` INT(11) NOT NULL,
-	PRIMARY KEY (`identifier`) USING BTREE,
-	INDEX `slots` (`slots`) USING BTREE
-) ENGINE=InnoDB;
-
--- --------------------------------------------------------
-
---
--- Table structure for table `datastore`
---
-
-CREATE TABLE `datastore` (
+-- Dumping structure for table es_extended.datastore
+CREATE TABLE IF NOT EXISTS `datastore` (
   `name` varchar(60) NOT NULL,
   `label` varchar(100) NOT NULL,
-  `shared` int(11) NOT NULL
-) ENGINE=InnoDB;
+  `shared` int(11) NOT NULL,
+  PRIMARY KEY (`name`) USING BTREE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci ROW_FORMAT=DYNAMIC;
 
---
--- Dumping data for table `datastore`
---
-
+-- Dumping data for table es_extended.datastore: ~47 rows (approximately)
 INSERT INTO `datastore` (`name`, `label`, `shared`) VALUES
-('property', 'Property', 0),
-('society_ambulance', 'EMS', 1),
-('society_mechanic', 'Mechanic', 1),
-('society_police', 'Police', 1),
-('society_taxi', 'Taxi', 1);
+	('housing', 'Housing', 0),
+	('property', 'Property', 0),
+	('society_afrika', 'Dark Afrika', 1),
+	('society_ambulance', 'Ambulance', 1),
+	('society_ballas', 'ballas', 1),
+	('society_bennys', 'Bennys', 1),
+	('society_bloods', 'bloods', 1),
+	('society_bratva', 'Bratva', 1),
+	('society_broavaz', 'Broavaz', 1),
+	('society_cali', 'cali', 1),
+	('society_cardealer', 'Cardealer', 1),
+	('society_cassino', 'cassino', 1),
+	('society_continental', 'continental', 1),
+	('society_cosanostra', 'cosanostra', 1),
+	('society_crips', 'Crips', 1),
+	('society_gokart', 'gokart', 1),
+	('society_groove', 'groove', 1),
+	('society_gruppe', 'gruppe', 1),
+	('society_homeless', 'homeless', 1),
+	('society_inkognito', 'inkognito', 1),
+	('society_ira', 'ira', 1),
+	('society_kingsman', 'kingsman', 1),
+	('society_lacosa', 'lacosa', 1),
+	('society_lostmc', 'lostmc', 1),
+	('society_mara', 'MS13', 1),
+	('society_mechanic', 'Szerelö', 1),
+	('society_medelin', 'medelin', 1),
+	('society_offtaxi', 'lostmc', 1),
+	('society_onkormanyzat', 'onkormanyzat', 1),
+	('society_orochi', 'orochi', 1),
+	('society_parabellum', 'parabellum', 1),
+	('society_peaky', 'peaky', 1),
+	('society_playboy', 'Playboy', 1),
+	('society_police', 'Police', 1),
+	('society_resto', 'Étterem', 1),
+	('society_sheriff', 'Sheriff', 1),
+	('society_sons', 'sons', 1),
+	('society_swat', 'swat', 1),
+	('society_taxi', 'Taxi', 1),
+	('society_unicorn', 'unicorn', 1),
+	('society_vagos', 'vagos', 1),
+	('society_weazelnews', 'weazelnews', 1),
+	('society_yakuza', 'Yakuza', 1),
+	('user_ears', 'Ears', 0),
+	('user_glasses', 'Glasses', 0),
+	('user_helmet', 'Helmet', 0),
+	('user_mask', 'Mask', 0);
 
-
-INSERT INTO `datastore` (`name`, `label`, `shared`) VALUES
-    ('user_ears', 'Ears', 0),
-    ('user_glasses', 'Glasses', 0),
-    ('user_helmet', 'Helmet', 0),
-    ('user_mask', 'Mask', 0);
-    
--- --------------------------------------------------------
-
---
--- Table structure for table `datastore_data`
---
-
-CREATE TABLE `datastore_data` (
-  `id` int(11) NOT NULL,
+-- Dumping structure for table es_extended.datastore_data
+CREATE TABLE IF NOT EXISTS `datastore_data` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
   `name` varchar(60) NOT NULL,
-  `owner` varchar(60) DEFAULT NULL,
-  `data` longtext DEFAULT NULL
-) ENGINE=InnoDB;
+  `owner` varchar(40) DEFAULT NULL,
+  `data` longtext DEFAULT NULL,
+  PRIMARY KEY (`id`) USING BTREE,
+  UNIQUE KEY `index_datastore_data_name_owner` (`name`,`owner`) USING BTREE,
+  KEY `index_datastore_data_name` (`name`) USING BTREE
+) ENGINE=InnoDB AUTO_INCREMENT=904 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci ROW_FORMAT=DYNAMIC;
 
---
--- Dumping data for table `datastore_data`
---
-
+-- Dumping data for table es_extended.datastore_data: ~741 rows (approximately)
 INSERT INTO `datastore_data` (`id`, `name`, `owner`, `data`) VALUES
-(1, 'society_police', NULL, '{}'),
-(2, 'society_ambulance', NULL, '{}'),
-(3, 'society_mechanic', NULL, '{}'),
-(4, 'society_taxi', NULL, '{}'),
-(5, 'property', NULL, '{}');
+	(1, 'society_afrika', NULL, '{}'),
+	(2, 'society_ambulance', NULL, '{}'),
+	(3, 'society_ballas', NULL, '{}'),
+	(4, 'society_bennys', NULL, '{}'),
+	(5, 'society_bloods', NULL, '{}'),
+	(6, 'society_bratva', NULL, '{}'),
+	(7, 'society_broavaz', NULL, '{}'),
+	(8, 'society_cali', NULL, '{}'),
+	(9, 'society_cardealer', NULL, '{}'),
+	(10, 'society_cassino', NULL, '{}'),
+	(11, 'society_continental', NULL, '{}'),
+	(12, 'society_cosanostra', NULL, '{}'),
+	(13, 'society_crips', NULL, '{}'),
+	(14, 'society_gokart', NULL, '{}'),
+	(15, 'society_groove', NULL, '{}'),
+	(16, 'society_gruppe', NULL, '{}'),
+	(17, 'society_homeless', NULL, '{}'),
+	(18, 'society_inkognito', NULL, '{}'),
+	(19, 'society_ira', NULL, '{}'),
+	(20, 'society_kingsman', NULL, '{}'),
+	(21, 'society_lacosa', NULL, '{}'),
+	(22, 'society_lostmc', NULL, '{}'),
+	(23, 'society_mara', NULL, '{}'),
+	(24, 'society_mechanic', NULL, '{}'),
+	(25, 'society_medelin', NULL, '{}'),
+	(26, 'society_offtaxi', NULL, '{}'),
+	(27, 'society_onkormanyzat', NULL, '{}'),
+	(28, 'society_orochi', NULL, '{}'),
+	(29, 'society_parabellum', NULL, '{}'),
+	(30, 'society_peaky', NULL, '{}'),
+	(31, 'society_playboy', NULL, '{}'),
+	(32, 'society_police', NULL, '{}'),
+	(33, 'society_resto', NULL, '{}'),
+	(34, 'society_sheriff', NULL, '{}'),
+	(35, 'society_sons', NULL, '{}'),
+	(36, 'society_swat', NULL, '{}'),
+	(37, 'society_taxi', NULL, '{}'),
+	(38, 'society_unicorn', NULL, '{}'),
+	(39, 'society_vagos', NULL, '{}'),
+	(40, 'society_weazelnews', NULL, '{}'),
+	(41, 'society_yakuza', NULL, '{}');
 
--- --------------------------------------------------------
-
---
--- Table structure for table `items`
---
-
-CREATE TABLE `items` (
-  `name` varchar(50) NOT NULL,
-  `label` varchar(50) NOT NULL,
-  `weight` int(11) NOT NULL DEFAULT 1,
+-- Dumping structure for table es_extended.items
+CREATE TABLE IF NOT EXISTS `items` (
+  `name` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `label` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `weight` varchar(11) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '1',
   `rare` tinyint(4) NOT NULL DEFAULT 0,
-  `can_remove` tinyint(4) NOT NULL DEFAULT 1
-) ENGINE=InnoDB;
+  `can_remove` tinyint(4) NOT NULL DEFAULT 1,
+  PRIMARY KEY (`name`) USING BTREE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci ROW_FORMAT=DYNAMIC;
 
---
--- Dumping data for table `items`
---
-
+-- Dumping data for table es_extended.items: ~331 rows (approximately)
 INSERT INTO `items` (`name`, `label`, `weight`, `rare`, `can_remove`) VALUES
-('alive_chicken', 'Living chicken', 1, 0, 1),
-('bandage', 'Bandage', 2, 0, 1),
-('blowpipe', 'Blowtorch', 2, 0, 1),
-('bread', 'Bread', 1, 0, 1),
-('cannabis', 'Cannabis', 3, 0, 1),
-('carokit', 'Body Kit', 3, 0, 1),
-('carotool', 'Tools', 2, 0, 1),
-('clothe', 'Cloth', 1, 0, 1),
-('copper', 'Copper', 1, 0, 1),
-('cutted_wood', 'Cut wood', 1, 0, 1),
-('diamond', 'Diamond', 1, 0, 1),
-('essence', 'Gas', 1, 0, 1),
-('fabric', 'Fabric', 1, 0, 1),
-('fish', 'Fish', 1, 0, 1),
-('radio', 'Radio', 1, 0, 1),
-('fixkit', 'Repair Kit', 3, 0, 1),
-('fixtool', 'Repair Tools', 2, 0, 1),
-('gazbottle', 'Gas Bottle', 2, 0, 1),
-('gold', 'Gold', 1, 0, 1),
-('iron', 'Iron', 1, 0, 1),
-('marijuana', 'Marijuana', 2, 0, 1),
-('medikit', 'Medikit', 2, 0, 1),
-('packaged_chicken', 'Chicken fillet', 1, 0, 1),
-('packaged_plank', 'Packaged wood', 1, 0, 1),
-('petrol', 'Oil', 1, 0, 1),
-('petrol_raffin', 'Processed oil', 1, 0, 1),
-('phone', 'Phone', 1, 0, 1),
-('slaughtered_chicken', 'Slaughtered chicken', 1, 0, 1),
-('stone', 'Stone', 1, 0, 1),
-('washed_stone', 'Washed stone', 1, 0, 1),
-('water', 'Water', 1, 0, 1),
-('wood', 'Wood', 1, 0, 1),
-('wool', 'Wool', 1, 0, 1);
+	('acetone', 'Aceton', '1', 0, 1),
+	('alive_chicken', 'Élö Csirke', '1', 0, 1),
+	('aluminum', 'Alumínium', '0.5', 0, 1),
+	('animal_bait', 'Vad csali', '1', 0, 1),
+	('arany', 'Arany', '1', 0, 1),
+	('arcso', 'AR Csö', '1', 0, 1),
+	('armarkolat', 'AR Markolat', '1', 0, 1),
+	('arravasz', 'AR Ravasz', '1', 0, 1),
+	('artar', 'AR Tár', '1', 0, 1),
+	('artus', 'AR Tus', '1', 0, 1),
+	('arvaz', 'AR Váz', '1', 0, 1),
+	('asdasdrgb', 'RGB Világitás', '1', 0, 1),
+	('asdasdrgbtav', 'RGB Távirányito', '1', 0, 1),
+	('bacardi', 'Bacardi', '1', 0, 1),
+	('bag', 'Táska', '1', 0, 1),
+	('bandage', 'Kötszer', '0.5', 0, 1),
+	('beer', 'Sör', '1', 0, 1),
+	('binoculars', 'Távcsö', '1', 0, 1),
+	('bloodssor', 'Bull Blood', '1', 0, 1),
+	('blowpipe', 'Csö', '1', 0, 1),
+	('blowtorch', 'Hegesztö', '1', 0, 1),
+	('boil_mash', 'Fött Szilva', '1', 0, 1),
+	('bombaygin', 'Bombay Gin', '1', 0, 1),
+	('boombox', 'Boombox', '1', 0, 1),
+	('bor', 'Vörösbor', '1', 0, 1),
+	('bread', 'Kenyér', '1', 0, 1),
+	('brokenfishingrod', 'Törött Horgászbot', '1', 0, 1),
+	('bulletproof', 'Golyóalló Mellény', '1', 0, 1),
+	('burger', 'HamBurger', '1', 0, 1),
+	('c4', 'C4', '1', 0, 1),
+	('c4_bank', 'C4', '1', 0, 1),
+	('cannabis', 'Cannabis', '1', 0, 1),
+	('carokit', 'Karosszéria Készlet', '1', 0, 1),
+	('carotool', 'Karosszéria Alkatrészek', '1', 0, 1),
+	('carparts', 'Karosszéria elemek', '-1', 0, 1),
+	('cartire', 'Kocsi Kerék', '1', 0, 1),
+	('champagne', 'Pezsgö', '1', 0, 1),
+	('cigarette', 'Cigi', '0.1', 0, 1),
+	('clam', 'Kagyló', '1', 0, 1),
+	('clothe', 'Ruha', '1', 0, 1),
+	('coal', 'Szén', '1', 0, 1),
+	('cocacola', 'Cola', '1', 0, 1),
+	('coke', 'Kokain', '1', 0, 1),
+	('coke10g', 'Kokain (10G)', '1', 0, 1),
+	('coke1g', 'Cocaine (1G)', '1', 0, 1),
+	('cokebrick', 'Kokain Tömb', '1', 0, 1),
+	('cokeburn', 'Fehér USB-C', '0.5', 0, 1),
+	('contract', 'Adásvételi Szerződés', '0.5', 0, 1),
+	('cookedmeat', 'Sült vadhús', '1', 0, 1),
+	('copper', 'Réz', '1', 0, 1),
+	('copper_bar', 'Réztömb', '1', 0, 1),
+	('corcso', 'COR Csö', '1', 0, 1),
+	('cormarkolat', 'COR Markolat', '1', 0, 1),
+	('corona', 'Corona', '1', 0, 1),
+	('corravasz', 'COR Ravasz', '1', 0, 1),
+	('cortar', 'COR Tár', '1', 0, 1),
+	('corvaz', 'COR Váz', '1', 0, 1),
+	('crcso', 'CR Csö', '1', 0, 1),
+	('crmarkolat', 'CR Markolat', '1', 0, 1),
+	('croquettes', 'Állateledel', '0.5', 0, 1),
+	('crravasz', 'CR Ravasz', '1', 0, 1),
+	('crtar', 'CR Tár', '1', 0, 1),
+	('crtus', 'CR Tus', '1', 0, 1),
+	('crvaz', 'CR Váz', '1', 0, 1),
+	('csirkeburger', 'Csirke Burger', '1', 0, 1),
+	('csirkecomb', 'Csirkecomb', '1', 0, 1),
+	('cutted_wood', 'Feldolgozott Fa', '1', 0, 1),
+	('darknet', 'Dark Net', '1', 0, 1),
+	('deadbatteries', 'Lemerült Elemek', '1', 0, 1),
+	('deer_horn', 'Szarvas agancs', '1', 0, 1),
+	('dia_box', 'Gyémántos Doboz', '1', 0, 1),
+	('diamond', 'Gyémánt', '1', 0, 1),
+	('diamond_diving', 'Gyémánt', '1', 0, 1),
+	('doboz', 'Ajándák doboz', '1', 0, 1),
+	('drill', 'Fúró', '1', 0, 1),
+	('drivelicense', 'Jogosítvány', '0.1', 0, 1),
+	('drugbags', 'Tasak', '0.2', 0, 1),
+	('electronics', 'Elektronika', '1', 0, 1),
+	('essence', 'Nyers Olaj', '1', 0, 1),
+	('exrbait', 'Horgász Csali', '1', 0, 1),
+	('exrgerenda', 'Gerenda', '1', 0, 1),
+	('exrhalak', 'Hal', '1', 0, 1),
+	('exrod', 'Horgászbot', '1', 0, 1),
+	('fabric', 'Szövet', '1', 0, 1),
+	('fagyi', 'Fagyi', '1', 0, 1),
+	('fank', 'Fánk', '0.4', 0, 1),
+	('fanta', 'Narancsos Kóla', '0.5', 0, 1),
+	('firework_1', 'Ding Dong', '1', 0, 1),
+	('firework_2', 'Pyro', '1', 0, 1),
+	('firework_3', 'Silver Sucks', '1', 0, 1),
+	('firework_4', 'At Once', '1', 0, 1),
+	('firstaidkit', 'Elsősegély Csomag', '1', 0, 1),
+	('fish', 'Hal', '1', 0, 1),
+	('fixkit', 'Szerelő Készlet', '1', 0, 1),
+	('fixtool', 'Szerelő Alkatrészek', '1', 0, 1),
+	('flashlight', 'Flashlight', '1', 0, 1),
+	('fly-ticket', 'North Yankton repülőjegy', '0.1', 0, 1),
+	('fontain_4', 'Etna', '1', 0, 1),
+	('fried', 'Rántotthús', '1', 0, 1),
+	('gazbottle', 'Gázpalack', '1', 0, 1),
+	('gintonic', 'Gin Tonic', '1', 0, 1),
+	('glassbottle', 'Üveg', '1', 0, 1),
+	('gold', 'Arany', '1', 0, 1),
+	('gold_bar', 'Arany Rúd', '1', 0, 1),
+	('goldbar', 'Aranyrúd', '0.5', 0, 1),
+	('goldbar_diving', 'Aranytömb', '1', 0, 1),
+	('goldwatch', 'Arany nyaklánc', '0.1', 0, 1),
+	('golf', 'Golf labda', '1', 0, 1),
+	('golf_green', 'Golf labda (green)', '1', 0, 1),
+	('golf_pink', 'Golf labda (pink)', '1', 0, 1),
+	('golf_yellow', 'Golf labda (yellow)', '1', 0, 1),
+	('gomba', 'Gomba', '1', 0, 1),
+	('grcso', 'GR Csö', '1', 0, 1),
+	('gree-keycard', 'Belépö Kártya', '1', 0, 1),
+	('green_keycard', 'Gruppe Keycard', '1', 0, 1),
+	('green-keycard', 'Belépö Kártya', '1', 0, 1),
+	('grip', 'Grip', '1', 0, 1),
+	('grmarkolat', 'GR Markolat', '1', 0, 1),
+	('grravasz', 'GR Ravasz', '1', 0, 1),
+	('grtar', 'GR Tár', '1', 0, 1),
+	('grtus', 'GR Tus', '1', 0, 1),
+	('grvaz', 'GR Váz', '1', 0, 1),
+	('gyemant', 'Gyémánt', '1', 0, 1),
+	('hack_boy', 'Hackboy', '1', 0, 1),
+	('hacker_phone', 'Hecker Phone', '1', 0, 1),
+	('hagyma', 'Hagyma', '0.3', 0, 1),
+	('halaszle', 'Halászlé', '1', 0, 1),
+	('hambi', 'Hamburger', '1', 0, 1),
+	('hamburger', 'Hamburger', '0.5', 0, 1),
+	('hammer', 'Kalapács', '1', 0, 1),
+	('handcuffs', 'Bilincs', '1', 0, 1),
+	('haribo', 'Haribo', '0.4', 0, 1),
+	('hawaiipizza', 'Hawaii Pizza', '1', 0, 1),
+	('hcso', 'Heavy cső', '1', 0, 1),
+	('headbag', 'Zsák', '1', 0, 1),
+	('heineken', 'Heineken', '1', 0, 1),
+	('hekk', 'Sült Hekk', '1', 0, 1),
+	('henessy', 'Henessy', '0.6', 0, 1),
+	('hmarkolat', 'Heavy markolat', '1', 0, 1),
+	('hqscale', 'Gramm Mérleg', '1', 0, 1),
+	('hravasz', 'Heavy ravasz', '1', 0, 1),
+	('htar', 'Heavy tár', '1', 0, 1),
+	('hvaz', 'Heavy váz', '1', 0, 1),
+	('id_card', 'ID Kártya', '0.1', 0, 1),
+	('idcard', 'Személyi Igazolvány', '0.1', 0, 1),
+	('iron', 'Vas', '0.3', 0, 1),
+	('jager', 'Jagermeister', '1', 0, 1),
+	('jar_mash', 'Palackozot Szilva pálinka', '1', 0, 1),
+	('jegkasa', 'Jégkása', '1', 0, 1),
+	('jeton', 'Zseton', '0', 0, 1),
+	('jewels', 'Ékszerek', '0.5', 0, 1),
+	('johnie', 'Johnnie Walker', '1', 0, 1),
+	('joint2g', 'Joint (2G)', '1', 0, 1),
+	('jonhjoalmaspite', 'Jon Hjo Almáspite', '1', 0, 1),
+	('jonhjokola', 'Jon Hjo Kóla', '1', 0, 1),
+	('jonhjoleves', 'Jon Hjo Leves', '1', 0, 1),
+	('jonhjosor', 'Jon Hjo Sör', '1', 0, 1),
+	('jonhjosteak', 'Jon Hjo Steak', '1', 0, 1),
+	('jonhjozoldsegestal', 'Jon Hjo Zöldségtál', '1', 0, 1),
+	('kcsiga', 'Kakaós Csiga', '0.2', 0, 1),
+	('kebab', 'Kebab', '1', 0, 1),
+	('ketchup', 'Ketchup', '0.3', 0, 1),
+	('keys', 'Bilincs Kulcs', '1', 0, 1),
+	('keys_master_key', 'Master Key', '1', 0, 1),
+	('keys_master_key_single_use', 'Master Key (Single Use)', '1', 0, 1),
+	('keys_missionrow_pd_front', 'Mission Row PD Key (Front)', '1', 0, 1),
+	('kiscola', '0,25L Kóla', '0.25', 0, 1),
+	('kolbasz', 'Kolbász', '0.5', 0, 1),
+	('ksultkrump', 'Kis Adag Sültkrumpli', '1', 0, 1),
+	('kulszosz', 'Különleges Szósz', '1', 0, 1),
+	('langos', 'Lángos', '0.3', 0, 1),
+	('laptop_h', 'Hacker Laptop', '1', 0, 1),
+	('lasagne', 'Lasagne', '1', 0, 1),
+	('lays', 'Chips', '0.2', 0, 1),
+	('leather', 'Bör', '0.1', 0, 1),
+	('leather_boar_bad', 'Selejt vaddisznó bör', '1', 0, 1),
+	('leather_boar_good', 'Jó vaddisznó bör', '1', 0, 1),
+	('leather_boar_perfect', 'Kiváló vaddisznó bör', '1', 0, 1),
+	('leather_chickenhawk_bad', 'Rossz csirkekötő bőr', '1', 0, 1),
+	('leather_chickenhawk_good', 'Jó csirkekötő bőr', '1', 0, 1),
+	('leather_chickenhawk_perfect', 'Kiváló csirkekötő bőr', '1', 0, 1),
+	('leather_cormorant_bad', 'Rossz kormorán bőr', '1', 0, 1),
+	('leather_cormorant_good', 'Jó kormorán bőr', '1', 0, 1),
+	('leather_cormorant_perfect', 'Kiváló kormorán bőr', '1', 0, 1),
+	('leather_coyote_bad', 'Rossz farkas bör', '1', 0, 1),
+	('leather_coyote_good', 'Jó farkas bör', '1', 0, 1),
+	('leather_coyote_perfect', 'Kiváló farkas bör', '1', 0, 1),
+	('leather_deer_bad', 'Selejt szarvasbör', '1', 0, 1),
+	('leather_deer_good', 'Jó szarvasbör', '1', 0, 1),
+	('leather_deer_perfect', 'Kiváló szarvasbör', '1', 0, 1),
+	('leather_mlion_bad', 'Selejt oroszlán bör', '1', 0, 1),
+	('leather_mlion_good', 'Jó oroszlán bör', '1', 0, 1),
+	('leather_mlion_perfect', 'Kiváló oroszlán bör', '1', 0, 1),
+	('leather_rabbit_bad', 'Rossz nyúl bör', '1', 0, 1),
+	('leather_rabbit_good', 'Jó nyúl bör', '1', 0, 1),
+	('leather_rabbit_perfect', 'Kiváló nyúl bör', '1', 0, 1),
+	('lipton', 'Jeges Tea', '0.5', 0, 1),
+	('lithium', 'Lithium Elemek', '1', 0, 1),
+	('lockpick', 'Zárfeltörő Készlet', '1', 0, 1),
+	('longisland', 'Long Island', '1', 0, 1),
+	('margarita', 'Margarita', '1', 0, 1),
+	('marhaburger', 'Marha Burger', '1', 0, 1),
+	('marijuana', 'Marijuana', '0.5', 0, 1),
+	('martini', 'Martini', '1', 0, 1),
+	('mash', 'Szilva', '1', 0, 1),
+	('meat', 'Friss hús', '0.1', 0, 1),
+	('medikit', 'Elsősegély Csomag', '0.5', 0, 1),
+	('meleny', 'Robbanó mellény', '1', 0, 1),
+	('melleny', 'Szerelhető robbanó mellény', '1', 0, 1),
+	('meth', 'Meth', '1', 0, 1),
+	('meth10g', 'Meth (10G)', '1', 0, 1),
+	('meth1g', 'Meth (1G)', '1', 0, 1),
+	('methbrick', 'Meth Tömb (100G)', '1', 0, 1),
+	('methburn', 'Kék USB-C', '0.5', 0, 1),
+	('methlab', 'Hordozható Meth Labor', '5', 0, 1),
+	('mikulas', 'Mikulás csomag', '1', 0, 1),
+	('milk', 'Tej', '1', 0, 1),
+	('milkbucket', 'Vödör Tej', '1', 0, 1),
+	('miscso', 'MIS Csö', '1', 0, 1),
+	('mismarkolat', 'MIS Markolat', '1', 0, 1),
+	('misravasz', 'MIS Ravasz', '1', 0, 1),
+	('mistar', 'MIS Tár', '1', 0, 1),
+	('misvaz', 'MIS Váz', '1', 0, 1),
+	('mjuice', 'Mangó Juice', '0.5', 0, 1),
+	('moneybag', 'Zsák pénz', '1', 0, 1),
+	('monsterenergy', 'Monster ', '1', 0, 1),
+	('mouldybread', 'Romlott Kenyér', '0.2', 0, 1),
+	('mscso', 'MS Csö', '1', 0, 1),
+	('msmarkolat', 'MS Markolat', '1', 0, 1),
+	('msravasz', 'MS Ravasz', '1', 0, 1),
+	('mstar', 'MS Tár', '1', 0, 1),
+	('msvaz', 'MS Váz', '1', 0, 1),
+	('muffin', 'Muffin', '0.2', 0, 1),
+	('nagycola', '0,5L Kóla', '0.5', 0, 1),
+	('narancsle', 'Narancslé', '1', 0, 1),
+	('nightvision', 'Éjjellátó szemüveg', '1', 0, 1),
+	('notepad', 'Jegyzet', '0.1', 0, 1),
+	('oldring', 'Régi Gyürü', '1', 0, 1),
+	('oldshoe', 'Régi Cipö', '1', 0, 1),
+	('orosz', ' Orosz Hústál', '1', 0, 1),
+	('oxygenmask', 'Oxigén Maszk', '1', 0, 1),
+	('packaged_chicken', 'Csomagolt Csirke', '1', 0, 1),
+	('packaged_plank', 'Csomagolt Fa', '1', 0, 1),
+	('palacsinta', 'Palacsinta', '1', 0, 1),
+	('palinka', 'Ágyas pálinka', '1', 0, 1),
+	('pcso', 'Pisztoly Csö', '1', 0, 1),
+	('penztarca', 'Pénztárca', '0.1', 0, 1),
+	('petrol', 'Olaj', '1', 0, 1),
+	('petrol_raffin', 'Finomitott Olaj', '1', 0, 1),
+	('phone', 'Phone', '1', 0, 1),
+	('pizza', 'Pizza', '1', 0, 1),
+	('pizzaszelet', 'Pizza', '1', 0, 1),
+	('plasmacutter', 'Fúró', '1', 0, 1),
+	('plastic', 'Műanyag', '1', 0, 1),
+	('pmarkolat', 'Pisztoly Markolat', '1', 0, 1),
+	('polip', 'Sült polip', '1', 0, 1),
+	('pravasz', 'Pisztoly Ravasz', '1', 0, 1),
+	('ptar', 'Pisztoly Tár', '1', 0, 1),
+	('pvaz', 'Pisztoly Váz', '1', 0, 1),
+	('radio', 'Rádió', '1', 0, 1),
+	('rak', 'Sült rák', '1', 0, 1),
+	('raspberry', 'Laptop', '1', 0, 1),
+	('redbull', 'Redbull', '1', 0, 1),
+	('regal', 'Chivas Regal', '1', 0, 1),
+	('rendeles1', 'Rendelés', '1', 0, 1),
+	('rendeles2', 'Rendelés', '1', 0, 1),
+	('rendeles3', 'Rendelés', '1', 0, 1),
+	('rendeles4', 'Rendelés', '1', 0, 1),
+	('rendeles5', 'Rendelés', '1', 0, 1),
+	('repairkit', 'Szerelő Készlet', '1', 0, 1),
+	('robbery_grinder', 'Flex', '1', 0, 1),
+	('rolpaper', 'Cigipapír', '0.2', 0, 1),
+	('rough_diamond', 'Nyers Gyémánt', '1', 0, 1),
+	('rozskes', 'Rozsdás Kés', '1', 0, 1),
+	('rubber', 'Radír', '0.2', 0, 1),
+	('sajtburger', 'Sajt Burger', '1', 0, 1),
+	('salad', 'Saláta', '1', 0, 1),
+	('saw', 'Fejcsapda', '1', 0, 1),
+	('scratch_ticket', 'Kaparós sorsjegy', '1', 0, 1),
+	('sell_mash', 'Szilva pálinka eladás', '1', 0, 1),
+	('sexonthebeach', 'Sex On the Beach', '1', 0, 1),
+	('shotmenu', 'Shot Menü', '1', 0, 1),
+	('shovel', 'Ásó', '1', 0, 1),
+	('sierra', 'Sierra', '1', 0, 1),
+	('slaughtered_chicken', 'Filézett Csirke', '1', 0, 1),
+	('somloi', 'Somlói galuska', '1', 0, 1),
+	('spagetti', 'Spagetti', '1', 0, 1),
+	('speed', 'Speed', '1', 0, 1),
+	('stone', 'Kö', '1', 0, 1),
+	('sultkrumpli', 'Sültkrumpli', '1', 0, 1),
+	('suppressor', 'Suppressor', '1', 0, 1),
+	('szar', 'Szar', '1', 0, 1),
+	('tatra', 'Tátra tea', '1', 0, 1),
+	('tequila', 'Tequila', '1', 0, 1),
+	('thermal_charge', 'Thermal Bomba', '1', 0, 1),
+	('thermite', 'Thermite', '1', 0, 1),
+	('ticket', 'Börtön jegy', '-1', 0, 1),
+	('tirekit', 'Kerék Javito Készlet', '1', 0, 1),
+	('tortilla', 'Tortilla', '1', 0, 1),
+	('totem', 'Totem', '1', 0, 1),
+	('towing_rope', 'Vontató kötél', '1', 0, 1),
+	('traffipax', 'Traffipax', '1', 0, 1),
+	('tuning_laptop', 'Tuner Laptop', '1', 0, 1),
+	('unicum', 'Unicum', '1', 0, 1),
+	('vcso', 'Vintage cső', '1', 0, 1),
+	('vehgps', 'Jármü GPS', '0.5', 0, 1),
+	('vmarkolat', 'Vintage markolat', '1', 0, 1),
+	('vodka', 'Vodka', '1', 0, 1),
+	('vravasz', 'Vintage ravasz', '1', 0, 1),
+	('vtar', 'Vintage tár', '1', 0, 1),
+	('vvaz', 'Vintage váz', '1', 0, 1),
+	('walking_stick', 'Járóbot', '1', 0, 1),
+	('wallet', 'Pénztárca', '0.2', 0, 1),
+	('washed_stone', 'Mosott Kö', '1', 0, 1),
+	('water', 'Víz', '0.2', 0, 1),
+	('weabox', 'Fegyveres Doboz', '1', 0, 1),
+	('weaclip', 'Fegyver Tár', '1', 0, 1),
+	('weapon_paintgun', 'Paintball Gun', '1', 0, 1),
+	('weaponlicense', 'Fegyverengedély', '0.1', 0, 1),
+	('weed20g', 'Fű (20G)', '1', 0, 1),
+	('weed4g', 'Fű (4G)', '0.5', 0, 1),
+	('weedbrick', 'Fű Tömb (200G)', '2', 0, 1),
+	('weedburn', 'Zöld USB-C', '1', 0, 1),
+	('wetsuit', 'Búvár ruha', '1', 0, 1),
+	('whisky', 'Whisky', '1', 0, 1),
+	('wine', 'Bor', '1', 0, 1),
+	('wood', 'Fa', '1', 0, 1),
+	('wool', 'Gyapju', '1', 0, 1),
+	('yusuf', 'Weapon Skin', '1', 0, 1),
+	('zlom', 'Ócskavas', '0.5', 0, 1),
+	('zombi', 'Zombi', '1', 0, 1);
 
--- --------------------------------------------------------
-
---
--- Table structure for table `jobs`
---
-
-CREATE TABLE `jobs` (
+-- Dumping structure for table es_extended.jobs
+CREATE TABLE IF NOT EXISTS `jobs` (
   `name` varchar(50) NOT NULL,
   `label` varchar(50) DEFAULT NULL,
-  `whitelisted` tinyint(1) NOT NULL DEFAULT 0
-) ENGINE=InnoDB;
+  `whitelisted` tinyint(1) NOT NULL DEFAULT 0,
+  PRIMARY KEY (`name`) USING BTREE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci ROW_FORMAT=DYNAMIC;
 
---
--- Dumping data for table `jobs`
---
-
+-- Dumping data for table es_extended.jobs: ~60 rows (approximately)
 INSERT INTO `jobs` (`name`, `label`, `whitelisted`) VALUES
-('ambulance', 'EMS', 0),
-('cardealer', 'Cardealer', 0),
-('fisherman', 'Fisherman', 0),
-('fueler', 'Fueler', 0),
-('lumberjack', 'Lumberjack', 0),
-('mechanic', 'Mechanic', 0),
-('miner', 'Miner', 0),
-('police', 'LSPD', 0),
-('reporter', 'Reporter', 0),
-('slaughterer', 'Butcher', 0),
-('tailor', 'Tailor', 0),
-('taxi', 'Taxi', 0),
-('unemployed', 'Unemployed', 0);
+	('ambulance', 'Ambulance', 1),
+	('ballas', 'Ballas', 1),
+	('bennys', 'Bennys Motorworks', 1),
+	('bloods', 'Bloods', 1),
+	('bratva', 'Solntsevskaya Bratva', 1),
+	('burger', 'Burger Shot', 0),
+	('busdriver', 'Busz soför', 0),
+	('cali', 'Cali Cartel', 1),
+	('cardealer', 'Jármű kereskedő', 1),
+	('cassino', 'Casino', 1),
+	('continental', 'Continental', 1),
+	('cosanostra', 'Cosa Nostra', 1),
+	('crips', 'Crips', 1),
+	('delivery', 'Futár', 1),
+	('eastcustoms', 'East Customs', 1),
+	('farmer', 'Farmer', 0),
+	('fisherman', 'Halász', 1),
+	('flt', 'Targoncás', 0),
+	('fueler', 'Olajfinomitó', 1),
+	('garbagecrew', 'Szemetes', 0),
+	('gokart', 'Gokart Gang', 1),
+	('groove', 'Grove Street Families', 1),
+	('gruppe', 'Gruppe6', 1),
+	('homeless', 'Homeless', 1),
+	('housing', 'Ingatlan ügynökség', 1),
+	('inkognito', 'Inkognító', 1),
+	('ira', 'I.R.A.', 1),
+	('kingsman', 'Kings Man', 1),
+	('lacosa', 'La Cosa Nostra', 1),
+	('lostmc', 'Lost MC', 1),
+	('lumberjack', 'Favágó', 0),
+	('mechanic', 'Szerelö', 1),
+	('medelin', 'Medellin Cartel', 1),
+	('miner', 'Bányász', 1),
+	('moonshine', 'Szeszgyártó', 1),
+	('offambulance', 'Szolgálaton Kivül', 1),
+	('offpolice', 'Szolgálaton Kivül', 1),
+	('offsheriff', 'Szolgálaton kívül', 1),
+	('offtaxi', 'The Lost MC', 1),
+	('onkormanyzat', 'Önkormányzat', 1),
+	('orochi', 'Orochi', 1),
+	('parabellum', 'Parabellum', 1),
+	('peaky', 'Peaky Blinders', 1),
+	('police', 'LSPD', 1),
+	('resto', 'Étterem', 1),
+	('segedmunkas', 'Segédmunkás', 0),
+	('sheriff', 'Sheriff', 1),
+	('slaughterer', 'Hentes', 1),
+	('sons', 'Sons of Anarchy', 1),
+	('swat', 'S.W.A.T', 1),
+	('tailor', 'Szabó', 1),
+	('taxi', 'Taxi', 1),
+	('technician', 'Technikus', 0),
+	('trucker', 'Sofőr', 0),
+	('unemployed', 'Munkanélküli', 0),
+	('unicorn', 'Vanilla Unicorn', 1),
+	('vagos', 'Vagos', 1),
+	('weazelnews', 'Weazel News', 1),
+	('yakuza', 'Yakuza', 1),
+	('zlom', 'Hulladékgyüjtö', 1);
 
--- --------------------------------------------------------
-
---
--- Table structure for table `job_grades`
---
-
-CREATE TABLE `job_grades` (
-  `id` int(11) NOT NULL,
+-- Dumping structure for table es_extended.job_grades
+CREATE TABLE IF NOT EXISTS `job_grades` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
   `job_name` varchar(50) DEFAULT NULL,
   `grade` int(11) NOT NULL,
   `name` varchar(50) NOT NULL,
   `label` varchar(50) NOT NULL,
   `salary` int(11) NOT NULL,
   `skin_male` longtext NOT NULL,
-  `skin_female` longtext NOT NULL
-) ENGINE=InnoDB;
+  `skin_female` longtext NOT NULL,
+  PRIMARY KEY (`id`) USING BTREE
+) ENGINE=InnoDB AUTO_INCREMENT=1204 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci ROW_FORMAT=DYNAMIC;
 
---
--- Dumping data for table `job_grades`
---
-
+-- Dumping data for table es_extended.job_grades: ~255 rows (approximately)
 INSERT INTO `job_grades` (`id`, `job_name`, `grade`, `name`, `label`, `salary`, `skin_male`, `skin_female`) VALUES
-(1, 'unemployed', 0, 'unemployed', 'Unemployed', 200, '{}', '{}'),
-(2, 'police', 0, 'recruit', 'Recruit', 20, '{}', '{}'),
-(3, 'police', 1, 'officer', 'Officer', 40, '{}', '{}'),
-(4, 'police', 2, 'sergeant', 'Sergeant', 60, '{}', '{}'),
-(5, 'police', 3, 'lieutenant', 'Lieutenant', 85, '{}', '{}'),
-(6, 'police', 4, 'boss', 'Captain', 100, '{}', '{}'),
-(11, 'cardealer', 0, 'recruit', 'Recruit', 10, '{}', '{}'),
-(12, 'cardealer', 1, 'novice', 'Novice', 25, '{}', '{}'),
-(13, 'cardealer', 2, 'experienced', 'Experienced', 40, '{}', '{}'),
-(14, 'cardealer', 3, 'boss', 'Boss', 0, '{}', '{}'),
-(15, 'lumberjack', 0, 'employee', 'Employee', 0, '{}', '{}'),
-(16, 'fisherman', 0, 'employee', 'Employee', 0, '{}', '{}'),
-(17, 'fueler', 0, 'employee', 'Employee', 0, '{}', '{}'),
-(18, 'reporter', 0, 'employee', 'Employee', 0, '{}', '{}'),
-(19, 'tailor', 0, 'employee', 'Employee', 0, '{\"mask_1\":0,\"arms\":1,\"glasses_1\":0,\"hair_color_2\":4,\"makeup_1\":0,\"face\":19,\"glasses\":0,\"mask_2\":0,\"makeup_3\":0,\"skin\":29,\"helmet_2\":0,\"lipstick_4\":0,\"sex\":0,\"torso_1\":24,\"makeup_2\":0,\"bags_2\":0,\"chain_2\":0,\"ears_1\":-1,\"bags_1\":0,\"bproof_1\":0,\"shoes_2\":0,\"lipstick_2\":0,\"chain_1\":0,\"tshirt_1\":0,\"eyebrows_3\":0,\"pants_2\":0,\"beard_4\":0,\"torso_2\":0,\"beard_2\":6,\"ears_2\":0,\"hair_2\":0,\"shoes_1\":36,\"tshirt_2\":0,\"beard_3\":0,\"hair_1\":2,\"hair_color_1\":0,\"pants_1\":48,\"helmet_1\":-1,\"bproof_2\":0,\"eyebrows_4\":0,\"eyebrows_2\":0,\"decals_1\":0,\"age_2\":0,\"beard_1\":5,\"shoes\":10,\"lipstick_1\":0,\"eyebrows_1\":0,\"glasses_2\":0,\"makeup_4\":0,\"decals_2\":0,\"lipstick_3\":0,\"age_1\":0}', '{\"mask_1\":0,\"arms\":5,\"glasses_1\":5,\"hair_color_2\":4,\"makeup_1\":0,\"face\":19,\"glasses\":0,\"mask_2\":0,\"makeup_3\":0,\"skin\":29,\"helmet_2\":0,\"lipstick_4\":0,\"sex\":1,\"torso_1\":52,\"makeup_2\":0,\"bags_2\":0,\"chain_2\":0,\"ears_1\":-1,\"bags_1\":0,\"bproof_1\":0,\"shoes_2\":1,\"lipstick_2\":0,\"chain_1\":0,\"tshirt_1\":23,\"eyebrows_3\":0,\"pants_2\":0,\"beard_4\":0,\"torso_2\":0,\"beard_2\":6,\"ears_2\":0,\"hair_2\":0,\"shoes_1\":42,\"tshirt_2\":4,\"beard_3\":0,\"hair_1\":2,\"hair_color_1\":0,\"pants_1\":36,\"helmet_1\":-1,\"bproof_2\":0,\"eyebrows_4\":0,\"eyebrows_2\":0,\"decals_1\":0,\"age_2\":0,\"beard_1\":5,\"shoes\":10,\"lipstick_1\":0,\"eyebrows_1\":0,\"glasses_2\":0,\"makeup_4\":0,\"decals_2\":0,\"lipstick_3\":0,\"age_1\":0}'),
-(20, 'miner', 0, 'employee', 'Employee', 0, '{\"tshirt_2\":1,\"ears_1\":8,\"glasses_1\":15,\"torso_2\":0,\"ears_2\":2,\"glasses_2\":3,\"shoes_2\":1,\"pants_1\":75,\"shoes_1\":51,\"bags_1\":0,\"helmet_2\":0,\"pants_2\":7,\"torso_1\":71,\"tshirt_1\":59,\"arms\":2,\"bags_2\":0,\"helmet_1\":0}', '{}'),
-(21, 'slaughterer', 0, 'employee', 'Employee', 0, '{\"age_1\":0,\"glasses_2\":0,\"beard_1\":5,\"decals_2\":0,\"beard_4\":0,\"shoes_2\":0,\"tshirt_2\":0,\"lipstick_2\":0,\"hair_2\":0,\"arms\":67,\"pants_1\":36,\"skin\":29,\"eyebrows_2\":0,\"shoes\":10,\"helmet_1\":-1,\"lipstick_1\":0,\"helmet_2\":0,\"hair_color_1\":0,\"glasses\":0,\"makeup_4\":0,\"makeup_1\":0,\"hair_1\":2,\"bproof_1\":0,\"bags_1\":0,\"mask_1\":0,\"lipstick_3\":0,\"chain_1\":0,\"eyebrows_4\":0,\"sex\":0,\"torso_1\":56,\"beard_2\":6,\"shoes_1\":12,\"decals_1\":0,\"face\":19,\"lipstick_4\":0,\"tshirt_1\":15,\"mask_2\":0,\"age_2\":0,\"eyebrows_3\":0,\"chain_2\":0,\"glasses_1\":0,\"ears_1\":-1,\"bags_2\":0,\"ears_2\":0,\"torso_2\":0,\"bproof_2\":0,\"makeup_2\":0,\"eyebrows_1\":0,\"makeup_3\":0,\"pants_2\":0,\"beard_3\":0,\"hair_color_2\":4}', '{\"age_1\":0,\"glasses_2\":0,\"beard_1\":5,\"decals_2\":0,\"beard_4\":0,\"shoes_2\":0,\"tshirt_2\":0,\"lipstick_2\":0,\"hair_2\":0,\"arms\":72,\"pants_1\":45,\"skin\":29,\"eyebrows_2\":0,\"shoes\":10,\"helmet_1\":-1,\"lipstick_1\":0,\"helmet_2\":0,\"hair_color_1\":0,\"glasses\":0,\"makeup_4\":0,\"makeup_1\":0,\"hair_1\":2,\"bproof_1\":0,\"bags_1\":0,\"mask_1\":0,\"lipstick_3\":0,\"chain_1\":0,\"eyebrows_4\":0,\"sex\":1,\"torso_1\":49,\"beard_2\":6,\"shoes_1\":24,\"decals_1\":0,\"face\":19,\"lipstick_4\":0,\"tshirt_1\":9,\"mask_2\":0,\"age_2\":0,\"eyebrows_3\":0,\"chain_2\":0,\"glasses_1\":5,\"ears_1\":-1,\"bags_2\":0,\"ears_2\":0,\"torso_2\":0,\"bproof_2\":0,\"makeup_2\":0,\"eyebrows_1\":0,\"makeup_3\":0,\"pants_2\":0,\"beard_3\":0,\"hair_color_2\":4}'),
-(22, 'ambulance', 0, 'ambulance', 'Jr. EMT', 20, '{\"tshirt_2\":0,\"hair_color_1\":5,\"glasses_2\":3,\"shoes\":9,\"torso_2\":3,\"hair_color_2\":0,\"pants_1\":24,\"glasses_1\":4,\"hair_1\":2,\"sex\":0,\"decals_2\":0,\"tshirt_1\":15,\"helmet_1\":8,\"helmet_2\":0,\"arms\":92,\"face\":19,\"decals_1\":60,\"torso_1\":13,\"hair_2\":0,\"skin\":34,\"pants_2\":5}', '{\"tshirt_2\":3,\"decals_2\":0,\"glasses\":0,\"hair_1\":2,\"torso_1\":73,\"shoes\":1,\"hair_color_2\":0,\"glasses_1\":19,\"skin\":13,\"face\":6,\"pants_2\":5,\"tshirt_1\":75,\"pants_1\":37,\"helmet_1\":57,\"torso_2\":0,\"arms\":14,\"sex\":1,\"glasses_2\":0,\"decals_1\":0,\"hair_2\":0,\"helmet_2\":0,\"hair_color_1\":0}'),
-(23, 'ambulance', 1, 'doctor', 'EMT', 40, '{\"tshirt_2\":0,\"hair_color_1\":5,\"glasses_2\":3,\"shoes\":9,\"torso_2\":3,\"hair_color_2\":0,\"pants_1\":24,\"glasses_1\":4,\"hair_1\":2,\"sex\":0,\"decals_2\":0,\"tshirt_1\":15,\"helmet_1\":8,\"helmet_2\":0,\"arms\":92,\"face\":19,\"decals_1\":60,\"torso_1\":13,\"hair_2\":0,\"skin\":34,\"pants_2\":5}', '{\"tshirt_2\":3,\"decals_2\":0,\"glasses\":0,\"hair_1\":2,\"torso_1\":73,\"shoes\":1,\"hair_color_2\":0,\"glasses_1\":19,\"skin\":13,\"face\":6,\"pants_2\":5,\"tshirt_1\":75,\"pants_1\":37,\"helmet_1\":57,\"torso_2\":0,\"arms\":14,\"sex\":1,\"glasses_2\":0,\"decals_1\":0,\"hair_2\":0,\"helmet_2\":0,\"hair_color_1\":0}'),
-(24, 'ambulance', 2, 'chief_doctor', 'Sr. EMT', 60, '{\"tshirt_2\":0,\"hair_color_1\":5,\"glasses_2\":3,\"shoes\":9,\"torso_2\":3,\"hair_color_2\":0,\"pants_1\":24,\"glasses_1\":4,\"hair_1\":2,\"sex\":0,\"decals_2\":0,\"tshirt_1\":15,\"helmet_1\":8,\"helmet_2\":0,\"arms\":92,\"face\":19,\"decals_1\":60,\"torso_1\":13,\"hair_2\":0,\"skin\":34,\"pants_2\":5}', '{\"tshirt_2\":3,\"decals_2\":0,\"glasses\":0,\"hair_1\":2,\"torso_1\":73,\"shoes\":1,\"hair_color_2\":0,\"glasses_1\":19,\"skin\":13,\"face\":6,\"pants_2\":5,\"tshirt_1\":75,\"pants_1\":37,\"helmet_1\":57,\"torso_2\":0,\"arms\":14,\"sex\":1,\"glasses_2\":0,\"decals_1\":0,\"hair_2\":0,\"helmet_2\":0,\"hair_color_1\":0}'),
-(25, 'ambulance', 3, 'boss', 'EMT Supervisor', 80, '{\"tshirt_2\":0,\"hair_color_1\":5,\"glasses_2\":3,\"shoes\":9,\"torso_2\":3,\"hair_color_2\":0,\"pants_1\":24,\"glasses_1\":4,\"hair_1\":2,\"sex\":0,\"decals_2\":0,\"tshirt_1\":15,\"helmet_1\":8,\"helmet_2\":0,\"arms\":92,\"face\":19,\"decals_1\":60,\"torso_1\":13,\"hair_2\":0,\"skin\":34,\"pants_2\":5}', '{\"tshirt_2\":3,\"decals_2\":0,\"glasses\":0,\"hair_1\":2,\"torso_1\":73,\"shoes\":1,\"hair_color_2\":0,\"glasses_1\":19,\"skin\":13,\"face\":6,\"pants_2\":5,\"tshirt_1\":75,\"pants_1\":37,\"helmet_1\":57,\"torso_2\":0,\"arms\":14,\"sex\":1,\"glasses_2\":0,\"decals_1\":0,\"hair_2\":0,\"helmet_2\":0,\"hair_color_1\":0}'),
-(26, 'mechanic', 0, 'recrue', 'Recruit', 12, '{}', '{}'),
-(27, 'mechanic', 1, 'novice', 'Novice', 24, '{}', '{}'),
-(28, 'mechanic', 2, 'experimente', 'Experienced', 36, '{}', '{}'),
-(29, 'mechanic', 3, 'chief', 'Leader', 48, '{}', '{}'),
-(30, 'mechanic', 4, 'boss', 'Boss', 0, '{}', '{}'),
-(31, 'taxi', 0, 'recrue', 'Recruit', 12, '{\"hair_2\":0,\"hair_color_2\":0,\"torso_1\":32,\"bags_1\":0,\"helmet_2\":0,\"chain_2\":0,\"eyebrows_3\":0,\"makeup_3\":0,\"makeup_2\":0,\"tshirt_1\":31,\"makeup_1\":0,\"bags_2\":0,\"makeup_4\":0,\"eyebrows_4\":0,\"chain_1\":0,\"lipstick_4\":0,\"bproof_2\":0,\"hair_color_1\":0,\"decals_2\":0,\"pants_2\":0,\"age_2\":0,\"glasses_2\":0,\"ears_2\":0,\"arms\":27,\"lipstick_1\":0,\"ears_1\":-1,\"mask_2\":0,\"sex\":0,\"lipstick_3\":0,\"helmet_1\":-1,\"shoes_2\":0,\"beard_2\":0,\"beard_1\":0,\"lipstick_2\":0,\"beard_4\":0,\"glasses_1\":0,\"bproof_1\":0,\"mask_1\":0,\"decals_1\":1,\"hair_1\":0,\"eyebrows_2\":0,\"beard_3\":0,\"age_1\":0,\"tshirt_2\":0,\"skin\":0,\"torso_2\":0,\"eyebrows_1\":0,\"face\":0,\"shoes_1\":10,\"pants_1\":24}', '{\"hair_2\":0,\"hair_color_2\":0,\"torso_1\":57,\"bags_1\":0,\"helmet_2\":0,\"chain_2\":0,\"eyebrows_3\":0,\"makeup_3\":0,\"makeup_2\":0,\"tshirt_1\":38,\"makeup_1\":0,\"bags_2\":0,\"makeup_4\":0,\"eyebrows_4\":0,\"chain_1\":0,\"lipstick_4\":0,\"bproof_2\":0,\"hair_color_1\":0,\"decals_2\":0,\"pants_2\":1,\"age_2\":0,\"glasses_2\":0,\"ears_2\":0,\"arms\":21,\"lipstick_1\":0,\"ears_1\":-1,\"mask_2\":0,\"sex\":1,\"lipstick_3\":0,\"helmet_1\":-1,\"shoes_2\":0,\"beard_2\":0,\"beard_1\":0,\"lipstick_2\":0,\"beard_4\":0,\"glasses_1\":5,\"bproof_1\":0,\"mask_1\":0,\"decals_1\":1,\"hair_1\":0,\"eyebrows_2\":0,\"beard_3\":0,\"age_1\":0,\"tshirt_2\":0,\"skin\":0,\"torso_2\":0,\"eyebrows_1\":0,\"face\":0,\"shoes_1\":49,\"pants_1\":11}'),
-(32, 'taxi', 1, 'novice', 'Cabby', 24, '{\"hair_2\":0,\"hair_color_2\":0,\"torso_1\":32,\"bags_1\":0,\"helmet_2\":0,\"chain_2\":0,\"eyebrows_3\":0,\"makeup_3\":0,\"makeup_2\":0,\"tshirt_1\":31,\"makeup_1\":0,\"bags_2\":0,\"makeup_4\":0,\"eyebrows_4\":0,\"chain_1\":0,\"lipstick_4\":0,\"bproof_2\":0,\"hair_color_1\":0,\"decals_2\":0,\"pants_2\":0,\"age_2\":0,\"glasses_2\":0,\"ears_2\":0,\"arms\":27,\"lipstick_1\":0,\"ears_1\":-1,\"mask_2\":0,\"sex\":0,\"lipstick_3\":0,\"helmet_1\":-1,\"shoes_2\":0,\"beard_2\":0,\"beard_1\":0,\"lipstick_2\":0,\"beard_4\":0,\"glasses_1\":0,\"bproof_1\":0,\"mask_1\":0,\"decals_1\":1,\"hair_1\":0,\"eyebrows_2\":0,\"beard_3\":0,\"age_1\":0,\"tshirt_2\":0,\"skin\":0,\"torso_2\":0,\"eyebrows_1\":0,\"face\":0,\"shoes_1\":10,\"pants_1\":24}', '{\"hair_2\":0,\"hair_color_2\":0,\"torso_1\":57,\"bags_1\":0,\"helmet_2\":0,\"chain_2\":0,\"eyebrows_3\":0,\"makeup_3\":0,\"makeup_2\":0,\"tshirt_1\":38,\"makeup_1\":0,\"bags_2\":0,\"makeup_4\":0,\"eyebrows_4\":0,\"chain_1\":0,\"lipstick_4\":0,\"bproof_2\":0,\"hair_color_1\":0,\"decals_2\":0,\"pants_2\":1,\"age_2\":0,\"glasses_2\":0,\"ears_2\":0,\"arms\":21,\"lipstick_1\":0,\"ears_1\":-1,\"mask_2\":0,\"sex\":1,\"lipstick_3\":0,\"helmet_1\":-1,\"shoes_2\":0,\"beard_2\":0,\"beard_1\":0,\"lipstick_2\":0,\"beard_4\":0,\"glasses_1\":5,\"bproof_1\":0,\"mask_1\":0,\"decals_1\":1,\"hair_1\":0,\"eyebrows_2\":0,\"beard_3\":0,\"age_1\":0,\"tshirt_2\":0,\"skin\":0,\"torso_2\":0,\"eyebrows_1\":0,\"face\":0,\"shoes_1\":49,\"pants_1\":11}'),
-(33, 'taxi', 2, 'experimente', 'Experienced', 36, '{\"hair_2\":0,\"hair_color_2\":0,\"torso_1\":26,\"bags_1\":0,\"helmet_2\":0,\"chain_2\":0,\"eyebrows_3\":0,\"makeup_3\":0,\"makeup_2\":0,\"tshirt_1\":57,\"makeup_1\":0,\"bags_2\":0,\"makeup_4\":0,\"eyebrows_4\":0,\"chain_1\":0,\"lipstick_4\":0,\"bproof_2\":0,\"hair_color_1\":0,\"decals_2\":0,\"pants_2\":4,\"age_2\":0,\"glasses_2\":0,\"ears_2\":0,\"arms\":11,\"lipstick_1\":0,\"ears_1\":-1,\"mask_2\":0,\"sex\":0,\"lipstick_3\":0,\"helmet_1\":-1,\"shoes_2\":0,\"beard_2\":0,\"beard_1\":0,\"lipstick_2\":0,\"beard_4\":0,\"glasses_1\":0,\"bproof_1\":0,\"mask_1\":0,\"decals_1\":0,\"hair_1\":0,\"eyebrows_2\":0,\"beard_3\":0,\"age_1\":0,\"tshirt_2\":0,\"skin\":0,\"torso_2\":0,\"eyebrows_1\":0,\"face\":0,\"shoes_1\":10,\"pants_1\":24}', '{\"hair_2\":0,\"hair_color_2\":0,\"torso_1\":57,\"bags_1\":0,\"helmet_2\":0,\"chain_2\":0,\"eyebrows_3\":0,\"makeup_3\":0,\"makeup_2\":0,\"tshirt_1\":38,\"makeup_1\":0,\"bags_2\":0,\"makeup_4\":0,\"eyebrows_4\":0,\"chain_1\":0,\"lipstick_4\":0,\"bproof_2\":0,\"hair_color_1\":0,\"decals_2\":0,\"pants_2\":1,\"age_2\":0,\"glasses_2\":0,\"ears_2\":0,\"arms\":21,\"lipstick_1\":0,\"ears_1\":-1,\"mask_2\":0,\"sex\":1,\"lipstick_3\":0,\"helmet_1\":-1,\"shoes_2\":0,\"beard_2\":0,\"beard_1\":0,\"lipstick_2\":0,\"beard_4\":0,\"glasses_1\":5,\"bproof_1\":0,\"mask_1\":0,\"decals_1\":1,\"hair_1\":0,\"eyebrows_2\":0,\"beard_3\":0,\"age_1\":0,\"tshirt_2\":0,\"skin\":0,\"torso_2\":0,\"eyebrows_1\":0,\"face\":0,\"shoes_1\":49,\"pants_1\":11}'),
-(34, 'taxi', 3, 'uber', 'Uber Cabby', 48, '{\"hair_2\":0,\"hair_color_2\":0,\"torso_1\":26,\"bags_1\":0,\"helmet_2\":0,\"chain_2\":0,\"eyebrows_3\":0,\"makeup_3\":0,\"makeup_2\":0,\"tshirt_1\":57,\"makeup_1\":0,\"bags_2\":0,\"makeup_4\":0,\"eyebrows_4\":0,\"chain_1\":0,\"lipstick_4\":0,\"bproof_2\":0,\"hair_color_1\":0,\"decals_2\":0,\"pants_2\":4,\"age_2\":0,\"glasses_2\":0,\"ears_2\":0,\"arms\":11,\"lipstick_1\":0,\"ears_1\":-1,\"mask_2\":0,\"sex\":0,\"lipstick_3\":0,\"helmet_1\":-1,\"shoes_2\":0,\"beard_2\":0,\"beard_1\":0,\"lipstick_2\":0,\"beard_4\":0,\"glasses_1\":0,\"bproof_1\":0,\"mask_1\":0,\"decals_1\":0,\"hair_1\":0,\"eyebrows_2\":0,\"beard_3\":0,\"age_1\":0,\"tshirt_2\":0,\"skin\":0,\"torso_2\":0,\"eyebrows_1\":0,\"face\":0,\"shoes_1\":10,\"pants_1\":24}', '{\"hair_2\":0,\"hair_color_2\":0,\"torso_1\":57,\"bags_1\":0,\"helmet_2\":0,\"chain_2\":0,\"eyebrows_3\":0,\"makeup_3\":0,\"makeup_2\":0,\"tshirt_1\":38,\"makeup_1\":0,\"bags_2\":0,\"makeup_4\":0,\"eyebrows_4\":0,\"chain_1\":0,\"lipstick_4\":0,\"bproof_2\":0,\"hair_color_1\":0,\"decals_2\":0,\"pants_2\":1,\"age_2\":0,\"glasses_2\":0,\"ears_2\":0,\"arms\":21,\"lipstick_1\":0,\"ears_1\":-1,\"mask_2\":0,\"sex\":1,\"lipstick_3\":0,\"helmet_1\":-1,\"shoes_2\":0,\"beard_2\":0,\"beard_1\":0,\"lipstick_2\":0,\"beard_4\":0,\"glasses_1\":5,\"bproof_1\":0,\"mask_1\":0,\"decals_1\":1,\"hair_1\":0,\"eyebrows_2\":0,\"beard_3\":0,\"age_1\":0,\"tshirt_2\":0,\"skin\":0,\"torso_2\":0,\"eyebrows_1\":0,\"face\":0,\"shoes_1\":49,\"pants_1\":11}'),
-(35, 'taxi', 4, 'boss', 'Lead Cabby', 0, '{\"hair_2\":0,\"hair_color_2\":0,\"torso_1\":29,\"bags_1\":0,\"helmet_2\":0,\"chain_2\":0,\"eyebrows_3\":0,\"makeup_3\":0,\"makeup_2\":0,\"tshirt_1\":31,\"makeup_1\":0,\"bags_2\":0,\"makeup_4\":0,\"eyebrows_4\":0,\"chain_1\":0,\"lipstick_4\":0,\"bproof_2\":0,\"hair_color_1\":0,\"decals_2\":0,\"pants_2\":4,\"age_2\":0,\"glasses_2\":0,\"ears_2\":0,\"arms\":1,\"lipstick_1\":0,\"ears_1\":-1,\"mask_2\":0,\"sex\":0,\"lipstick_3\":0,\"helmet_1\":-1,\"shoes_2\":0,\"beard_2\":0,\"beard_1\":0,\"lipstick_2\":0,\"beard_4\":0,\"glasses_1\":0,\"bproof_1\":0,\"mask_1\":0,\"decals_1\":0,\"hair_1\":0,\"eyebrows_2\":0,\"beard_3\":0,\"age_1\":0,\"tshirt_2\":0,\"skin\":0,\"torso_2\":4,\"eyebrows_1\":0,\"face\":0,\"shoes_1\":10,\"pants_1\":24}', '{\"hair_2\":0,\"hair_color_2\":0,\"torso_1\":57,\"bags_1\":0,\"helmet_2\":0,\"chain_2\":0,\"eyebrows_3\":0,\"makeup_3\":0,\"makeup_2\":0,\"tshirt_1\":38,\"makeup_1\":0,\"bags_2\":0,\"makeup_4\":0,\"eyebrows_4\":0,\"chain_1\":0,\"lipstick_4\":0,\"bproof_2\":0,\"hair_color_1\":0,\"decals_2\":0,\"pants_2\":1,\"age_2\":0,\"glasses_2\":0,\"ears_2\":0,\"arms\":21,\"lipstick_1\":0,\"ears_1\":-1,\"mask_2\":0,\"sex\":1,\"lipstick_3\":0,\"helmet_1\":-1,\"shoes_2\":0,\"beard_2\":0,\"beard_1\":0,\"lipstick_2\":0,\"beard_4\":0,\"glasses_1\":5,\"bproof_1\":0,\"mask_1\":0,\"decals_1\":1,\"hair_1\":0,\"eyebrows_2\":0,\"beard_3\":0,\"age_1\":0,\"tshirt_2\":0,\"skin\":0,\"torso_2\":0,\"eyebrows_1\":0,\"face\":0,\"shoes_1\":49,\"pants_1\":11}');
+	(1, 'unemployed', 0, 'unemployed', 'Munkanélküli', 200, '{}', '{}'),
+	(2, 'police', 0, 'rang0', 'Kadét', 2300, '{}', '{}'),
+	(3, 'police', 1, 'rang1', 'Járőr', 2400, '{}', '{}'),
+	(4, 'police', 2, 'rang2', 'Tizedes', 2500, '{}', '{}'),
+	(5, 'police', 3, 'rang3', 'Szolgálatparancsnok', 2600, '{}', '{}'),
+	(6, 'police', 4, 'rang4', 'Őrmester', 2750, '{}', '{}'),
+	(7, 'police', 5, 'rang5', 'Zászlós', 2800, '{}', '{}'),
+	(8, 'police', 6, 'rang6', 'Hadnagy', 2850, '{}', '{}'),
+	(9, 'police', 7, 'rang7', 'Százados', 2900, '{}', '{}'),
+	(10, 'police', 8, 'rang8', 'Őrnagy', 3000, '{}', '{}'),
+	(11, 'police', 9, 'rang9', 'Ezredes', 3100, '{}', '{}'),
+	(12, 'police', 10, 'alboss', 'Kapitányhelyettes', 3300, '{}', '{}'),
+	(13, 'police', 11, 'boss', 'Fökapitány', 3500, '{}', '{}'),
+	(42, 'cosanostra', 0, 'rang1', 'Picciotti', 1, '{}', '{}'),
+	(43, 'cosanostra', 1, 'rang2', 'Soldati', 1, '{}', '{}'),
+	(44, 'cosanostra', 2, 'rang3', 'Consiglieri', 1, '{}', '{}'),
+	(45, 'cosanostra', 3, 'rang4', 'Sottocapo', 1, '{}', '{}'),
+	(46, 'cosanostra', 4, 'boss', 'Don', 1, '{}', '{}'),
+	(52, 'offtaxi', 0, 'rang1', 'Prospect', 1, '{}', '{}'),
+	(53, 'offtaxi', 1, 'rang2', 'Enforcer', 1, '{}', '{}'),
+	(54, 'offtaxi', 2, 'rang3', 'Road Captain', 1, '{}', '{}'),
+	(55, 'offtaxi', 3, 'rang4', 'Vice-President', 1, '{}', '{}'),
+	(56, 'offtaxi', 4, 'boss', 'President', 10, '{}', '{}'),
+	(71, 'burger', 0, 'employee', 'Alkalmazott', 0, '{}', '{}'),
+	(72, 'delivery', 0, 'delivery', 'Futár', 0, '{}', '{}'),
+	(73, 'lumberjack', 0, 'employee', 'Munkavállaló', 0, '{"tshirt_2":1,"ears_1":8,"glasses_1":15,"torso_2":0,"ears_2":2,"glasses_2":3,"shoes_2":1,"pants_1":75,"shoes_1":51,"bags_1":0,"helmet_2":0,"pants_2":7,"torso_1":71,"tshirt_1":59,"arms":2,"bags_2":0,"helmet_1":0}', '{"tshirt_2":1,"ears_1":8,"glasses_1":15,"torso_2":0,"ears_2":2,"glasses_2":3,"shoes_2":1,"pants_1":75,"shoes_1":51,"bags_1":0,"helmet_2":0,"pants_2":7,"torso_1":71,"tshirt_1":59,"arms":2,"bags_2":0,"helmet_1":0}'),
+	(74, 'fisherman', 0, 'employee', 'Munkavállaló', 0, '{}', '{}'),
+	(75, 'fueler', 0, 'employee', 'Munkavállaló', 0, '{}', '{}'),
+	(77, 'tailor', 0, 'employee', 'Munkavállaló', 0, '{"mask_1":0,"arms":1,"glasses_1":0,"hair_color_2":4,"makeup_1":0,"face":19,"glasses":0,"mask_2":0,"makeup_3":0,"skin":29,"helmet_2":0,"lipstick_4":0,"sex":0,"torso_1":24,"makeup_2":0,"bags_2":0,"chain_2":0,"ears_1":-1,"bags_1":0,"bproof_1":0,"shoes_2":0,"lipstick_2":0,"chain_1":0,"tshirt_1":0,"eyebrows_3":0,"pants_2":0,"beard_4":0,"torso_2":0,"beard_2":6,"ears_2":0,"hair_2":0,"shoes_1":36,"tshirt_2":0,"beard_3":0,"hair_1":2,"hair_color_1":0,"pants_1":48,"helmet_1":-1,"bproof_2":0,"eyebrows_4":0,"eyebrows_2":0,"decals_1":0,"age_2":0,"beard_1":5,"shoes":10,"lipstick_1":0,"eyebrows_1":0,"glasses_2":0,"makeup_4":0,"decals_2":0,"lipstick_3":0,"age_1":0}', '{"mask_1":0,"arms":5,"glasses_1":5,"hair_color_2":4,"makeup_1":0,"face":19,"glasses":0,"mask_2":0,"makeup_3":0,"skin":29,"helmet_2":0,"lipstick_4":0,"sex":1,"torso_1":52,"makeup_2":0,"bags_2":0,"chain_2":0,"ears_1":-1,"bags_1":0,"bproof_1":0,"shoes_2":1,"lipstick_2":0,"chain_1":0,"tshirt_1":23,"eyebrows_3":0,"pants_2":0,"beard_4":0,"torso_2":0,"beard_2":6,"ears_2":0,"hair_2":0,"shoes_1":42,"tshirt_2":4,"beard_3":0,"hair_1":2,"hair_color_1":0,"pants_1":36,"helmet_1":-1,"bproof_2":0,"eyebrows_4":0,"eyebrows_2":0,"decals_1":0,"age_2":0,"beard_1":5,"shoes":10,"lipstick_1":0,"eyebrows_1":0,"glasses_2":0,"makeup_4":0,"decals_2":0,"lipstick_3":0,"age_1":0}'),
+	(78, 'miner', 0, 'employee', 'Munkavállaló', 0, '{"tshirt_2":1,"ears_1":8,"glasses_1":15,"torso_2":0,"ears_2":2,"glasses_2":3,"shoes_2":1,"pants_1":75,"shoes_1":51,"bags_1":0,"helmet_2":0,"pants_2":7,"torso_1":71,"tshirt_1":59,"arms":2,"bags_2":0,"helmet_1":0}', '{}'),
+	(79, 'slaughterer', 0, 'employee', 'Munkavállaló', 0, '{"age_1":0,"glasses_2":0,"beard_1":5,"decals_2":0,"beard_4":0,"shoes_2":0,"tshirt_2":0,"lipstick_2":0,"hair_2":0,"arms":67,"pants_1":36,"skin":29,"eyebrows_2":0,"shoes":10,"helmet_1":-1,"lipstick_1":0,"helmet_2":0,"hair_color_1":0,"glasses":0,"makeup_4":0,"makeup_1":0,"hair_1":2,"bproof_1":0,"bags_1":0,"mask_1":0,"lipstick_3":0,"chain_1":0,"eyebrows_4":0,"sex":0,"torso_1":56,"beard_2":6,"shoes_1":12,"decals_1":0,"face":19,"lipstick_4":0,"tshirt_1":15,"mask_2":0,"age_2":0,"eyebrows_3":0,"chain_2":0,"glasses_1":0,"ears_1":-1,"bags_2":0,"ears_2":0,"torso_2":0,"bproof_2":0,"makeup_2":0,"eyebrows_1":0,"makeup_3":0,"pants_2":0,"beard_3":0,"hair_color_2":4}', '{"age_1":0,"glasses_2":0,"beard_1":5,"decals_2":0,"beard_4":0,"shoes_2":0,"tshirt_2":0,"lipstick_2":0,"hair_2":0,"arms":72,"pants_1":45,"skin":29,"eyebrows_2":0,"shoes":10,"helmet_1":-1,"lipstick_1":0,"helmet_2":0,"hair_color_1":0,"glasses":0,"makeup_4":0,"makeup_1":0,"hair_1":2,"bproof_1":0,"bags_1":0,"mask_1":0,"lipstick_3":0,"chain_1":0,"eyebrows_4":0,"sex":1,"torso_1":49,"beard_2":6,"shoes_1":24,"decals_1":0,"face":19,"lipstick_4":0,"tshirt_1":9,"mask_2":0,"age_2":0,"eyebrows_3":0,"chain_2":0,"glasses_1":5,"ears_1":-1,"bags_2":0,"ears_2":0,"torso_2":0,"bproof_2":0,"makeup_2":0,"eyebrows_1":0,"makeup_3":0,"pants_2":0,"beard_3":0,"hair_color_2":4}'),
+	(80, 'segedmunkas', 0, 'employee', 'Ács', 0, '{}', '{}'),
+	(81, 'mechanic', 0, 'recrue', 'Segédmunkás', 500, '{}', '{}'),
+	(82, 'mechanic', 1, 'novice', 'Szerelö', 600, '{}', '{}'),
+	(83, 'mechanic', 2, 'experimente', 'Tapasztalt Szerelö', 700, '{}', '{}'),
+	(84, 'mechanic', 3, 'chief', 'Üzletvezetö Helyettes', 1000, '{}', '{}'),
+	(85, 'mechanic', 4, 'boss', 'Üzletvezetö', 2000, '{}', '{}'),
+	(86, 'sheriff', 0, 'recruit', 'Lieutenant', 2500, '{}', '{}'),
+	(87, 'sheriff', 1, 'officer', 'Captain', 2750, '{}', '{}'),
+	(88, 'sheriff', 2, 'sergeant', 'Ranger', 3000, '{}', '{}'),
+	(89, 'sheriff', 3, 'lieutenant', 'Major', 3250, '{}', '{}'),
+	(90, 'sheriff', 4, 'boss', 'Sheriff', 3500, '{}', '{}'),
+	(91, 'taxi', 0, 'recrue', 'Próbaidős taxis', 200, '{"hair_2":0,"hair_color_2":0,"torso_1":32,"bags_1":0,"helmet_2":0,"chain_2":0,"eyebrows_3":0,"makeup_3":0,"makeup_2":0,"tshirt_1":31,"makeup_1":0,"bags_2":0,"makeup_4":0,"eyebrows_4":0,"chain_1":0,"lipstick_4":0,"bproof_2":0,"hair_color_1":0,"decals_2":0,"pants_2":0,"age_2":0,"glasses_2":0,"ears_2":0,"arms":27,"lipstick_1":0,"ears_1":-1,"mask_2":0,"sex":0,"lipstick_3":0,"helmet_1":-1,"shoes_2":0,"beard_2":0,"beard_1":0,"lipstick_2":0,"beard_4":0,"glasses_1":0,"bproof_1":0,"mask_1":0,"decals_1":1,"hair_1":0,"eyebrows_2":0,"beard_3":0,"age_1":0,"tshirt_2":0,"skin":0,"torso_2":0,"eyebrows_1":0,"face":0,"shoes_1":10,"pants_1":24}', '{"hair_2":0,"hair_color_2":0,"torso_1":57,"bags_1":0,"helmet_2":0,"chain_2":0,"eyebrows_3":0,"makeup_3":0,"makeup_2":0,"tshirt_1":38,"makeup_1":0,"bags_2":0,"makeup_4":0,"eyebrows_4":0,"chain_1":0,"lipstick_4":0,"bproof_2":0,"hair_color_1":0,"decals_2":0,"pants_2":1,"age_2":0,"glasses_2":0,"ears_2":0,"arms":21,"lipstick_1":0,"ears_1":-1,"mask_2":0,"sex":1,"lipstick_3":0,"helmet_1":-1,"shoes_2":0,"beard_2":0,"beard_1":0,"lipstick_2":0,"beard_4":0,"glasses_1":5,"bproof_1":0,"mask_1":0,"decals_1":1,"hair_1":0,"eyebrows_2":0,"beard_3":0,"age_1":0,"tshirt_2":0,"skin":0,"torso_2":0,"eyebrows_1":0,"face":0,"shoes_1":49,"pants_1":11}'),
+	(92, 'taxi', 1, 'novice', 'Taxisofőr', 300, '{"hair_2":0,"hair_color_2":0,"torso_1":32,"bags_1":0,"helmet_2":0,"chain_2":0,"eyebrows_3":0,"makeup_3":0,"makeup_2":0,"tshirt_1":31,"makeup_1":0,"bags_2":0,"makeup_4":0,"eyebrows_4":0,"chain_1":0,"lipstick_4":0,"bproof_2":0,"hair_color_1":0,"decals_2":0,"pants_2":0,"age_2":0,"glasses_2":0,"ears_2":0,"arms":27,"lipstick_1":0,"ears_1":-1,"mask_2":0,"sex":0,"lipstick_3":0,"helmet_1":-1,"shoes_2":0,"beard_2":0,"beard_1":0,"lipstick_2":0,"beard_4":0,"glasses_1":0,"bproof_1":0,"mask_1":0,"decals_1":1,"hair_1":0,"eyebrows_2":0,"beard_3":0,"age_1":0,"tshirt_2":0,"skin":0,"torso_2":0,"eyebrows_1":0,"face":0,"shoes_1":10,"pants_1":24}', '{"hair_2":0,"hair_color_2":0,"torso_1":57,"bags_1":0,"helmet_2":0,"chain_2":0,"eyebrows_3":0,"makeup_3":0,"makeup_2":0,"tshirt_1":38,"makeup_1":0,"bags_2":0,"makeup_4":0,"eyebrows_4":0,"chain_1":0,"lipstick_4":0,"bproof_2":0,"hair_color_1":0,"decals_2":0,"pants_2":1,"age_2":0,"glasses_2":0,"ears_2":0,"arms":21,"lipstick_1":0,"ears_1":-1,"mask_2":0,"sex":1,"lipstick_3":0,"helmet_1":-1,"shoes_2":0,"beard_2":0,"beard_1":0,"lipstick_2":0,"beard_4":0,"glasses_1":5,"bproof_1":0,"mask_1":0,"decals_1":1,"hair_1":0,"eyebrows_2":0,"beard_3":0,"age_1":0,"tshirt_2":0,"skin":0,"torso_2":0,"eyebrows_1":0,"face":0,"shoes_1":49,"pants_1":11}'),
+	(93, 'taxi', 2, 'experimente', 'Tapasztalt taxis', 350, '{"hair_2":0,"hair_color_2":0,"torso_1":26,"bags_1":0,"helmet_2":0,"chain_2":0,"eyebrows_3":0,"makeup_3":0,"makeup_2":0,"tshirt_1":57,"makeup_1":0,"bags_2":0,"makeup_4":0,"eyebrows_4":0,"chain_1":0,"lipstick_4":0,"bproof_2":0,"hair_color_1":0,"decals_2":0,"pants_2":4,"age_2":0,"glasses_2":0,"ears_2":0,"arms":11,"lipstick_1":0,"ears_1":-1,"mask_2":0,"sex":0,"lipstick_3":0,"helmet_1":-1,"shoes_2":0,"beard_2":0,"beard_1":0,"lipstick_2":0,"beard_4":0,"glasses_1":0,"bproof_1":0,"mask_1":0,"decals_1":0,"hair_1":0,"eyebrows_2":0,"beard_3":0,"age_1":0,"tshirt_2":0,"skin":0,"torso_2":0,"eyebrows_1":0,"face":0,"shoes_1":10,"pants_1":24}', '{"hair_2":0,"hair_color_2":0,"torso_1":57,"bags_1":0,"helmet_2":0,"chain_2":0,"eyebrows_3":0,"makeup_3":0,"makeup_2":0,"tshirt_1":38,"makeup_1":0,"bags_2":0,"makeup_4":0,"eyebrows_4":0,"chain_1":0,"lipstick_4":0,"bproof_2":0,"hair_color_1":0,"decals_2":0,"pants_2":1,"age_2":0,"glasses_2":0,"ears_2":0,"arms":21,"lipstick_1":0,"ears_1":-1,"mask_2":0,"sex":1,"lipstick_3":0,"helmet_1":-1,"shoes_2":0,"beard_2":0,"beard_1":0,"lipstick_2":0,"beard_4":0,"glasses_1":5,"bproof_1":0,"mask_1":0,"decals_1":1,"hair_1":0,"eyebrows_2":0,"beard_3":0,"age_1":0,"tshirt_2":0,"skin":0,"torso_2":0,"eyebrows_1":0,"face":0,"shoes_1":49,"pants_1":11}'),
+	(94, 'taxi', 3, 'uber', 'Veterán taxis', 400, '{"hair_2":0,"hair_color_2":0,"torso_1":26,"bags_1":0,"helmet_2":0,"chain_2":0,"eyebrows_3":0,"makeup_3":0,"makeup_2":0,"tshirt_1":57,"makeup_1":0,"bags_2":0,"makeup_4":0,"eyebrows_4":0,"chain_1":0,"lipstick_4":0,"bproof_2":0,"hair_color_1":0,"decals_2":0,"pants_2":4,"age_2":0,"glasses_2":0,"ears_2":0,"arms":11,"lipstick_1":0,"ears_1":-1,"mask_2":0,"sex":0,"lipstick_3":0,"helmet_1":-1,"shoes_2":0,"beard_2":0,"beard_1":0,"lipstick_2":0,"beard_4":0,"glasses_1":0,"bproof_1":0,"mask_1":0,"decals_1":0,"hair_1":0,"eyebrows_2":0,"beard_3":0,"age_1":0,"tshirt_2":0,"skin":0,"torso_2":0,"eyebrows_1":0,"face":0,"shoes_1":10,"pants_1":24}', '{"hair_2":0,"hair_color_2":0,"torso_1":57,"bags_1":0,"helmet_2":0,"chain_2":0,"eyebrows_3":0,"makeup_3":0,"makeup_2":0,"tshirt_1":38,"makeup_1":0,"bags_2":0,"makeup_4":0,"eyebrows_4":0,"chain_1":0,"lipstick_4":0,"bproof_2":0,"hair_color_1":0,"decals_2":0,"pants_2":1,"age_2":0,"glasses_2":0,"ears_2":0,"arms":21,"lipstick_1":0,"ears_1":-1,"mask_2":0,"sex":1,"lipstick_3":0,"helmet_1":-1,"shoes_2":0,"beard_2":0,"beard_1":0,"lipstick_2":0,"beard_4":0,"glasses_1":5,"bproof_1":0,"mask_1":0,"decals_1":1,"hair_1":0,"eyebrows_2":0,"beard_3":0,"age_1":0,"tshirt_2":0,"skin":0,"torso_2":0,"eyebrows_1":0,"face":0,"shoes_1":49,"pants_1":11}'),
+	(95, 'taxi', 4, 'boss', 'Főnök', 50, '{"hair_2":0,"hair_color_2":0,"torso_1":29,"bags_1":0,"helmet_2":0,"chain_2":0,"eyebrows_3":0,"makeup_3":0,"makeup_2":0,"tshirt_1":31,"makeup_1":0,"bags_2":0,"makeup_4":0,"eyebrows_4":0,"chain_1":0,"lipstick_4":0,"bproof_2":0,"hair_color_1":0,"decals_2":0,"pants_2":4,"age_2":0,"glasses_2":0,"ears_2":0,"arms":1,"lipstick_1":0,"ears_1":-1,"mask_2":0,"sex":0,"lipstick_3":0,"helmet_1":-1,"shoes_2":0,"beard_2":0,"beard_1":0,"lipstick_2":0,"beard_4":0,"glasses_1":0,"bproof_1":0,"mask_1":0,"decals_1":0,"hair_1":0,"eyebrows_2":0,"beard_3":0,"age_1":0,"tshirt_2":0,"skin":0,"torso_2":4,"eyebrows_1":0,"face":0,"shoes_1":10,"pants_1":24}', '{"hair_2":0,"hair_color_2":0,"torso_1":57,"bags_1":0,"helmet_2":0,"chain_2":0,"eyebrows_3":0,"makeup_3":0,"makeup_2":0,"tshirt_1":38,"makeup_1":0,"bags_2":0,"makeup_4":0,"eyebrows_4":0,"chain_1":0,"lipstick_4":0,"bproof_2":0,"hair_color_1":0,"decals_2":0,"pants_2":1,"age_2":0,"glasses_2":0,"ears_2":0,"arms":21,"lipstick_1":0,"ears_1":-1,"mask_2":0,"sex":1,"lipstick_3":0,"helmet_1":-1,"shoes_2":0,"beard_2":0,"beard_1":0,"lipstick_2":0,"beard_4":0,"glasses_1":5,"bproof_1":0,"mask_1":0,"decals_1":1,"hair_1":0,"eyebrows_2":0,"beard_3":0,"age_1":0,"tshirt_2":0,"skin":0,"torso_2":0,"eyebrows_1":0,"face":0,"shoes_1":49,"pants_1":11}'),
+	(96, 'offpolice', 0, 'rang0', 'Kadét', 1, '{}', '{}'),
+	(97, 'offpolice', 1, 'rang1', 'Örmester', 1, '{}', '{}'),
+	(98, 'offpolice', 2, 'rang2', 'Fötörzsörmester', 1, '{}', '{}'),
+	(99, 'offpolice', 3, 'rang3', 'Zászlós', 1, '{}', '{}'),
+	(100, 'offpolice', 4, 'rang4', 'Fötörzszászlós', 1, '{}', '{}'),
+	(101, 'offpolice', 5, 'rang5', 'Hadnagy', 1, '{}', '{}'),
+	(102, 'offpolice', 6, 'rang6', 'Ezredes', 1, '{}', '{}'),
+	(106, 'offpolice', 10, 'alboss', 'Kapitányhelyettes', 1, '{}', '{}'),
+	(107, 'offpolice', 11, 'boss', 'Fökapitány', 1, '{}', '{}'),
+	(108, 'farmer', 0, 'rang1', 'Rang1', 0, '{}', '{}'),
+	(109, 'farmer', 1, 'rang2', 'Rang2', 0, '{}', '{}'),
+	(110, 'farmer', 2, 'rang3', 'Rang3', 0, '{}', '{}'),
+	(111, 'farmer', 3, 'rang4', 'Rang4', 0, '{}', '{}'),
+	(112, 'farmer', 4, 'boss', 'Boss', 0, '{}', '{}'),
+	(129, 'busdriver', 0, 'employee', 'Alkalmazott', 20, '{}', '{}'),
+	(131, 'flt', 0, 'employee', 'Alkalmazott', 20, '{"tshirt_1":59,"torso_1":57,"arms":15,"pants_1":9,"glasses_1":0,"decals_2":0,"hair_color_2":0,"helmet_2":0,"hair_color_1":0,"face":2,"glasses_2":0,"torso_2":1,"shoes":35,"hair_1":0,"skin":0,"sex":0,"glasses_1":19,"pants_2":0,"hair_2":0,"decals_1":0,"tshirt_2":0,"helmet_1":120}', '{"tshirt_1":36,"torso_1":0,"arms":68,"pants_1":30,"glasses_1":15,"decals_2":0,"hair_color_2":0,"helmet_2":0,"hair_color_1":0,"face":27,"glasses_2":0,"torso_2":11,"shoes":26,"hair_1":5,"skin":0,"sex":1,"glasses_1":15,"pants_2":2,"hair_2":0,"decals_1":0,"tshirt_2":0,"helmet_1":19}'),
+	(132, 'garbagecrew', 0, 'employee', 'Munkavállaló', 45, '{"tshirt_1":59,"torso_1":89,"arms":31,"pants_1":36,"glasses_1":19,"decals_2":0,"hair_color_2":0,"helmet_2":0,"hair_color_1":0,"face":2,"glasses_2":0,"torso_2":1,"shoes":35,"hair_1":0,"skin":0,"sex":0,"glasses_1":19,"pants_2":0,"hair_2":0,"decals_1":0,"tshirt_2":0,"helmet_1":5}', '{"tshirt_1":36,"torso_1":0,"arms":68,"pants_1":30,"glasses_1":15,"decals_2":0,"hair_color_2":0,"helmet_2":0,"hair_color_1":0,"face":27,"glasses_2":0,"torso_2":11,"shoes":26,"hair_1":5,"skin":0,"sex":1,"glasses_1":15,"pants_2":2,"hair_2":0,"decals_1":0,"tshirt_2":0,"helmet_1":19}'),
+	(150, 'offpolice', 7, 'rang7', 'LSPD', 1, '{}', '{}'),
+	(151, 'offpolice', 8, 'rang8', 'LSPD', 1, '{}', '{}'),
+	(152, 'offpolice', 9, 'rang9', 'LSPD', 1, '{}', '{}'),
+	(1001, 'zlom', 0, 'employee', 'Munkavállaló', 45, '', ''),
+	(1002, 'technician', 0, 'worker', 'Munkás', 20, '{}', '{}'),
+	(1003, 'technician', 1, 'boss', 'Fönök', 30, '{}', '{}'),
+	(1004, 'trucker', 0, 'employee', 'Alkalmazott', 20, '{"tshirt_1":59,"torso_1":89,"arms":31,"pants_1":36,"glasses_1":19,"decals_2":0,"hair_color_2":0,"helmet_2":0,"hair_color_1":0,"face":2,"glasses_2":0,"torso_2":1,"shoes":35,"hair_1":0,"skin":0,"sex":0,"glasses_1":19,"pants_2":0,"hair_2":0,"decals_1":0,"tshirt_2":0,"helmet_1":5}', '{"tshirt_1":36,"torso_1":0,"arms":68,"pants_1":30,"glasses_1":15,"decals_2":0,"hair_color_2":0,"helmet_2":0,"hair_color_1":0,"face":27,"glasses_2":0,"torso_2":11,"shoes":26,"hair_1":5,"skin":0,"sex":1,"glasses_1":15,"pants_2":2,"hair_2":0,"decals_1":0,"tshirt_2":0,"helmet_1":19}'),
+	(1005, 'cassino', 0, 'recruit', 'Újonc', 1000, '{}', '{}'),
+	(1006, 'cassino', 1, 'officer', 'Inas', 3500, '{}', '{}'),
+	(1007, 'cassino', 2, 'sergeant', 'Tag', 5000, '{}', '{}'),
+	(1008, 'cassino', 3, 'lieutenant', 'Al-Leader', 8000, '{}', '{}'),
+	(1009, 'cassino', 4, 'boss', 'Fönök', 20000, '{}', '{}'),
+	(1010, 'moonshine', 0, 'employee', 'Munkavállaló', 45, '{}', '{}'),
+	(1011, 'lacosa', 0, 'recruit', 'Kezdő', 1, '{}', '{}'),
+	(1012, 'lacosa', 1, 'officer', 'Haladó', 1, '{}', '{}'),
+	(1013, 'lacosa', 2, 'sergeant', 'Profi', 1, '{}', '{}'),
+	(1014, 'lacosa', 3, 'lieutenant', 'Al-Leader', 1, '{}', '{}'),
+	(1015, 'lacosa', 4, 'boss', 'Leader', 1, '{}', '{}'),
+	(1016, 'medelin', 0, 'recruit', 'Associates', 1, '{}', '{}'),
+	(1017, 'medelin', 1, 'officer', 'Soldier', 1, '{}', '{}'),
+	(1018, 'medelin', 2, 'sergeant', 'Caporegime', 1, '{}', '{}'),
+	(1019, 'medelin', 3, 'lieutenant', 'El Leroy', 1, '{}', '{}'),
+	(1020, 'medelin', 4, 'boss', 'Don Pablo', 1, '{}', '{}'),
+	(1021, 'sons', 0, 'recruit', 'Nomad', 1, '{}', '{}'),
+	(1022, 'sons', 1, 'officer', 'Tail Gunner', 1, '{}', '{}'),
+	(1023, 'sons', 2, 'sergeant', 'Road Captain', 1, '{}', '{}'),
+	(1024, 'sons', 3, 'lieutenant', 'V.President', 1, '{}', '{}'),
+	(1025, 'sons', 4, 'boss', 'President', 1, '{}', '{}'),
+	(1026, 'housing', 0, 'recruit', 'Ingatlan ügynök', 1000, '', ''),
+	(1027, 'housing', 1, 'boss', 'Ingatlan Eladó', 2000, '', ''),
+	(1032, 'ambulance', 0, 'ambulance', 'Mentős', 1200, '{"tshirt_2":0,"hair_color_1":5,"glasses_2":3,"shoes":9,"torso_2":3,"hair_color_2":0,"pants_1":24,"glasses_1":4,"hair_1":2,"sex":0,"decals_2":0,"tshirt_1":15,"helmet_1":8,"helmet_2":0,"arms":92,"face":19,"decals_1":60,"torso_1":13,"hair_2":0,"skin":34,"pants_2":5}', '{"tshirt_2":3,"decals_2":0,"glasses":0,"hair_1":2,"torso_1":73,"shoes":1,"hair_color_2":0,"glasses_1":19,"skin":13,"face":6,"pants_2":5,"tshirt_1":75,"pants_1":37,"helmet_1":57,"torso_2":0,"arms":14,"sex":1,"glasses_2":0,"decals_1":0,"hair_2":0,"helmet_2":0,"hair_color_1":0}'),
+	(1033, 'ambulance', 1, 'doctor', 'Doktor', 1800, '{"tshirt_2":0,"hair_color_1":5,"glasses_2":3,"shoes":9,"torso_2":3,"hair_color_2":0,"pants_1":24,"glasses_1":4,"hair_1":2,"sex":0,"decals_2":0,"tshirt_1":15,"helmet_1":8,"helmet_2":0,"arms":92,"face":19,"decals_1":60,"torso_1":13,"hair_2":0,"skin":34,"pants_2":5}', '{"tshirt_2":3,"decals_2":0,"glasses":0,"hair_1":2,"torso_1":73,"shoes":1,"hair_color_2":0,"glasses_1":19,"skin":13,"face":6,"pants_2":5,"tshirt_1":75,"pants_1":37,"helmet_1":57,"torso_2":0,"arms":14,"sex":1,"glasses_2":0,"decals_1":0,"hair_2":0,"helmet_2":0,"hair_color_1":0}'),
+	(1034, 'ambulance', 2, 'chief_doctor', 'Főorvos', 2150, '{"tshirt_2":0,"hair_color_1":5,"glasses_2":3,"shoes":9,"torso_2":3,"hair_color_2":0,"pants_1":24,"glasses_1":4,"hair_1":2,"sex":0,"decals_2":0,"tshirt_1":15,"helmet_1":8,"helmet_2":0,"arms":92,"face":19,"decals_1":60,"torso_1":13,"hair_2":0,"skin":34,"pants_2":5}', '{"tshirt_2":3,"decals_2":0,"glasses":0,"hair_1":2,"torso_1":73,"shoes":1,"hair_color_2":0,"glasses_1":19,"skin":13,"face":6,"pants_2":5,"tshirt_1":75,"pants_1":37,"helmet_1":57,"torso_2":0,"arms":14,"sex":1,"glasses_2":0,"decals_1":0,"hair_2":0,"helmet_2":0,"hair_color_1":0}'),
+	(1035, 'ambulance', 3, 'boss', 'Igazgató', 2500, '{"tshirt_2":0,"hair_color_1":5,"glasses_2":3,"shoes":9,"torso_2":3,"hair_color_2":0,"pants_1":24,"glasses_1":4,"hair_1":2,"sex":0,"decals_2":0,"tshirt_1":15,"helmet_1":8,"helmet_2":0,"arms":92,"face":19,"decals_1":60,"torso_1":13,"hair_2":0,"skin":34,"pants_2":5}', '{"tshirt_2":3,"decals_2":0,"glasses":0,"hair_1":2,"torso_1":73,"shoes":1,"hair_color_2":0,"glasses_1":19,"skin":13,"face":6,"pants_2":5,"tshirt_1":75,"pants_1":37,"helmet_1":57,"torso_2":0,"arms":14,"sex":1,"glasses_2":0,"decals_1":0,"hair_2":0,"helmet_2":0,"hair_color_1":0}'),
+	(1036, 'offambulance', 0, 'ambulance', 'Ambulancier', 20, '{"tshirt_2":0,"hair_color_1":5,"glasses_2":3,"shoes":9,"torso_2":3,"hair_color_2":0,"pants_1":24,"glasses_1":4,"hair_1":2,"sex":0,"decals_2":0,"tshirt_1":15,"helmet_1":8,"helmet_2":0,"arms":92,"face":19,"decals_1":60,"torso_1":13,"hair_2":0,"skin":34,"pants_2":5}', '{"tshirt_2":3,"decals_2":0,"glasses":0,"hair_1":2,"torso_1":73,"shoes":1,"hair_color_2":0,"glasses_1":19,"skin":13,"face":6,"pants_2":5,"tshirt_1":75,"pants_1":37,"helmet_1":57,"torso_2":0,"arms":14,"sex":1,"glasses_2":0,"decals_1":0,"hair_2":0,"helmet_2":0,"hair_color_1":0}'),
+	(1037, 'offambulance', 1, 'doctor', 'Medecin', 40, '{"tshirt_2":0,"hair_color_1":5,"glasses_2":3,"shoes":9,"torso_2":3,"hair_color_2":0,"pants_1":24,"glasses_1":4,"hair_1":2,"sex":0,"decals_2":0,"tshirt_1":15,"helmet_1":8,"helmet_2":0,"arms":92,"face":19,"decals_1":60,"torso_1":13,"hair_2":0,"skin":34,"pants_2":5}', '{"tshirt_2":3,"decals_2":0,"glasses":0,"hair_1":2,"torso_1":73,"shoes":1,"hair_color_2":0,"glasses_1":19,"skin":13,"face":6,"pants_2":5,"tshirt_1":75,"pants_1":37,"helmet_1":57,"torso_2":0,"arms":14,"sex":1,"glasses_2":0,"decals_1":0,"hair_2":0,"helmet_2":0,"hair_color_1":0}'),
+	(1038, 'offambulance', 2, 'chief_doctor', 'Medecin-chef', 60, '{"tshirt_2":0,"hair_color_1":5,"glasses_2":3,"shoes":9,"torso_2":3,"hair_color_2":0,"pants_1":24,"glasses_1":4,"hair_1":2,"sex":0,"decals_2":0,"tshirt_1":15,"helmet_1":8,"helmet_2":0,"arms":92,"face":19,"decals_1":60,"torso_1":13,"hair_2":0,"skin":34,"pants_2":5}', '{"tshirt_2":3,"decals_2":0,"glasses":0,"hair_1":2,"torso_1":73,"shoes":1,"hair_color_2":0,"glasses_1":19,"skin":13,"face":6,"pants_2":5,"tshirt_1":75,"pants_1":37,"helmet_1":57,"torso_2":0,"arms":14,"sex":1,"glasses_2":0,"decals_1":0,"hair_2":0,"helmet_2":0,"hair_color_1":0}'),
+	(1039, 'offambulance', 3, 'boss', 'Chirurgien', 80, '{"tshirt_2":0,"hair_color_1":5,"glasses_2":3,"shoes":9,"torso_2":3,"hair_color_2":0,"pants_1":24,"glasses_1":4,"hair_1":2,"sex":0,"decals_2":0,"tshirt_1":15,"helmet_1":8,"helmet_2":0,"arms":92,"face":19,"decals_1":60,"torso_1":13,"hair_2":0,"skin":34,"pants_2":5}', '{"tshirt_2":3,"decals_2":0,"glasses":0,"hair_1":2,"torso_1":73,"shoes":1,"hair_color_2":0,"glasses_1":19,"skin":13,"face":6,"pants_2":5,"tshirt_1":75,"pants_1":37,"helmet_1":57,"torso_2":0,"arms":14,"sex":1,"glasses_2":0,"decals_1":0,"hair_2":0,"helmet_2":0,"hair_color_1":0}'),
+	(1040, 'parabellum', 0, 'recruit', 'Associates', 1, '{}', '{}'),
+	(1041, 'parabellum', 1, 'officer', 'Soldier', 1, '{}', '{}'),
+	(1042, 'parabellum', 2, 'sergeant', 'Tag', 1, '{}', '{}'),
+	(1043, 'parabellum', 3, 'lieutenant', 'Al-Leader', 1, '{}', '{}'),
+	(1044, 'parabellum', 4, 'boss', 'Leader', 1, '{}', '{}'),
+	(1051, 'continental', 0, 'recruit', 'Anfanger', 1, '{}', '{}'),
+	(1052, 'continental', 1, 'officer', 'Breit', 1, '{}', '{}'),
+	(1053, 'continental', 2, 'sergeant', 'Assistent', 1, '{}', '{}'),
+	(1054, 'continental', 3, 'lieutenant', 'Al-Chef', 1, '{}', '{}'),
+	(1055, 'continental', 4, 'boss', 'Führer', 1, '{}', '{}'),
+	(1056, 'gokart', 0, 'recruit', 'Kezdő', 1, '{}', '{}'),
+	(1057, 'gokart', 1, 'officer', 'Gokartos', 1, '{}', '{}'),
+	(1058, 'gokart', 2, 'sergeant', 'Konvoj vezető', 1, '{}', '{}'),
+	(1059, 'gokart', 3, 'lieutenant', 'Al-Leader', 1, '{}', '{}'),
+	(1060, 'gokart', 4, 'boss', 'Leader', 1, '{}', '{}'),
+	(1061, 'swat', 0, 'rang0', 'Tizedes', 1000, '{}', '{}'),
+	(1062, 'swat', 1, 'rang1', 'Képzett', 1200, '{}', '{}'),
+	(1063, 'swat', 2, 'rang2', 'Törzsörmester', 1350, '{}', '{}'),
+	(1064, 'swat', 3, 'rang3', 'Fötözsörmester', 1500, '{}', '{}'),
+	(1065, 'swat', 4, 'rang4', 'Zászlós', 1700, '{}', '{}'),
+	(1066, 'swat', 5, 'rang5', 'Hadnagy', 1800, '{}', '{}'),
+	(1067, 'swat', 6, 'rang6', 'Föhadnagy', 2000, '{}', '{}'),
+	(1068, 'swat', 7, 'rang7', 'Százados', 2100, '{}', '{}'),
+	(1069, 'swat', 8, 'rang8', 'Ezredes', 2200, '{}', '{}'),
+	(1070, 'swat', 9, 'alboss', 'Altábornagy', 2350, '{}', '{}'),
+	(1071, 'swat', 10, 'boss', 'Vezérezredes', 2500, '{}', '{}'),
+	(1072, 'offsheriff', 0, 'recruit', 'Recrue', 20, '{}', '{}'),
+	(1073, 'offsheriff', 1, 'officer', 'Deputy', 40, '{}', '{}'),
+	(1074, 'offsheriff', 2, 'sergeant', 'Major', 60, '{}', '{}'),
+	(1075, 'offsheriff', 4, 'lieutenant', 'Sheriff', 85, '{}', '{}'),
+	(1076, 'offsheriff', 5, 'boss', 'Sheriff', 100, '{}', '{}'),
+	(1077, 'inkognito', 0, 'recruit', 'Újonc', 1, '{}', '{}'),
+	(1078, 'inkognito', 1, 'officer', 'Haladó', 1, '{}', '{}'),
+	(1079, 'inkognito', 2, 'sergeant', 'Felügyelő', 1, '{}', '{}'),
+	(1080, 'inkognito', 3, 'lieutenant', 'Főnök helyettes', 1, '{}', '{}'),
+	(1081, 'inkognito', 4, 'boss', 'Főnök', 1, '{}', '{}'),
+	(1082, 'ira', 0, 'recruit', 'Újonc', 1, '{}', '{}'),
+	(1083, 'ira', 1, 'officer', 'Haladó', 1, '{}', '{}'),
+	(1084, 'ira', 2, 'sergeant', 'Tag', 1, '{}', '{}'),
+	(1085, 'ira', 3, 'lieutenant', 'Al-Leader', 1, '{}', '{}'),
+	(1086, 'ira', 4, 'boss', 'Leader', 1, '{}', '{}'),
+	(1087, 'bloods', 0, 'recruit', 'Újonc', 1, '{}', '{}'),
+	(1088, 'bloods', 1, 'officer', 'Haladó', 1, '{}', '{}'),
+	(1089, 'bloods', 2, 'sergeant', 'Vezető', 1, '{}', '{}'),
+	(1090, 'bloods', 3, 'lieutenant', 'Főnök helyettes', 1, '{}', '{}'),
+	(1091, 'bloods', 4, 'boss', 'Főnök', 1, '{}', '{}'),
+	(1092, 'homeless', 0, 'recruit', 'Újonc csöves', 1, '{}', '{}'),
+	(1093, 'homeless', 1, 'officer', 'Kezdő csöves', 1, '{}', '{}'),
+	(1094, 'homeless', 2, 'sergeant', 'Csöves tag', 1, '{}', '{}'),
+	(1095, 'homeless', 3, 'lieutenant', 'Fő csöves jobb keze', 1, '{}', '{}'),
+	(1096, 'homeless', 4, 'boss', 'Fő csöves', 1, '{}', '{}'),
+	(1097, 'crips', 0, 'recruit', 'Crippled', 1, '{}', '{}'),
+	(1098, 'crips', 1, 'officer', 'Plug', 1, '{}', '{}'),
+	(1099, 'crips', 2, 'sergeant', 'Gangsta', 1, '{}', '{}'),
+	(1100, 'crips', 3, 'lieutenant', 'Original Gangsta', 1, '{}', '{}'),
+	(1101, 'crips', 4, 'boss', 'Founder', 1, '{}', '{}'),
+	(1102, 'onkormanyzat', 0, 'recruit', 'Biztonsági őr', 20, '{}', '{}'),
+	(1103, 'onkormanyzat', 1, 'officer', 'Biztonsági főnök', 40, '{}', '{}'),
+	(1104, 'onkormanyzat', 2, 'sergeant', 'Test őr', 60, '{}', '{}'),
+	(1105, 'onkormanyzat', 3, 'lieutenant', 'Alpolgármester', 85, '{}', '{}'),
+	(1106, 'onkormanyzat', 4, 'boss', 'Polgármester', 100, '{}', '{}'),
+	(1107, 'orochi', 0, 'recruit', 'Prospect', 1, '{}', '{}'),
+	(1108, 'orochi', 1, 'officer', 'Secretary', 1, '{}', '{}'),
+	(1109, 'orochi', 2, 'sergeant', 'Road Captain', 1, '{}', '{}'),
+	(1110, 'orochi', 3, 'lieutenant', 'Vice President', 1, '{}', '{}'),
+	(1111, 'orochi', 4, 'boss', 'President', 1, '{}', '{}'),
+	(1112, 'yakuza', 0, 'recruit', 'Újonc', 1, '{}', '{}'),
+	(1113, 'yakuza', 1, 'officer', 'Tag', 1, '{}', '{}'),
+	(1114, 'yakuza', 2, 'sergeant', 'Beavatott', 1, '{}', '{}'),
+	(1115, 'yakuza', 3, 'lieutenant', 'Al-Leader', 1, '{}', '{}'),
+	(1116, 'yakuza', 4, 'boss', 'Leader', 1, '{}', '{}'),
+	(1117, 'weazelnews', 0, 'recruit', 'Újonc', 1500, '{}', '{}'),
+	(1118, 'weazelnews', 1, 'officer', 'Próbaidős', 1700, '{}', '{}'),
+	(1119, 'weazelnews', 2, 'sergeant', 'Újságíró', 2000, '{}', '{}'),
+	(1120, 'weazelnews', 3, 'lieutenant', 'Riporter', 2250, '{}', '{}'),
+	(1121, 'weazelnews', 4, 'boss', 'Igazgató', 2500, '{}', '{}'),
+	(1122, 'gruppe', 0, 'recruit', 'Prospect', 1500, '{}', '{}'),
+	(1123, 'gruppe', 1, 'officer', 'Secretary', 1750, '{}', '{}'),
+	(1124, 'gruppe', 2, 'sergeant', 'Road Captain', 2000, '{}', '{}'),
+	(1125, 'gruppe', 3, 'lieutenant', 'Rőnök helyettes', 2250, '{}', '{}'),
+	(1126, 'gruppe', 4, 'boss', 'Boss', 2500, '{}', '{}'),
+	(1127, 'unicorn', 0, 'recruit', 'Consoles', 1, '{}', '{}'),
+	(1128, 'unicorn', 1, 'officer', 'Company leader', 1, '{}', '{}'),
+	(1129, 'unicorn', 2, 'sergeant', 'Illegal broad', 1, '{}', '{}'),
+	(1130, 'unicorn', 3, 'lieutenant', 'Al-Leader', 1, '{}', '{}'),
+	(1131, 'unicorn', 4, 'boss', 'Leader', 1, '{}', '{}'),
+	(1132, 'kingsman', 0, 'recruit', 'Újonc', 1, '{}', '{}'),
+	(1133, 'kingsman', 1, 'officer', 'Haladó', 1, '{}', '{}'),
+	(1134, 'kingsman', 2, 'sergeant', 'Tag', 1, '{}', '{}'),
+	(1135, 'kingsman', 3, 'lieutenant', 'Al-Vezető', 1, '{}', '{}'),
+	(1136, 'kingsman', 4, 'boss', 'Vezető', 1, '{}', '{}'),
+	(1137, 'resto', 0, 'recruit', 'Mosogató', 20, '{}', '{}'),
+	(1138, 'resto', 1, 'officer', 'Szakács', 40, '{}', '{}'),
+	(1139, 'resto', 2, 'sergeant', 'Felszolgáló', 60, '{}', '{}'),
+	(1140, 'resto', 3, 'lieutenant', 'Vezető-helyettes', 85, '{}', '{}'),
+	(1141, 'resto', 4, 'boss', 'Vezető', 100, '{}', '{}'),
+	(1142, 'ballas', 0, 'recruit', 'Young Balla', 1, '{}', '{}'),
+	(1143, 'ballas', 1, 'officer', 'Little Balla', 1, '{}', '{}'),
+	(1144, 'ballas', 2, 'sergeant', 'Elite Team', 1, '{}', '{}'),
+	(1145, 'ballas', 3, 'lieutenant', 'O.G', 1, '{}', '{}'),
+	(1146, 'ballas', 4, 'boss', 'Double O.G', 1, '{}', '{}'),
+	(1147, 'vagos', 0, 'recruit', 'Young vagos', 1, '{}', '{}'),
+	(1148, 'vagos', 1, 'officer', 'Vagos 1', 1, '{}', '{}'),
+	(1149, 'vagos', 2, 'sergeant', 'Vagos', 1, '{}', '{}'),
+	(1150, 'vagos', 3, 'lieutenant', 'OG Vagos', 1, '{}', '{}'),
+	(1151, 'vagos', 4, 'boss', 'Vagos Boss', 1, '{}', '{}'),
+	(1152, 'cali', 0, 'recruit', 'Zöldfülű: Los Socios', 1, '{}', '{}'),
+	(1153, 'cali', 1, 'officer', 'Beavató: Capitáns', 1, '{}', '{}'),
+	(1154, 'cali', 2, 'sergeant', 'Beavatott: Soldier', 1, '{}', '{}'),
+	(1155, 'cali', 3, 'lieutenant', 'Al-Leader: El Bajo Jefe', 1, '{}', '{}'),
+	(1156, 'cali', 4, 'boss', 'Fő-Leader: El Jefe', 1, '{}', '{}'),
+	(1157, 'bennys', 0, 'recrue', 'Újonc', 500, '{}', '{}'),
+	(1158, 'bennys', 1, 'novice', 'Szerelő', 600, '{}', '{}'),
+	(1159, 'bennys', 2, 'experimente', 'Tuning Mester', 700, '{}', '{}'),
+	(1160, 'bennys', 3, 'chief', 'Telephely Vezető', 1000, '{}', '{}'),
+	(1161, 'bennys', 4, 'boss', 'Telephely Tulajdonos', 2000, '{}', '{}'),
+	(1162, 'lostmc', 0, 'rang1', 'Prospect', 1, '{}', '{}'),
+	(1163, 'lostmc', 1, 'rang2', 'Secretary', 1, '{}', '{}'),
+	(1164, 'lostmc', 2, 'rang3', 'Road Captain', 1, '{}', '{}'),
+	(1165, 'lostmc', 3, 'rang4', 'Vice President', 1, '{}', '{}'),
+	(1166, 'lostmc', 4, 'boss', 'President', 1, '{}', '{}'),
+	(1167, 'bratva', 0, 'recruit', 'Shestyorka', 1, '{}', '{}'),
+	(1168, 'bratva', 1, 'officer', 'Bratok', 1, '{}', '{}'),
+	(1169, 'bratva', 2, 'sergeant', 'Avtoritet', 1, '{}', '{}'),
+	(1170, 'bratva', 3, 'lieutenant', 'Derzhatel obschaka', 1, '{}', '{}'),
+	(1171, 'bratva', 4, 'boss', 'Pakhan', 1, '{}', '{}'),
+	(1172, 'groove', 0, 'recruit', 'Family újonc', 1, '{}', '{}'),
+	(1173, 'groove', 1, 'officer', 'Zöldfülű', 1, '{}', '{}'),
+	(1174, 'groove', 2, 'sergeant', 'Family Member', 1, '{}', '{}'),
+	(1175, 'groove', 3, 'lieutenant', 'OG Groove Family', 1, '{}', '{}'),
+	(1176, 'groove', 4, 'boss', 'OOG Groove Family', 1, '{}', '{}'),
+	(1177, 'cardealer', 0, 'recruit', 'Tanuló', 10, '{}', '{}'),
+	(1178, 'cardealer', 1, 'novice', 'Alkalmazott', 25, '{}', '{}'),
+	(1179, 'cardealer', 2, 'experienced', 'Tapasztalt', 40, '{}', '{}'),
+	(1180, 'cardealer', 3, 'boss', 'Főnök', 0, '{}', '{}'),
+	(1181, 'cardealer', 0, 'recruit', 'Tanuló', 10, '{}', '{}'),
+	(1182, 'cardealer', 1, 'novice', 'Alkalmazott', 25, '{}', '{}'),
+	(1183, 'cardealer', 2, 'experienced', 'Tapasztalt', 40, '{}', '{}'),
+	(1184, 'cardealer', 3, 'boss', 'Főnök', 0, '{}', '{}'),
+	(1185, 'cardealer', 0, 'recruit', 'Tanuló', 10, '{}', '{}'),
+	(1186, 'cardealer', 1, 'novice', 'Alkalmazott', 25, '{}', '{}'),
+	(1187, 'cardealer', 2, 'experienced', 'Tapasztalt', 40, '{}', '{}'),
+	(1188, 'cardealer', 3, 'boss', 'Főnök', 0, '{}', '{}'),
+	(1189, 'peaky', 0, 'recruit', 'Újonc', 1, '{}', '{}'),
+	(1190, 'peaky', 1, 'officer', 'Kvázi-tag', 1, '{}', '{}'),
+	(1191, 'peaky', 2, 'sergeant', 'Tag', 1, '{}', '{}'),
+	(1192, 'peaky', 3, 'lieutenant', 'Al-Leader', 1, '{}', '{}'),
+	(1193, 'peaky', 4, 'boss', 'Leader', 1, '{}', '{}'),
+	(1199, 'eastcustoms', 0, 'recrue', 'Újonc', 12, '{}', '{}'),
+	(1200, 'eastcustoms', 1, 'novice', 'Kezdő', 24, '{}', '{}'),
+	(1201, 'eastcustoms', 2, 'experimente', 'Tapasztalt', 36, '{}', '{}'),
+	(1202, 'eastcustoms', 3, 'chief', 'Vezető', 48, '{}', '{}'),
+	(1203, 'eastcustoms', 4, 'boss', 'Főnök', 0, '{}', '{}');
 
--- --------------------------------------------------------
-
---
--- Table structure for table `licenses`
---
-
-CREATE TABLE `licenses` (
-  `type` varchar(60) NOT NULL,
-  `label` varchar(60) NOT NULL
-) ENGINE=InnoDB;
-
---
--- Dumping data for table `licenses`
---
-
-INSERT INTO `licenses` (`type`, `label`) VALUES
-('dmv', 'Driving Permit'),
-('drive', 'Drivers License'),
-('drive_bike', 'Motorcycle License'),
-('drive_truck', 'Commercial Drivers License'),
-('weed_processing', 'Weed Processing License'),
-('boat', 'Boat License');
-
--- --------------------------------------------------------
-
---
--- Table structure for table `owned_vehicles`
---
-
-CREATE TABLE `owned_vehicles` (
-  `owner` varchar(60) DEFAULT NULL,
+-- Dumping structure for table es_extended.owned_vehicles
+CREATE TABLE IF NOT EXISTS `owned_vehicles` (
+  `owner` varchar(40) NOT NULL,
   `plate` varchar(12) NOT NULL,
   `vehicle` longtext DEFAULT NULL,
   `type` varchar(20) NOT NULL DEFAULT 'car',
-  `job` varchar(20) DEFAULT NULL,
-  `stored` tinyint(4) NOT NULL DEFAULT 0,
-  `parking` VARCHAR(60) DEFAULT NULL,
-  `pound` VARCHAR(60) DEFAULT NULL
-) ENGINE=InnoDB;
+  `job` varchar(20) NOT NULL DEFAULT 'civ',
+  `stored` tinyint(1) NOT NULL DEFAULT 0,
+  `color` varchar(5) DEFAULT 'NOT',
+  `lasthouse` int(11) DEFAULT 0,
+  `garage` varchar(200) DEFAULT 'A',
+  `glovebox` longtext DEFAULT NULL,
+  `trunk` longtext DEFAULT NULL,
+  `mileage` float DEFAULT 0,
+  PRIMARY KEY (`plate`) USING BTREE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci ROW_FORMAT=DYNAMIC;
 
--- --------------------------------------------------------
-
---
--- Table structure for table `rented_vehicles`
---
-
-CREATE TABLE `rented_vehicles` (
+-- Dumping structure for table es_extended.rented_vehicles
+CREATE TABLE IF NOT EXISTS `rented_vehicles` (
   `vehicle` varchar(60) NOT NULL,
   `plate` varchar(12) NOT NULL,
   `player_name` varchar(255) NOT NULL,
   `base_price` int(11) NOT NULL,
   `rent_price` int(11) NOT NULL,
-  `owner` varchar(22) NOT NULL
-) ENGINE=InnoDB;
+  `owner` varchar(22) NOT NULL,
+  PRIMARY KEY (`plate`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
---
--- Table structure for table `society_moneywash`
---
+-- Dumping structure for table es_extended.user_documents
+CREATE TABLE IF NOT EXISTS `user_documents` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `owner` varchar(45) NOT NULL,
+  `data` longtext NOT NULL,
+  PRIMARY KEY (`id`) USING BTREE
+) ENGINE=InnoDB AUTO_INCREMENT=21 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci ROW_FORMAT=DYNAMIC;
 
-CREATE TABLE `society_moneywash` (
-  `id` int(11) NOT NULL,
-  `identifier` varchar(60) NOT NULL,
-  `society` varchar(60) NOT NULL,
-  `amount` int(11) NOT NULL
-) ENGINE=InnoDB;
-
--- --------------------------------------------------------
-
---
--- Table structure for table `users`
---
-
-CREATE TABLE `users` (
-  `identifier` varchar(60) NOT NULL,
-  `accounts` longtext DEFAULT NULL,
-  `group` varchar(50) DEFAULT 'user',
-  `inventory` longtext DEFAULT NULL,
-  `job` varchar(20) DEFAULT 'unemployed',
-  `job_grade` int(11) DEFAULT 0,
-  `loadout` longtext DEFAULT NULL,
-  `metadata` LONGTEXT NULL DEFAULT NULL,
-  `position` longtext NULL DEFAULT NULL,
-  `firstname` varchar(16) DEFAULT NULL,
-  `lastname` varchar(16) DEFAULT NULL,
-  `dateofbirth` varchar(10) DEFAULT NULL,
-  `sex` varchar(1) DEFAULT NULL,
-  `height` int(11) DEFAULT NULL,
-  `skin` longtext DEFAULT NULL,
-  `status` longtext DEFAULT NULL,
-  `is_dead` tinyint(1) DEFAULT 0,
-  `id` int(11) NOT NULL,
-  `disabled` TINYINT(1) NULL DEFAULT '0',
-  `last_property` varchar(255) DEFAULT NULL,
-  `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
-  `last_seen` timestamp NULL DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP,
-  `phone_number` VARCHAR(20) DEFAULT NULL
-) ENGINE=InnoDB;
-
--- --------------------------------------------------------
-
---
--- Table structure for table `user_licenses`
---
-
-CREATE TABLE `user_licenses` (
-  `id` int(11) NOT NULL,
+-- Dumping structure for table es_extended.user_licenses
+CREATE TABLE IF NOT EXISTS `user_licenses` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
   `type` varchar(60) NOT NULL,
-  `owner` varchar(60) NOT NULL
-) ENGINE=InnoDB;
+  `owner` varchar(40) NOT NULL,
+  PRIMARY KEY (`id`) USING BTREE
+) ENGINE=InnoDB AUTO_INCREMENT=69 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci ROW_FORMAT=DYNAMIC;
 
-
---
--- Table structure for table `vehicles`
---
-
-CREATE TABLE `vehicles` (
+-- Dumping structure for table es_extended.vehicles
+CREATE TABLE IF NOT EXISTS `vehicles` (
   `name` varchar(60) NOT NULL,
   `model` varchar(60) NOT NULL,
   `price` int(11) NOT NULL,
-  `category` varchar(60) DEFAULT NULL
-) ENGINE=InnoDB;
+  `category` varchar(60) DEFAULT NULL,
+  PRIMARY KEY (`model`) USING BTREE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci ROW_FORMAT=DYNAMIC;
 
---
--- Dumping data for table `vehicles`
---
+-- Dumping structure for table es_extended.vehicles2
+CREATE TABLE IF NOT EXISTS `vehicles2` (
+  `name` varchar(60) CHARACTER SET utf8mb3 COLLATE utf8mb3_bin NOT NULL,
+  `model` varchar(60) CHARACTER SET utf8mb3 COLLATE utf8mb3_bin NOT NULL,
+  `price` int(11) NOT NULL,
+  `category` varchar(60) CHARACTER SET utf8mb3 COLLATE utf8mb3_bin DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci ROW_FORMAT=DYNAMIC;
 
-INSERT INTO `vehicles` (`name`, `model`, `price`, `category`) VALUES
-('Adder', 'adder', 900000, 'super'),
-('Akuma', 'AKUMA', 7500, 'motorcycles'),
-('Alpha', 'alpha', 60000, 'sports'),
-('Ardent', 'ardent', 1150000, 'sportsclassics'),
-('Asea', 'asea', 5500, 'sedans'),
-('Autarch', 'autarch', 1955000, 'super'),
-('Avarus', 'avarus', 18000, 'motorcycles'),
-('Bagger', 'bagger', 13500, 'motorcycles'),
-('Baller', 'baller2', 40000, 'suvs'),
-('Baller Sport', 'baller3', 60000, 'suvs'),
-('Banshee', 'banshee', 70000, 'sports'),
-('Banshee 900R', 'banshee2', 255000, 'super'),
-('Bati 801', 'bati', 12000, 'motorcycles'),
-('Bati 801RR', 'bati2', 19000, 'motorcycles'),
-('Bestia GTS', 'bestiagts', 55000, 'sports'),
-('BF400', 'bf400', 6500, 'motorcycles'),
-('Bf Injection', 'bfinjection', 16000, 'offroad'),
-('Bifta', 'bifta', 12000, 'offroad'),
-('Bison', 'bison', 45000, 'vans'),
-('Blade', 'blade', 15000, 'muscle'),
-('Blazer', 'blazer', 6500, 'offroad'),
-('Blazer Sport', 'blazer4', 8500, 'offroad'),
-('blazer5', 'blazer5', 1755600, 'offroad'),
-('Blista', 'blista', 8000, 'compacts'),
-('BMX (velo)', 'bmx', 160, 'motorcycles'),
-('Bobcat XL', 'bobcatxl', 32000, 'vans'),
-('Brawler', 'brawler', 45000, 'offroad'),
-('Brioso R/A', 'brioso', 18000, 'compacts'),
-('Btype', 'btype', 62000, 'sportsclassics'),
-('Btype Hotroad', 'btype2', 155000, 'sportsclassics'),
-('Btype Luxe', 'btype3', 85000, 'sportsclassics'),
-('Buccaneer', 'buccaneer', 18000, 'muscle'),
-('Buccaneer Rider', 'buccaneer2', 24000, 'muscle'),
-('Buffalo', 'buffalo', 12000, 'sports'),
-('Buffalo S', 'buffalo2', 20000, 'sports'),
-('Bullet', 'bullet', 90000, 'super'),
-('Burrito', 'burrito3', 19000, 'vans'),
-('Camper', 'camper', 42000, 'vans'),
-('Carbonizzare', 'carbonizzare', 75000, 'sports'),
-('Carbon RS', 'carbonrs', 18000, 'motorcycles'),
-('Casco', 'casco', 30000, 'sportsclassics'),
-('Cavalcade', 'cavalcade2', 55000, 'suvs'),
-('Cheetah', 'cheetah', 375000, 'super'),
-('Chimera', 'chimera', 38000, 'motorcycles'),
-('Chino', 'chino', 15000, 'muscle'),
-('Chino Luxe', 'chino2', 19000, 'muscle'),
-('Cliffhanger', 'cliffhanger', 9500, 'motorcycles'),
-('Cognoscenti Cabrio', 'cogcabrio', 55000, 'coupes'),
-('Cognoscenti', 'cognoscenti', 55000, 'sedans'),
-('Comet', 'comet2', 65000, 'sports'),
-('Comet 5', 'comet5', 1145000, 'sports'),
-('Contender', 'contender', 70000, 'suvs'),
-('Coquette', 'coquette', 65000, 'sports'),
-('Coquette Classic', 'coquette2', 40000, 'sportsclassics'),
-('Coquette BlackFin', 'coquette3', 55000, 'muscle'),
-('Cruiser (velo)', 'cruiser', 510, 'motorcycles'),
-('Cyclone', 'cyclone', 1890000, 'super'),
-('Daemon', 'daemon', 11500, 'motorcycles'),
-('Daemon High', 'daemon2', 13500, 'motorcycles'),
-('Defiler', 'defiler', 9800, 'motorcycles'),
-('Deluxo', 'deluxo', 4721500, 'sportsclassics'),
-('Dominator', 'dominator', 35000, 'muscle'),
-('Double T', 'double', 28000, 'motorcycles'),
-('Dubsta', 'dubsta', 45000, 'suvs'),
-('Dubsta Luxuary', 'dubsta2', 60000, 'suvs'),
-('Bubsta 6x6', 'dubsta3', 120000, 'offroad'),
-('Dukes', 'dukes', 28000, 'muscle'),
-('Dune Buggy', 'dune', 8000, 'offroad'),
-('Elegy', 'elegy2', 38500, 'sports'),
-('Emperor', 'emperor', 8500, 'sedans'),
-('Enduro', 'enduro', 5500, 'motorcycles'),
-('Entity XF', 'entityxf', 425000, 'super'),
-('Esskey', 'esskey', 4200, 'motorcycles'),
-('Exemplar', 'exemplar', 32000, 'coupes'),
-('F620', 'f620', 40000, 'coupes'),
-('Faction', 'faction', 20000, 'muscle'),
-('Faction Rider', 'faction2', 30000, 'muscle'),
-('Faction XL', 'faction3', 40000, 'muscle'),
-('Faggio', 'faggio', 1900, 'motorcycles'),
-('Vespa', 'faggio2', 2800, 'motorcycles'),
-('Felon', 'felon', 42000, 'coupes'),
-('Felon GT', 'felon2', 55000, 'coupes'),
-('Feltzer', 'feltzer2', 55000, 'sports'),
-('Stirling GT', 'feltzer3', 65000, 'sportsclassics'),
-('Fixter (velo)', 'fixter', 225, 'motorcycles'),
-('FMJ', 'fmj', 185000, 'super'),
-('Fhantom', 'fq2', 17000, 'suvs'),
-('Fugitive', 'fugitive', 12000, 'sedans'),
-('Furore GT', 'furoregt', 45000, 'sports'),
-('Fusilade', 'fusilade', 40000, 'sports'),
-('Gargoyle', 'gargoyle', 16500, 'motorcycles'),
-('Gauntlet', 'gauntlet', 30000, 'muscle'),
-('Gang Burrito', 'gburrito', 45000, 'vans'),
-('Burrito', 'gburrito2', 29000, 'vans'),
-('Glendale', 'glendale', 6500, 'sedans'),
-('Grabger', 'granger', 50000, 'suvs'),
-('Gresley', 'gresley', 47500, 'suvs'),
-('GT 500', 'gt500', 785000, 'sportsclassics'),
-('Guardian', 'guardian', 45000, 'offroad'),
-('Hakuchou', 'hakuchou', 31000, 'motorcycles'),
-('Hakuchou Sport', 'hakuchou2', 55000, 'motorcycles'),
-('Hermes', 'hermes', 535000, 'muscle'),
-('Hexer', 'hexer', 12000, 'motorcycles'),
-('Hotknife', 'hotknife', 125000, 'muscle'),
-('Huntley S', 'huntley', 40000, 'suvs'),
-('Hustler', 'hustler', 625000, 'muscle'),
-('Infernus', 'infernus', 180000, 'super'),
-('Innovation', 'innovation', 23500, 'motorcycles'),
-('Intruder', 'intruder', 7500, 'sedans'),
-('Issi', 'issi2', 10000, 'compacts'),
-('Jackal', 'jackal', 38000, 'coupes'),
-('Jester', 'jester', 65000, 'sports'),
-('Jester(Racecar)', 'jester2', 135000, 'sports'),
-('Journey', 'journey', 6500, 'vans'),
-('Kamacho', 'kamacho', 345000, 'offroad'),
-('Khamelion', 'khamelion', 38000, 'sports'),
-('Kuruma', 'kuruma', 30000, 'sports'),
-('Landstalker', 'landstalker', 35000, 'suvs'),
-('RE-7B', 'le7b', 325000, 'super'),
-('Lynx', 'lynx', 40000, 'sports'),
-('Mamba', 'mamba', 70000, 'sports'),
-('Manana', 'manana', 12800, 'sportsclassics'),
-('Manchez', 'manchez', 5300, 'motorcycles'),
-('Massacro', 'massacro', 65000, 'sports'),
-('Massacro(Racecar)', 'massacro2', 130000, 'sports'),
-('Mesa', 'mesa', 16000, 'suvs'),
-('Mesa Trail', 'mesa3', 40000, 'suvs'),
-('Minivan', 'minivan', 13000, 'vans'),
-('Monroe', 'monroe', 55000, 'sportsclassics'),
-('The Liberator', 'monster', 210000, 'offroad'),
-('Moonbeam', 'moonbeam', 18000, 'vans'),
-('Moonbeam Rider', 'moonbeam2', 35000, 'vans'),
-('Nemesis', 'nemesis', 5800, 'motorcycles'),
-('Neon', 'neon', 1500000, 'sports'),
-('Nightblade', 'nightblade', 35000, 'motorcycles'),
-('Nightshade', 'nightshade', 65000, 'muscle'),
-('9F', 'ninef', 65000, 'sports'),
-('9F Cabrio', 'ninef2', 80000, 'sports'),
-('Omnis', 'omnis', 35000, 'sports'),
-('Oppressor', 'oppressor', 3524500, 'super'),
-('Oracle XS', 'oracle2', 35000, 'coupes'),
-('Osiris', 'osiris', 160000, 'super'),
-('Panto', 'panto', 10000, 'compacts'),
-('Paradise', 'paradise', 19000, 'vans'),
-('Pariah', 'pariah', 1420000, 'sports'),
-('Patriot', 'patriot', 55000, 'suvs'),
-('PCJ-600', 'pcj', 6200, 'motorcycles'),
-('Penumbra', 'penumbra', 28000, 'sports'),
-('Pfister', 'pfister811', 85000, 'super'),
-('Phoenix', 'phoenix', 12500, 'muscle'),
-('Picador', 'picador', 18000, 'muscle'),
-('Pigalle', 'pigalle', 20000, 'sportsclassics'),
-('Prairie', 'prairie', 12000, 'compacts'),
-('Premier', 'premier', 8000, 'sedans'),
-('Primo Custom', 'primo2', 14000, 'sedans'),
-('X80 Proto', 'prototipo', 2500000, 'super'),
-('Radius', 'radi', 29000, 'suvs'),
-('raiden', 'raiden', 1375000, 'sports'),
-('Rapid GT', 'rapidgt', 35000, 'sports'),
-('Rapid GT Convertible', 'rapidgt2', 45000, 'sports'),
-('Rapid GT3', 'rapidgt3', 885000, 'sportsclassics'),
-('Reaper', 'reaper', 150000, 'super'),
-('Rebel', 'rebel2', 35000, 'offroad'),
-('Regina', 'regina', 5000, 'sedans'),
-('Retinue', 'retinue', 615000, 'sportsclassics'),
-('Revolter', 'revolter', 1610000, 'sports'),
-('riata', 'riata', 380000, 'offroad'),
-('Rocoto', 'rocoto', 45000, 'suvs'),
-('Ruffian', 'ruffian', 6800, 'motorcycles'),
-('Ruiner 2', 'ruiner2', 5745600, 'muscle'),
-('Rumpo', 'rumpo', 15000, 'vans'),
-('Rumpo Trail', 'rumpo3', 19500, 'vans'),
-('Sabre Turbo', 'sabregt', 20000, 'muscle'),
-('Sabre GT', 'sabregt2', 25000, 'muscle'),
-('Sanchez', 'sanchez', 5300, 'motorcycles'),
-('Sanchez Sport', 'sanchez2', 5300, 'motorcycles'),
-('Sanctus', 'sanctus', 25000, 'motorcycles'),
-('Sandking', 'sandking', 55000, 'offroad'),
-('Savestra', 'savestra', 990000, 'sportsclassics'),
-('SC 1', 'sc1', 1603000, 'super'),
-('Schafter', 'schafter2', 25000, 'sedans'),
-('Schafter V12', 'schafter3', 50000, 'sports'),
-('Scorcher (velo)', 'scorcher', 280, 'motorcycles'),
-('Seminole', 'seminole', 25000, 'suvs'),
-('Sentinel', 'sentinel', 32000, 'coupes'),
-('Sentinel XS', 'sentinel2', 40000, 'coupes'),
-('Sentinel3', 'sentinel3', 650000, 'sports'),
-('Seven 70', 'seven70', 39500, 'sports'),
-('ETR1', 'sheava', 220000, 'super'),
-('Shotaro Concept', 'shotaro', 320000, 'motorcycles'),
-('Slam Van', 'slamvan3', 11500, 'muscle'),
-('Sovereign', 'sovereign', 22000, 'motorcycles'),
-('Stinger', 'stinger', 80000, 'sportsclassics'),
-('Stinger GT', 'stingergt', 75000, 'sportsclassics'),
-('Streiter', 'streiter', 500000, 'sports'),
-('Stretch', 'stretch', 90000, 'sedans'),
-('Stromberg', 'stromberg', 3185350, 'sports'),
-('Sultan', 'sultan', 15000, 'sports'),
-('Sultan RS', 'sultanrs', 65000, 'super'),
-('Super Diamond', 'superd', 130000, 'sedans'),
-('Surano', 'surano', 50000, 'sports'),
-('Surfer', 'surfer', 12000, 'vans'),
-('T20', 't20', 300000, 'super'),
-('Tailgater', 'tailgater', 30000, 'sedans'),
-('Tampa', 'tampa', 16000, 'muscle'),
-('Drift Tampa', 'tampa2', 80000, 'sports'),
-('Thrust', 'thrust', 24000, 'motorcycles'),
-('Tri bike (velo)', 'tribike3', 520, 'motorcycles'),
-('Trophy Truck', 'trophytruck', 60000, 'offroad'),
-('Trophy Truck Limited', 'trophytruck2', 80000, 'offroad'),
-('Tropos', 'tropos', 40000, 'sports'),
-('Turismo R', 'turismor', 350000, 'super'),
-('Tyrus', 'tyrus', 600000, 'super'),
-('Vacca', 'vacca', 120000, 'super'),
-('Vader', 'vader', 7200, 'motorcycles'),
-('Verlierer', 'verlierer2', 70000, 'sports'),
-('Vigero', 'vigero', 12500, 'muscle'),
-('Virgo', 'virgo', 14000, 'muscle'),
-('Viseris', 'viseris', 875000, 'sportsclassics'),
-('Visione', 'visione', 2250000, 'super'),
-('Voltic', 'voltic', 90000, 'super'),
-('Voltic 2', 'voltic2', 3830400, 'super'),
-('Voodoo', 'voodoo', 7200, 'muscle'),
-('Vortex', 'vortex', 9800, 'motorcycles'),
-('Warrener', 'warrener', 4000, 'sedans'),
-('Washington', 'washington', 9000, 'sedans'),
-('Windsor', 'windsor', 95000, 'coupes'),
-('Windsor Drop', 'windsor2', 125000, 'coupes'),
-('Woflsbane', 'wolfsbane', 9000, 'motorcycles'),
-('XLS', 'xls', 32000, 'suvs'),
-('Yosemite', 'yosemite', 485000, 'muscle'),
-('Youga', 'youga', 10800, 'vans'),
-('Youga Luxuary', 'youga2', 14500, 'vans'),
-('Z190', 'z190', 900000, 'sportsclassics'),
-('Zentorno', 'zentorno', 1500000, 'super'),
-('Zion', 'zion', 36000, 'coupes'),
-('Zion Cabrio', 'zion2', 45000, 'coupes'),
-('Zombie', 'zombiea', 9500, 'motorcycles'),
-('Zombie Luxuary', 'zombieb', 12000, 'motorcycles'),
-('Z-Type', 'ztype', 220000, 'sportsclassics');
+-- Dumping data for table es_extended.vehicles2: ~0 rows (approximately)
 
--- --------------------------------------------------------
-
---
--- Table structure for table `vehicle_categories`
---
-
-CREATE TABLE `vehicle_categories` (
+-- Dumping structure for table es_extended.vehicle_categories
+CREATE TABLE IF NOT EXISTS `vehicle_categories` (
   `name` varchar(60) NOT NULL,
-  `label` varchar(60) NOT NULL
-) ENGINE=InnoDB;
+  `label` varchar(60) NOT NULL,
+  PRIMARY KEY (`name`) USING BTREE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci ROW_FORMAT=DYNAMIC;
 
---
--- Dumping data for table `vehicle_categories`
---
-
+-- Dumping data for table es_extended.vehicle_categories: ~11 rows (approximately)
 INSERT INTO `vehicle_categories` (`name`, `label`) VALUES
-('compacts', 'Compacts'),
-('coupes', 'Coupés'),
-('motorcycles', 'Motos'),
-('muscle', 'Muscle'),
-('offroad', 'Off Road'),
-('sedans', 'Sedans'),
-('sports', 'Sports'),
-('sportsclassics', 'Sports Classics'),
-('super', 'Super'),
-('suvs', 'SUVs'),
-('vans', 'Vans');
+	('cycle', 'Kerékpárok'),
+	('import', 'Import'),
+	('modclass', 'Klasszikus'),
+	('modcomp', 'Utcai'),
+	('modmot', 'Motor'),
+	('modmuscle', 'Izomautók'),
+	('modoff', 'Off Road'),
+	('modsport', 'Sport'),
+	('modsuper', 'Szuperautók'),
+	('premium', 'Prémium Járművek'),
+	('trailer', 'Tréler');
 
--- --------------------------------------------------------
-
---
--- Table structure for table `vehicle_sold`
---
-
-CREATE TABLE `vehicle_sold` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
+-- Dumping structure for table es_extended.vehicle_sold
+CREATE TABLE IF NOT EXISTS `vehicle_sold` (
   `client` varchar(50) NOT NULL,
   `model` varchar(50) NOT NULL,
   `plate` varchar(50) NOT NULL,
   `soldby` varchar(50) NOT NULL,
   `date` varchar(50) NOT NULL,
-   PRIMARY KEY (`id`)
-) ENGINE=InnoDB;
-
---
--- Table structure for table `whitelist`
---
-
-CREATE TABLE `whitelist` (
-	`identifier` varchar(60) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
---
--- Indexes for dumped tables
---
-
---
--- Indexes for table `addon_account`
---
-ALTER TABLE `addon_account`
-  ADD PRIMARY KEY (`name`);
-
---
--- Indexes for table `addon_account_data`
---
-ALTER TABLE `addon_account_data`
-  ADD PRIMARY KEY (`id`),
-  ADD UNIQUE KEY `index_addon_account_data_account_name_owner` (`account_name`,`owner`),
-  ADD KEY `index_addon_account_data_account_name` (`account_name`);
-
---
--- Indexes for table `addon_inventory`
---
-ALTER TABLE `addon_inventory`
-  ADD PRIMARY KEY (`name`);
-
---
--- Indexes for table `addon_inventory_items`
---
-ALTER TABLE `addon_inventory_items`
-  ADD PRIMARY KEY (`id`),
-  ADD KEY `index_addon_inventory_items_inventory_name_name` (`inventory_name`,`name`),
-  ADD KEY `index_addon_inventory_items_inventory_name_name_owner` (`inventory_name`,`name`,`owner`),
-  ADD KEY `index_addon_inventory_inventory_name` (`inventory_name`);
-
---
--- Indexes for table `billing`
---
-ALTER TABLE `billing`
-  ADD PRIMARY KEY (`id`);
-
---
--- Indexes for table `cardealer_vehicles`
---
-ALTER TABLE `cardealer_vehicles`
-  ADD PRIMARY KEY (`id`);
-
---
--- Indexes for table `datastore`
---
-ALTER TABLE `datastore`
-  ADD PRIMARY KEY (`name`);
-
---
--- Indexes for table `datastore_data`
---
-ALTER TABLE `datastore_data`
-  ADD PRIMARY KEY (`id`),
-  ADD UNIQUE KEY `index_datastore_data_name_owner` (`name`,`owner`),
-  ADD KEY `index_datastore_data_name` (`name`);
-
---
--- Indexes for table `items`
---
-ALTER TABLE `items`
-  ADD PRIMARY KEY (`name`);
-
---
--- Indexes for table `jobs`
---
-ALTER TABLE `jobs`
-  ADD PRIMARY KEY (`name`);
-
---
--- Indexes for table `job_grades`
---
-ALTER TABLE `job_grades`
-  ADD PRIMARY KEY (`id`);
-
---
--- Indexes for table `licenses`
---
-ALTER TABLE `licenses`
-  ADD PRIMARY KEY (`type`);
-
---
---
--- Indexes for table `owned_vehicles`
---
-ALTER TABLE `owned_vehicles`
-  ADD PRIMARY KEY (`plate`);
-
---
--- Indexes for table `rented_vehicles`
---
-ALTER TABLE `rented_vehicles`
-  ADD PRIMARY KEY (`plate`);
-
---
--- Indexes for table `society_moneywash`
---
-ALTER TABLE `society_moneywash`
-  ADD PRIMARY KEY (`id`);
-
---
--- Indexes for table `users`
---
-ALTER TABLE `users`
-  ADD PRIMARY KEY (`identifier`),
-  ADD UNIQUE KEY `id` (`id`);
-
---
--- Indexes for table `user_licenses`
---
-ALTER TABLE `user_licenses`
-  ADD PRIMARY KEY (`id`);
-
---
--- Indexes for table `vehicle_categories`
---
-ALTER TABLE `vehicle_categories`
-  ADD PRIMARY KEY (`name`);
-
---
--- Indexes for table `whitelist`
---
-ALTER TABLE `whitelist`
-  ADD PRIMARY KEY (`identifier`);
-
---
--- AUTO_INCREMENT for table `addon_account_data`
---
-ALTER TABLE `addon_account_data`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
-
---
--- AUTO_INCREMENT for table `addon_inventory_items`
---
-ALTER TABLE `addon_inventory_items`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
-
---
--- AUTO_INCREMENT for table `billing`
---
-ALTER TABLE `billing`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
-
---
--- AUTO_INCREMENT for table `cardealer_vehicles`
---
-ALTER TABLE `cardealer_vehicles`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
-
---
--- AUTO_INCREMENT for table `datastore_data`
---
-ALTER TABLE `datastore_data`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
-
---
--- AUTO_INCREMENT for table `job_grades`
---
-ALTER TABLE `job_grades`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=36;
-
-
--- AUTO_INCREMENT for table `society_moneywash`
---
-ALTER TABLE `society_moneywash`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
-
---
--- AUTO_INCREMENT for table `users`
---
-ALTER TABLE `users`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
-
---
--- AUTO_INCREMENT for table `user_licenses`
---
-ALTER TABLE `user_licenses`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
-  
---
--- Fine Types
---
-	CREATE TABLE `fine_types` (
-	`id` int NOT NULL AUTO_INCREMENT,
-	`label` varchar(255) DEFAULT NULL,
-	`amount` int DEFAULT NULL,
-	`category` int DEFAULT NULL,
-
-	PRIMARY KEY (`id`)
-) ENGINE=InnoDB;
-
-INSERT INTO `fine_types` (label, amount, category) VALUES
-	('Misuse of a horn', 30, 0),
-	('Illegally Crossing a continuous Line', 40, 0),
-	('Driving on the wrong side of the road', 250, 0),
-	('Illegal U-Turn', 250, 0),
-	('Illegally Driving Off-road', 170, 0),
-	('Refusing a Lawful Command', 30, 0),
-	('Illegally Stopping a Vehicle', 150, 0),
-	('Illegal Parking', 70, 0),
-	('Failing to Yield to the right', 70, 0),
-	('Failure to comply with Vehicle Information', 90, 0),
-	('Failing to stop at a Stop Sign ', 105, 0),
-	('Failing to stop at a Red Light', 130, 0),
-	('Illegal Passing', 100, 0),
-	('Driving an illegal Vehicle', 100, 0),
-	('Driving without a License', 1500, 0),
-	('Hit and Run', 800, 0),
-	('Exceeding Speeds Over < 5 mph', 90, 0),
-	('Exceeding Speeds Over 5-15 mph', 120, 0),
-	('Exceeding Speeds Over 15-30 mph', 180, 0),
-	('Exceeding Speeds Over > 30 mph', 300, 0),
-	('Impeding traffic flow', 110, 1),
-	('Public Intoxication', 90, 1),
-	('Disorderly conduct', 90, 1),
-	('Obstruction of Justice', 130, 1),
-	('Insults towards Civilans', 75, 1),
-	('Disrespecting of an LEO', 110, 1),
-	('Verbal Threat towards a Civilan', 90, 1),
-	('Verbal Threat towards an LEO', 150, 1),
-	('Providing False Information', 250, 1),
-	('Attempt of Corruption', 1500, 1),
-	('Brandishing a weapon in city Limits', 120, 2),
-	('Brandishing a Lethal Weapon in city Limits', 300, 2),
-	('No Firearms License', 600, 2),
-	('Possession of an Illegal Weapon', 700, 2),
-	('Possession of Burglary Tools', 300, 2),
-	('Grand Theft Auto', 1800, 2),
-	('Intent to Sell/Distrube of an illegal Substance', 1500, 2),
-	('Frabrication of an Illegal Substance', 1500, 2),
-	('Possession of an Illegal Substance ', 650, 2),
-	('Kidnapping of a Civilan', 1500, 2),
-	('Kidnapping of an LEO', 2000, 2),
-	('Robbery', 650, 2),
-	('Armed Robbery of a Store', 650, 2),
-	('Armed Robbery of a Bank', 1500, 2),
-	('Assault on a Civilian', 2000, 3),
-	('Assault of an LEO', 2500, 3),
-	('Attempt of Murder of a Civilian', 3000, 3),
-	('Attempt of Murder of an LEO', 5000, 3),
-	('Murder of a Civilian', 10000, 3),
-	('Murder of an LEO', 30000, 3),
-	('Involuntary manslaughter', 1800, 3),
-	('Fraud', 2000, 2);
-
-
---
--- ESX Bankerjob
---
-
-INSERT INTO `addon_account` (name, label, shared) VALUES
-	('society_banker','Bank',1),
-	('bank_savings','Savings account',0)
-;
-
-INSERT INTO `jobs` (name, label) VALUES
-	('banker','Banker')
-;
-
-INSERT INTO `job_grades` (job_name, grade, name, label, salary, skin_male, skin_female) VALUES
-	('banker',0,'advisor','Consultant',10,'{}','{}'),
-	('banker',1,'banker','Banker',20,'{}','{}'),
-	('banker',2,'business_banker',"Investment banker",30,'{}','{}'),
-	('banker',3,'trader','Broker',40,'{}','{}'),
-	('banker',4,'boss','Boss',0,'{}','{}')
-;
-
---
--- ESX Banking
---
-
-CREATE TABLE IF NOT EXISTS `banking` (
-  `identifier` varchar(46) DEFAULT NULL,
-  `type` varchar(50) DEFAULT NULL,
-  `amount` int(64) DEFAULT NULL,
-  `time` bigint(20) DEFAULT NULL,
-  `ID` int(11) NOT NULL AUTO_INCREMENT,
-  `balance` int(11) DEFAULT 0,
-  PRIMARY KEY (`ID`)
-) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4;
-
-ALTER TABLE `users` ADD COLUMN `pincode` INT NULL;
+  PRIMARY KEY (`plate`) USING BTREE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci ROW_FORMAT=DYNAMIC;
