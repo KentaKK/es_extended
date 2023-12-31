@@ -174,7 +174,7 @@ end
 ---@param msg string
 ---@param thisFrame boolean?
 ---@param beep boolean?
----@param duration number
+---@param duration? number
 function ESX.ShowHelpNotification(msg, thisFrame, beep, duration)
 	AddTextEntry('esxHelpNotification', msg)
 
@@ -451,9 +451,10 @@ end
 ESX.Game.SpawnVehicle = function(vehicle, coords, heading, cb)
     local model = type(vehicle) == 'number' and vehicle or joaat(vehicle)
     --local vector = type(coords) == "vector3" and coords or vec(coords.x, coords.y, coords.z)
+    if not IsModelInCdimage(model) then return end
 
     local playerCoords = GetEntityCoords(ESX.PlayerData.ped)
-    if not playerCoords then 
+    if not playerCoords then
         return
     end
 
@@ -463,19 +464,20 @@ ESX.Game.SpawnVehicle = function(vehicle, coords, heading, cb)
 
 	RequestCollisionAtCoord(coords.x, coords.y, coords.z)
 
-	print('Spawning ' .. tostring(model) .. ' at ' .. tostring(vector4(coords.x, coords.y, coords.z, heading + 0.0)))
-	local vehicle = CreateVehicle(model, coords.x, coords.y, coords.z, heading, true, false)
-	local id = NetworkGetNetworkIdFromEntity(vehicle)
+	print('Spawning '..tostring(model)..' at '..tostring(vector4(coords.x, coords.y, coords.z, heading + 0.0)))
+	local veh = CreateVehicle(model, coords.x, coords.y, coords.z, heading, true, true)
+	local id = NetworkGetNetworkIdFromEntity(veh)
 		SetNetworkIdCanMigrate(id, true)
-		SetEntityAsMissionEntity(vehicle, true, false)
-		SetVehicleHasBeenOwnedByPlayer(vehicle, true)
-		SetVehicleNeedsToBeHotwired(vehicle, false)
-		SetVehRadioStation(vehicle, 'OFF')
+		SetEntityAsMissionEntity(veh, true, true)
+		SetVehicleHasBeenOwnedByPlayer(veh, true)
+		SetVehicleNeedsToBeHotwired(veh, false)
+		SetVehRadioStation(veh, 'OFF')
+                SetVehicleOnGroundProperly(veh)
 		SetModelAsNoLongerNeeded(model)
 
-		if DoesEntityExist(vehicle) then
+		if DoesEntityExist(veh) then
             local xxxx = 0
-			while not HasCollisionLoadedAroundEntity(vehicle) do
+			while not HasCollisionLoadedAroundEntity(veh) do
                 print("Request Collision: " ..xxxx)
 			    RequestCollisionAtCoord(coords.x, coords.y, coords.z)
                 if xxxx > 40 then
@@ -485,9 +487,8 @@ ESX.Game.SpawnVehicle = function(vehicle, coords, heading, cb)
 			    Wait(50)
 			end
 		end
-                
 		if cb ~= nil then
-			cb(vehicle)
+			cb(veh)
             local elapsedTime = (GetGameTimer() - GU.Time)
             print(('[^2INFO^7] Spawn time %s ms'):format(elapsedTime))
 		end
@@ -716,8 +717,8 @@ function ESX.Game.GetVehicleInDirection()
 end
 
 
----@param vehicle number|string
----@return table
+---@param vehicle number
+---@return table|nil
 ESX.Game.GetVehicleProperties = function(vehicle)
     if not DoesEntityExist(vehicle) then
         return
@@ -888,7 +889,7 @@ ESX.Game.GetVehicleProperties = function(vehicle)
     }
 end
 
----@param vehicle number|string
+---@param vehicle number
 ---@param props table
 ESX.Game.SetVehicleProperties = function(vehicle, props)
     if not DoesEntityExist(vehicle) then
@@ -1153,9 +1154,9 @@ ESX.Game.SetVehicleProperties = function(vehicle, props)
         if props.tankHealth then
             SetVehiclePetrolTankHealth(vehicle, props.tankHealth + 0.0)
         end
-
+        print("----------")
         if Config.LegacyFuel then
-           if props.fuelLevel ~= nil then
+           if props.fuelLevel then
 	       exports['LegacyFuel']:SetFuel(vehicle, props.fuelLevel + 0.0)
                print("Fuel: " ..props.fuelLevel)
            end
@@ -1173,16 +1174,16 @@ ESX.Game.SetVehicleProperties = function(vehicle, props)
             SetVehicleEngineHealth(vehicle, props.engineHealth + 0.0)
             print("Engine: " ..props.engineHealth)
         end
-
+        print("----------")
         if props.deformat then
            local deformation = json.decode(props.deformat)
            Entity(vehicle).state:set('deformation', deformation, true)
         end
-        if props.wheelData then 
-            exports['vstancer']:SetFrontCamber(vehicle, props.wheelData["frontCamber"])
-	    exports['vstancer']:SetRearCamber(vehicle, props.wheelData["rearCamber"])
-	    exports['vstancer']:SetFrontTrackWidth(vehicle, props.wheelData["frontWidth"])
-	    exports['vstancer']:SetRearTrackWidth(vehicle, props.wheelData["rearWidth"])
+        if props.wheelData then
+                exports['vstancer']:SetFrontCamber(vehicle, props.wheelData["frontCamber"])
+                exports['vstancer']:SetRearCamber(vehicle, props.wheelData["rearCamber"])
+                exports['vstancer']:SetFrontTrackWidth(vehicle, props.wheelData["frontWidth"])
+                exports['vstancer']:SetRearTrackWidth(vehicle, props.wheelData["rearWidth"])
         end
 	--[[if props.stancer then
 	    local stancer = json.decode(props.stancer)
