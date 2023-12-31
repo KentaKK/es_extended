@@ -320,7 +320,6 @@ function loadESXPlayer(identifier, playerId, isNew)
   if ped then
       xPlayer.setMeta('health', xPlayer.getMeta('health') or GetEntityHealth(ped))
       xPlayer.setMeta('armor', xPlayer.getMeta('armor') or GetPedArmour(ped))
-
   end
   TriggerEvent('esx:playerLoaded', playerId, xPlayer, isNew)
 
@@ -484,7 +483,7 @@ if not Config.OxInventory then
             targetXPlayer.setWeaponTint(itemName, weaponTint)
           end
           if weaponComponents then
-            for k, v in pairs(weaponComponents) do
+            for _, v in pairs(weaponComponents) do
               targetXPlayer.addWeaponComponent(itemName, v)
             end
           end
@@ -572,7 +571,7 @@ if not Config.OxInventory then
           xPlayer.addWeapon(pickup.name, pickup.count)
           xPlayer.setWeaponTint(pickup.name, pickup.tintIndex)
 
-          for k, v in ipairs(pickup.components) do
+          for _, v in ipairs(pickup.components) do
             xPlayer.addWeaponComponent(pickup.name, v)
           end
         end
@@ -627,7 +626,7 @@ end)
 ESX.RegisterServerCallback('esx:getPlayerNames', function(source, cb, players)
   players[source] = nil
 
-  for playerId, v in pairs(players) do
+  for playerId,_ in pairs(players) do
     local xPlayer = ESX.GetPlayerFromId(playerId)
 
     if xPlayer then
