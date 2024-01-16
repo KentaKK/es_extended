@@ -334,6 +334,7 @@ function loadESXPlayer(identifier, playerId, isNew)
       inventory = xPlayer.getInventory(),
       job = xPlayer.getJob(),
       loadout = xPlayer.getLoadout(),
+      group = userData.group,
       maxWeight = xPlayer.getMaxWeight(),
       money = xPlayer.getMoney(),
       sex = xPlayer.get("sex") or "m",
