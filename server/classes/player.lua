@@ -793,9 +793,6 @@ function CreateExtendedPlayer(playerId, identifier, group, accounts, inventory, 
 
 			self.metadata[index][value] = subValue
 		end
-
-
-		self.triggerEvent('esx:updatePlayerData', 'metadata', self.metadata)
 		Player(self.source).state:set('metadata', self.metadata, true)
 	end
 
@@ -819,7 +816,6 @@ function CreateExtendedPlayer(playerId, identifier, group, accounts, inventory, 
 		end
 
 		self.metadata[index] = nil
-		self.triggerEvent('esx:updatePlayerData', 'metadata', self.metadata)
 		Player(self.source).state:set('metadata', self.metadata, true)
 	end
 
