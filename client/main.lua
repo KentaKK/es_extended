@@ -1,5 +1,13 @@
 local pickups = {}
 
+AddStateBagChangeHandler('metadata', 'player:' .. tostring(GetPlayerServerId(PlayerId())), function(_, key, val)
+	ESX.SetPlayerData(key, val)
+end)
+
+AddStateBagChangeHandler('group', 'player:' .. tostring(GetPlayerServerId(PlayerId())), function(_, key, val)
+	ESX.SetPlayerData(key, val)
+end)
+
 CreateThread(function()
 	while not Config.Multichar do
 		Wait(0)
@@ -139,6 +147,7 @@ AddEventHandler('esx:playerLoaded', function(xPlayer, isNew, skin)
 
 
 	SetDefaultVehicleNumberPlateTextPattern(-1, Config.CustomAIPlates)
+        if ESX.PlayerData.group then print(ESX.PlayerData.group) end
 	StartServerSyncLoops()
 end)
 
@@ -654,10 +663,6 @@ end)
 
 ESX.RegisterClientCallback("esx:GetVehicleType", function(cb, model)
 	cb(ESX.GetVehicleType(model))
-end)
-
-RegisterNetEvent('esx:updatePlayerData', function(key, val)
-	ESX.SetPlayerData(key, val)
 end)
 
 local DoNotUse = {
