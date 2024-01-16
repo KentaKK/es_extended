@@ -321,6 +321,9 @@ function loadESXPlayer(identifier, playerId, isNew)
       xPlayer.setMeta('health', xPlayer.getMeta('health') or GetEntityHealth(ped))
       xPlayer.setMeta('armor', xPlayer.getMeta('armor') or GetPedArmour(ped))
   end
+  if userData.group then
+      xPlayer.setGroup(userData.group)
+  end
   TriggerEvent('esx:playerLoaded', playerId, xPlayer, isNew)
 
   xPlayer.triggerEvent('esx:playerLoaded',
