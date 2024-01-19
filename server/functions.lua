@@ -4,20 +4,6 @@ function ESX.Trace(msg)
 	end
 end
 
-function sendToDiscord(name, message, color)
-  local connect = {
-        {
-            ["color"] = color,
-            ["title"] = "**".. name .."**",
-            ["description"] = message,
-            ["footer"] = {
-                ["text"] = "",
-            },
-        }
-    }
-  PerformHttpRequest(DISCORD_WEBHOOK, function(err, text, headers) end, 'POST', json.encode({username = DISCORD_NAME, embeds = connect, avatar_url = DISCORD_IMAGE}), { ['Content-Type'] = 'application/json' })
-end
-
 ---@param name string
 ---@param group string
 ---@param cb function
