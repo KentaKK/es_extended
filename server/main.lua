@@ -1,11 +1,6 @@
 SetMapName('Los Santos')
 SetGameType('RolePlay')
 
-local DISCORD_WEBHOOK = 'https://discord.com/api/webhooks/978703100644818954/7nvgdrbVjyqXur1OYM-4wyGUaBFHU_EVNl9xhWi3woLEpW-krR21rg_GaKjSeXtKznlc'
-local DISCORD_NAME = "Inventory-log"
-local STEAM_KEY = ""
-local DISCORD_IMAGE = "https://i.imgur.com/D0EYeVO.png" -- default is safe logo
-
 local newPlayer = 'INSERT INTO `users` SET `accounts` = ?, `identifier` = ?, `group` = ?'
 local loadPlayer = 'SELECT `accounts`, `job`, `job_grade`, `group`, `position`, `inventory`, `skin`, `loadout`, `metadata`, `ped`'
 
@@ -17,7 +12,7 @@ if Config.Multichar or Config.Identity then
     loadPlayer = loadPlayer .. ', `firstname`, `lastname`, `dateofbirth`, `sex`, `height`'
 end
 
-loadPlayer = loadPlayer .. ' FROM `users` WHERE identifier = ?'
+loadPlayer = loadPlayer .. ' FROM `users` WHERE `identifier` = ?'
 
 
 if Config.Multichar then
@@ -57,7 +52,7 @@ function onPlayerJoined(playerId)
         ('there was an error loading your character!\nError code: identifier-active-ingame\n\nThis error is caused by a player on this server who has the same identifier as you have. Make sure you are not playing on the same Rockstar account.\n\nYour Rockstar identifier: %s'):format(
           identifier))
     else
-      local result = MySQL.scalar.await('SELECT 1 FROM users WHERE identifier = ?', {identifier})
+      local result = MySQL.scalar.await('SELECT 1 FROM `users` WHERE `identifier` = ?', {identifier})
       if result then
         loadESXPlayer(identifier, playerId, false)
       else
@@ -104,7 +99,7 @@ function getPhoneRandomNumber()
 end
 
 if not Config.Multichar then
-  AddEventHandler('playerConnecting', function(name, setCallback, deferrals)
+  AddEventHandler('playerConnecting', function(_, _, deferrals)
     deferrals.defer()
     local playerId = source
     local identifier = ESX.GetIdentifier(playerId)
@@ -229,14 +224,9 @@ function loadESXPlayer(identifier, playerId, isNew)
 
   -- Group
   if result.group then
-    if result.group == "admin" then
-      userData.group = "admin"
-      --print("[^3WARNING^7] Superadmin detected, setting group to admin")
-    else
       userData.group = result.group
-    end
   else
-    userData.group = 'user'
+      userData.group = 'user'
   end
 
   -- Loadout
@@ -321,9 +311,6 @@ function loadESXPlayer(identifier, playerId, isNew)
       xPlayer.setMeta('health', xPlayer.getMeta('health') or GetEntityHealth(ped))
       xPlayer.setMeta('armor', xPlayer.getMeta('armor') or GetPedArmour(ped))
   end
-  if userData.group then
-      xPlayer.setGroup(userData.group)
-  end
   TriggerEvent('esx:playerLoaded', playerId, xPlayer, isNew)
 
   xPlayer.triggerEvent('esx:playerLoaded',
@@ -368,26 +355,6 @@ AddEventHandler('chatMessage', function(playerId, author, message)
         xPlayer.showNotification(_U('commanderror_invalidcommand', commandName))
     end
 end)
-
-ESX.RegisterServerCallback('notw4018:getplayers', function(source, cb)
-	local xPlayers = ESX.GetExtendedPlayers()
-	local players  = {}
-
-	for i=1, #(xPlayers) do
-		local xPlayer = xPlayers[i]
-		table.insert(players, {
-			source      = xPlayer.source,
-			identifier  = xPlayer.getIdentifier(),
-            name        = GetPlayerName(xPlayers[i]),
-			job         = xPlayer.getJob(),
-            group       = xPlayer.getGroup(),
-            job       = xPlayer.job.label,
-            grade          = xPlayer.job.grade_label,
-		})
-	end
-	cb(players)
-end)
-
 
 AddEventHandler('playerDropped', function(reason)
   local playerId = source
