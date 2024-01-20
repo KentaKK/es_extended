@@ -55,14 +55,12 @@ function CreateExtendedPlayer(playerId, identifier, group, accounts, inventory, 
 
 	---@param eventName string
 	---@param ... any
-	---@return void
 	function self.triggerEvent(eventName, ...)
 		_assert(type(eventName) == "string", "eventName should be string!")
 		_TriggerClientEvent(eventName, self.source, ...)
 	end
 
 	---@param coordinates vector4 | vector3 | table
-	---@return void
 	function self.setCoords(coordinates)
 		local ped <const> = _GetPlayerPed(self.source)
 		_SetEntityCoords(ped, coordinates.x, coordinates.y, coordinates.z, false, false, false, false)
@@ -80,13 +78,11 @@ function CreateExtendedPlayer(playerId, identifier, group, accounts, inventory, 
 	end
 
 	---@param reason string
-	---@return void
 	function self.kick(reason)
 		_DropPlayer(self.source, reason)
 	end
 
 	---@param money number
-	---@return void
 	function self.setMoney(money)
 		_assert(type(money) == "number", "money should be number!")
 		money = ESX.Math.Round(money)
@@ -100,7 +96,6 @@ function CreateExtendedPlayer(playerId, identifier, group, accounts, inventory, 
 
 	---@param money number
 	---@param reason string
-	---@return void
 	function self.addMoney(money, reason)
 		money = ESX.Math.Round(money)
 		self.addAccountMoney('money', money, reason)
@@ -108,7 +103,6 @@ function CreateExtendedPlayer(playerId, identifier, group, accounts, inventory, 
 
 	---@param money number
 	---@param reason string
-	---@return void
 	function self.removeMoney(money, reason)
 		money = ESX.Math.Round(money)
 		self.removeAccountMoney('money', money, reason)
@@ -120,7 +114,6 @@ function CreateExtendedPlayer(playerId, identifier, group, accounts, inventory, 
 	end
 
 	---@param newGroup string
-	---@return void
 	function self.setGroup(newGroup)
 		_ExecuteCommand(('remove_principal identifier.%s group.%s'):format(self.license, self.group))
 		self.group = newGroup
@@ -135,7 +128,6 @@ function CreateExtendedPlayer(playerId, identifier, group, accounts, inventory, 
 
 	---@param k string
 	---@param v any
-	---@return void
 	function self.set(k, v)
 		self.variables[k] = v
 		Player(self.source).state:set(k, v, true)
@@ -233,7 +225,6 @@ function CreateExtendedPlayer(playerId, identifier, group, accounts, inventory, 
 	end
 
 	---@param newName string
-	---@return void
 	function self.setName(newName)
 		self.name = newName
 		Player(self.source).state:set("name", self.name, true)
@@ -242,7 +233,6 @@ function CreateExtendedPlayer(playerId, identifier, group, accounts, inventory, 
 	---@param accountName string
 	---@param money number
 	---@param reason string
-	---@return void
 	function self.setAccountMoney(accountName, money, reason)
 		reason = reason or 'unknown'
 		if not tonumber(money) then
@@ -269,7 +259,6 @@ function CreateExtendedPlayer(playerId, identifier, group, accounts, inventory, 
 	---@param accountName string
 	---@param money number
 	---@param reason string
-	---@return void
 	function self.addAccountMoney(accountName, money, reason)
 		reason = reason or 'Unknown'
 		if not tonumber(money) then
@@ -295,7 +284,6 @@ function CreateExtendedPlayer(playerId, identifier, group, accounts, inventory, 
 	---@param accountName string
 	---@param money number
 	---@param reason string
-	---@return void
 	function self.removeAccountMoney(accountName, money, reason)
 		reason = reason or 'Unknown'
 		if not tonumber(money) then
@@ -332,7 +320,6 @@ function CreateExtendedPlayer(playerId, identifier, group, accounts, inventory, 
 
 	---@param itemName string
 	---@param count number
-	---@return void
 	function self.addInventoryItem(itemName, count)
 		local item = self.getInventoryItem(itemName)
 
@@ -348,7 +335,6 @@ function CreateExtendedPlayer(playerId, identifier, group, accounts, inventory, 
 
 	---@param itemName string
 	---@param count number
-	---@return void
 	function self.removeInventoryItem(itemName, count)
 		local item = self.getInventoryItem(itemName)
 
@@ -372,7 +358,6 @@ function CreateExtendedPlayer(playerId, identifier, group, accounts, inventory, 
 
 	---@param itemName string
 	---@param count number
-	---@return void
 	function self.setInventoryItem(itemName, count)
 		local item = self.getInventoryItem(itemName)
 
@@ -399,7 +384,7 @@ function CreateExtendedPlayer(playerId, identifier, group, accounts, inventory, 
 
 	---@param itemName string
 	---@param count number
-	---@return boolean
+	---@return boolean|nil
 	function self.canCarryItem(itemName, count)
 		if ESX.Items[itemName] then
 			local currentWeight, itemWeight = self.weight, ESX.Items[itemName].weight
@@ -407,7 +392,7 @@ function CreateExtendedPlayer(playerId, identifier, group, accounts, inventory, 
 
 			return newWeight <= self.maxWeight
 		else
-			print(('[^3WARNING^7] Item ^5"%s"^7 was used but does not exist!'):format(itemName))
+			return print(('[^3WARNING^7] Item ^5"%s"^7 was used but does not exist!'):format(itemName))
 		end
 	end
 
@@ -420,9 +405,9 @@ function CreateExtendedPlayer(playerId, identifier, group, accounts, inventory, 
 		local firstItemObject = self.getInventoryItem(firstItem)
 		local testItemObject = self.getInventoryItem(testItem)
 
-		if firstItemObject.count >= firstItemCount then
-			local weightWithoutFirstItem = ESX.Math.Round(self.weight - (firstItemObject.weight * firstItemCount))
-			local weightWithTestItem = ESX.Math.Round(weightWithoutFirstItem + (testItemObject.weight * testItemCount))
+		if firstItemObject?.count >= firstItemCount then
+			local weightWithoutFirstItem = ESX.Math.Round(self.weight - (firstItemObject?.weight * firstItemCount))
+			local weightWithTestItem = ESX.Math.Round(weightWithoutFirstItem + (testItemObject?.weight * testItemCount))
 
 			return weightWithTestItem <= self.maxWeight
 		end
@@ -431,7 +416,6 @@ function CreateExtendedPlayer(playerId, identifier, group, accounts, inventory, 
 	end
 
 	---@param newWeight number
-	---@return void
 	function self.setMaxWeight(newWeight)
 		self.maxWeight = newWeight
 		self.triggerEvent('esx:setMaxWeight', self.maxWeight)
@@ -439,7 +423,6 @@ function CreateExtendedPlayer(playerId, identifier, group, accounts, inventory, 
 
 	---@param newJob string
 	---@param grade string
-	---@return void
 	function self.setJob(newJob, grade)
 		grade = tostring(grade)
 		local lastJob <const> = json.decode(json.encode(self.job))
@@ -478,7 +461,6 @@ function CreateExtendedPlayer(playerId, identifier, group, accounts, inventory, 
 
 	---@param weaponName string
 	---@param ammo number
-	---@return void
 	function self.addWeapon(weaponName, ammo)
 		if not self.hasWeapon(weaponName) then
 			local weaponLabel <const> = ESX.GetWeaponLabel(weaponName)
@@ -498,7 +480,6 @@ function CreateExtendedPlayer(playerId, identifier, group, accounts, inventory, 
 
 	---@param weaponName string
 	---@param weaponComponent string
-	---@return void
 	function self.addWeaponComponent(weaponName, weaponComponent)
 		local loadoutNum <const>, weapon <const> = self.getWeapon(weaponName)
 
@@ -518,7 +499,6 @@ function CreateExtendedPlayer(playerId, identifier, group, accounts, inventory, 
 
 	---@param weaponName string
 	---@param ammoCount number
-	---@return void
 	function self.addWeaponAmmo(weaponName, ammoCount)
 		local _, weapon = self.getWeapon(weaponName)
 
@@ -528,9 +508,8 @@ function CreateExtendedPlayer(playerId, identifier, group, accounts, inventory, 
 		end
 	end
 
-	---@param weaponName string
-	---@param ammoCount number
-	---@return void
+---@param weaponName string
+---@param ammoCount number
 	function self.updateWeaponAmmo(weaponName, ammoCount)
 		local _, weapon = self.getWeapon(weaponName)
 
@@ -541,7 +520,6 @@ function CreateExtendedPlayer(playerId, identifier, group, accounts, inventory, 
 
 	---@param weaponName string
 	---@param weaponTintIndex number
-	---@return void
 	function self.setWeaponTint(weaponName, weaponTintIndex)
 		local loadoutNum <const>, weapon <const> = self.getWeapon(weaponName)
 
@@ -569,11 +547,10 @@ function CreateExtendedPlayer(playerId, identifier, group, accounts, inventory, 
 	end
 
 	---@param weaponName string
-	---@return void
 	function self.removeWeapon(weaponName)
 		local weaponLabel, playerPed <const> = nil, _GetPlayerPed(self.source)
 
-		if not (playerPed) then 
+		if not (playerPed) then
 			return print("[^1ERROR^7] xPlayer.removeWeapon ^5invalid^7 player ped!")
 		end
 
@@ -601,7 +578,6 @@ function CreateExtendedPlayer(playerId, identifier, group, accounts, inventory, 
 
 	---@param weaponName string
 	---@param weaponComponent string
-	---@return void
 	function self.removeWeaponComponent(weaponName, weaponComponent)
 		local loadoutNum <const>, weapon <const> = self.getWeapon(weaponName)
 
@@ -627,13 +603,12 @@ function CreateExtendedPlayer(playerId, identifier, group, accounts, inventory, 
 
 	---@param weaponName string
 	---@param ammoCount number
-	---@return void
 	function self.removeWeaponAmmo(weaponName, ammoCount)
 		local _, weapon = self.getWeapon(weaponName)
 
 		if weapon then
 			weapon.ammo = weapon.ammo - ammoCount
-                        _SetPedAmmo(GetPlayerPed(self.source), joaat(weaponName), weapon.ammo)
+            _SetPedAmmo(GetPlayerPed(self.source), joaat(weaponName), weapon.ammo)
 		end
 	end
 
@@ -673,7 +648,7 @@ function CreateExtendedPlayer(playerId, identifier, group, accounts, inventory, 
 				return (v), (v.count)
 			end
 		end
-		return false
+		return {}, false
 	end
 
 	---@param weaponName string
@@ -690,7 +665,6 @@ function CreateExtendedPlayer(playerId, identifier, group, accounts, inventory, 
 	---@param msg string
 	---@param type string
 	---@param length number
-	---@return void
 	function self.showNotification(msg, type, length)
 		self.triggerEvent('esx:showNotification', msg, type, length)
 	end
@@ -703,7 +677,6 @@ function CreateExtendedPlayer(playerId, identifier, group, accounts, inventory, 
 	---@param flash boolean
 	---@param saveToBrief boolean
 	---@param hudColorIndex number
-	---@return void
 	function self.showAdvancedNotification(sender, subject, msg, textureDict, iconType, flash, saveToBrief, hudColorIndex)
 		self.triggerEvent('esx:showAdvancedNotification', sender, subject, msg, textureDict, iconType, flash, saveToBrief, hudColorIndex)
 	end
@@ -712,7 +685,6 @@ function CreateExtendedPlayer(playerId, identifier, group, accounts, inventory, 
 	---@param thisFrame boolean
 	---@param beep boolean
 	---@param duration number
-	---@return void
 	function self.showHelpNotification(msg, thisFrame, beep, duration)
 		self.triggerEvent('esx:showHelpNotification', msg, thisFrame, beep, duration)
 	end
@@ -764,7 +736,6 @@ function CreateExtendedPlayer(playerId, identifier, group, accounts, inventory, 
 	---@param index any
 	---@param value any
 	---@param subValue any
-	---@return void
 	function self.setMeta(index, value, subValue)
 		if not index then
 			return print("[^1ERROR^7] xPlayer.setMeta ^5index^7 is Missing!")
@@ -797,7 +768,6 @@ function CreateExtendedPlayer(playerId, identifier, group, accounts, inventory, 
 	end
 
 	---@param index any
-	---@return void
 	function self.clearMeta(index)
 		if not index then
 			return print(("[^1ERROR^7] xPlayer.clearMeta ^5%s^7 is Missing!"):format(index))
@@ -824,5 +794,4 @@ function CreateExtendedPlayer(playerId, identifier, group, accounts, inventory, 
 	end
 
 	return self
-
 end
