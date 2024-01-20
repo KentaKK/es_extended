@@ -4,122 +4,7 @@ SetGameType('RolePlay')
 local newPlayer = 'INSERT INTO `users` SET `accounts` = ?, `identifier` = ?, `group` = ?'
 local loadPlayer = 'SELECT `accounts`, `job`, `job_grade`, `group`, `position`, `inventory`, `skin`, `loadout`, `metadata`, `ped`'
 
-if Config.Multichar then
-    newPlayer = newPlayer .. ', `firstname` = ?, `lastname` = ?, `dateofbirth` = ?, `sex` = ?, `height` = ?'
-end
-
-if Config.Multichar or Config.Identity then
-    loadPlayer = loadPlayer .. ', `firstname`, `lastname`, `dateofbirth`, `sex`, `height`'
-end
-
-loadPlayer = loadPlayer .. ' FROM `users` WHERE `identifier` = ?'
-
-
-if Config.Multichar then
-  AddEventHandler('esx:onPlayerJoined', function(src, char, data)
-    while not next(ESX.Jobs) do
-      Wait(50)
-    end
-
-    if not ESX.Players[src] then
-      local identifier = char .. ':' .. ESX.GetIdentifier(src)
-      if data then
-        createESXPlayer(identifier, src, data)
-      else
-        loadESXPlayer(identifier, src, false)
-      end
-    end
-  end)
-else
-  RegisterNetEvent('esx:onPlayerJoined')
-  AddEventHandler('esx:onPlayerJoined', function()
-    local _source = source
-    while not next(ESX.Jobs) do
-      Wait(50)
-    end
-
-    if not ESX.Players[_source] then
-      onPlayerJoined(_source)
-    end
-  end)
-end
-
-function onPlayerJoined(playerId)
-  local identifier = ESX.GetIdentifier(playerId)
-  if identifier then
-    if ESX.GetPlayerFromIdentifier(identifier) then
-      DropPlayer(playerId,
-        ('there was an error loading your character!\nError code: identifier-active-ingame\n\nThis error is caused by a player on this server who has the same identifier as you have. Make sure you are not playing on the same Rockstar account.\n\nYour Rockstar identifier: %s'):format(
-          identifier))
-    else
-      local result = MySQL.scalar.await('SELECT 1 FROM `users` WHERE `identifier` = ?', {identifier})
-      if result then
-        loadESXPlayer(identifier, playerId, false)
-      else
-        createESXPlayer(identifier, playerId)
-      end
-    end
-  else
-    DropPlayer(playerId,
-      'there was an error loading your character!\nError code: identifier-missing-ingame\n\nThe cause of this error is not known, your identifier could not be found. Please come back later or report this problem to the server administration team.')
-  end
-end
-
-function createESXPlayer(identifier, playerId, data)
-  local accounts = {}
-
-  for account, money in pairs(Config.StartingAccountMoney) do
-    accounts[account] = money
-  end
-
-  if Core.IsPlayerAdmin(playerId) then
-    print(('^2[INFO] ^0 Player ^5%s ^0Has been granted admin permissions via ^5Ace Perms.^7'):format(playerId))
-    defaultGroup = "admin"
-  else
-    defaultGroup = "user"
-  end
-
-  if not Config.Multichar then
-    MySQL.prepare(newPlayer, {json.encode(accounts), identifier, defaultGroup}, function()
-      loadESXPlayer(identifier, playerId, true)
-    end)
-  else
-    MySQL.prepare(newPlayer,
-      {json.encode(accounts), identifier, defaultGroup, data.firstname, data.lastname, data.dateofbirth, data.sex, data.height}, function()
-        loadESXPlayer(identifier, playerId, true)
-      end)
-  end
-  myPhoneNumber = getPhoneRandomNumber()
-  Wait(300)
-  MySQL.prepare('UPDATE `users` SET `phone_number` = ? WHERE `identifier` = ?', { myPhoneNumber, identifier})
-end
-
-function getPhoneRandomNumber()
-    return '' .. math.random(10000,99999)
-end
-
-if not Config.Multichar then
-  AddEventHandler('playerConnecting', function(_, _, deferrals)
-    deferrals.defer()
-    local playerId = source
-    local identifier = ESX.GetIdentifier(playerId)
-
-    if identifier then
-      if ESX.GetPlayerFromIdentifier(identifier) then
-        deferrals.done(
-          ('There was an error loading your character!\nError code: identifier-active\n\nThis error is caused by a player on this server who has the same identifier as you have. Make sure you are not playing on the same account.\n\nYour identifier: %s'):format(
-            identifier))
-      else
-        deferrals.done()
-      end
-    else
-      deferrals.done(
-        'There was an error loading your character!\nError code: identifier-missing\n\nThe cause of this error is not known, your identifier could not be found. Please come back later or report this problem to the server administration team.')
-    end
-  end)
-end
-
-function loadESXPlayer(identifier, playerId, isNew)
+local function loadESXPlayer(identifier, playerId, isNew)
 	local userData = {
 		accounts = {},
 		inventory = {},
@@ -347,6 +232,121 @@ function loadESXPlayer(identifier, playerId, isNew)
   print(('[^2INFO^0] Player ^5"%s"^0 has connected to the server. ID: ^5%s^7'):format(xPlayer.getName(), playerId))
 end
 
+local function getPhoneRandomNumber()
+  return '' .. math.random(10000,99999)
+end
+
+local function createESXPlayer(identifier, playerId, data)
+  local accounts = {}
+
+  for account, money in pairs(Config.StartingAccountMoney) do
+    accounts[account] = money
+  end
+
+  if Core.IsPlayerAdmin(playerId) then
+    print(('^2[INFO] ^0 Player ^5%s ^0Has been granted admin permissions via ^5Ace Perms.^7'):format(playerId))
+    defaultGroup = "admin"
+  else
+    defaultGroup = "user"
+  end
+
+  if not Config.Multichar then
+    MySQL.prepare(newPlayer, {json.encode(accounts), identifier, defaultGroup}, function()
+      loadESXPlayer(identifier, playerId, true)
+    end)
+  else
+    MySQL.prepare(newPlayer,
+      {json.encode(accounts), identifier, defaultGroup, data.firstname, data.lastname, data.dateofbirth, data.sex, data.height}, function()
+        loadESXPlayer(identifier, playerId, true)
+      end)
+  end
+  local myPhoneNumber = getPhoneRandomNumber()
+  Wait(300)
+  MySQL.prepare('UPDATE `users` SET `phone_number` = ? WHERE `identifier` = ?', { myPhoneNumber, identifier})
+end
+
+local function onPlayerJoined(playerId)
+  local identifier = ESX.GetIdentifier(playerId)
+  if identifier then
+    if ESX.GetPlayerFromIdentifier(identifier) then
+      DropPlayer(playerId,
+        ('there was an error loading your character!\nError code: identifier-active-ingame\n\nThis error is caused by a player on this server who has the same identifier as you have. Make sure you are not playing on the same Rockstar account.\n\nYour Rockstar identifier: %s'):format(
+          identifier))
+    else
+      local result = MySQL.scalar.await('SELECT 1 FROM `users` WHERE `identifier` = ?', {identifier})
+      if result then
+        loadESXPlayer(identifier, playerId, false)
+      else
+        createESXPlayer(identifier, playerId)
+      end
+    end
+  else
+    DropPlayer(playerId,
+      'there was an error loading your character!\nError code: identifier-missing-ingame\n\nThe cause of this error is not known, your identifier could not be found. Please come back later or report this problem to the server administration team.')
+  end
+end
+
+if Config.Multichar then
+    newPlayer = newPlayer .. ', `firstname` = ?, `lastname` = ?, `dateofbirth` = ?, `sex` = ?, `height` = ?'
+end
+
+if Config.Multichar or Config.Identity then
+    loadPlayer = loadPlayer .. ', `firstname`, `lastname`, `dateofbirth`, `sex`, `height`'
+end
+
+loadPlayer = loadPlayer .. ' FROM `users` WHERE `identifier` = ?'
+
+
+if Config.Multichar then
+  AddEventHandler('esx:onPlayerJoined', function(src, char, data)
+    while not next(ESX.Jobs) do
+      Wait(50)
+    end
+
+    if not ESX.Players[src] then
+      local identifier = char .. ':' .. ESX.GetIdentifier(src)
+      if data then
+        createESXPlayer(identifier, src, data)
+      else
+        loadESXPlayer(identifier, src, false)
+      end
+    end
+  end)
+else
+  RegisterNetEvent('esx:onPlayerJoined')
+  AddEventHandler('esx:onPlayerJoined', function()
+    local _source = source
+    while not next(ESX.Jobs) do
+      Wait(50)
+    end
+
+    if not ESX.Players[_source] then
+      onPlayerJoined(_source)
+    end
+  end)
+end
+
+if not Config.Multichar then
+  AddEventHandler('playerConnecting', function(_, _, deferrals)
+    deferrals.defer()
+    local playerId = source
+    local identifier = ESX.GetIdentifier(playerId)
+
+    if identifier then
+      if ESX.GetPlayerFromIdentifier(identifier) then
+        deferrals.done(
+          ('There was an error loading your character!\nError code: identifier-active\n\nThis error is caused by a player on this server who has the same identifier as you have. Make sure you are not playing on the same account.\n\nYour identifier: %s'):format(
+            identifier))
+      else
+        deferrals.done()
+      end
+    else
+      deferrals.done(
+        'There was an error loading your character!\nError code: identifier-missing\n\nThe cause of this error is not known, your identifier could not be found. Please come back later or report this problem to the server administration team.')
+    end
+  end)
+end
+
 AddEventHandler('chatMessage', function(playerId, author, message)
     local xPlayer = ESX.GetPlayerFromId(playerId)
     if message:sub(1, 1) == '/' and playerId > 0 then
@@ -482,7 +482,7 @@ if not Config.OxInventory then
       end
     elseif type == 'item_ammo' then
       if sourceXPlayer.hasWeapon(itemName) then
-        local weaponNum, weapon = sourceXPlayer.getWeapon(itemName)
+        local _, weapon = sourceXPlayer.getWeapon(itemName)
 
         if targetXPlayer.hasWeapon(itemName) then
           local _, weaponObject = ESX.GetWeapon(itemName)
@@ -622,18 +622,3 @@ end)
 AddEventHandler('txAdmin:events:serverShuttingDown', function()
   Core.SavePlayers()
 end)
-
-
-function sendToDiscord(name, message, color)
-  local connect = {
-        {
-            ["color"] = color,
-            ["title"] = "**".. name .."**",
-            ["description"] = message,
-            ["footer"] = {
-                ["text"] = "",
-            },
-        }
-    }
-  PerformHttpRequest(DISCORD_WEBHOOK, function(err, text, headers) end, 'POST', json.encode({username = DISCORD_NAME, embeds = connect, avatar_url = DISCORD_IMAGE}), { ['Content-Type'] = 'application/json' })
-end
