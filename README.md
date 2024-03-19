@@ -2,7 +2,7 @@
 
 ### Information
 ##### Legacy provides some necessary bug-fixes and improvements to optimise the framework before reaching the end of official support by the development team.
-##### Most resources designed for 1.2 will have no issues with Legacy, notable exceptions are those which modify spawning/loading behaviour.   There are several minor feature updates which do not impact compatibility with old resources.  
+##### Most resources designed for 1.2 probably will have no issues with Legacy, notable exceptions are those which modify spawning/loading behaviour.   There are several minor feature updates which do not impact compatibility with old resources.  
 ##### NOTE: The loadouts system in ESX has always been problematic, and fixing it would require a complete overhaul. Your best option is to use a resource that handles weapons as items.
 
 #### Optimisation
@@ -13,6 +13,7 @@
 - Support for the latest weapons and components
 
 #### Features
+- integrated ped system
 - Integrated vehicle deformation
 - Integrated support for identity data
 - Integrated commands from esx_adminplus
@@ -36,16 +37,6 @@
 - ESX.Jobs table is populated after all jobs are setup, allowing other resources to retrieve it if needed
 - All weapons are properly removed when using the clearloadout command
 ##### For creating or updating resources refer to the [updated boilerplate](/esx_example).
-
-### 1.2 Features
-- Weight based inventory system
-- Weapons support, including support for attachments and tints
-- Supports different money accounts (defaulted with cash, bank and black money)
-- Many official resources available in our GitHub
-- Job system, with grades and clothes support
-- Supports multiple languages, most strings are localized
-- Easy to use API for developers to easily integrate ESX to their projects
-- Register your own commands easily, with argument validation, chat suggestion and using FXServer ACL
 
 ### Requirements
 - All resources from the `core` folder
