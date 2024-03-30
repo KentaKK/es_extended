@@ -15,12 +15,10 @@ ESX.Streaming = {}
 local GU = {}
 GU.Time = 0
 
-AddStateBagChangeHandler('deformation' --[[key filter]], nil --[[bag filter]], function(bagName, key, value, _unused, replicated)
+AddStateBagChangeHandler('deformation', nil, function(bagName, _, value, _, _)
 	Wait(100)
 	local entity = GetEntityFromStateBagName(bagName)
 	if not value or entity == 0 then return end
-	local ent = Entity(entity).state
-	local plate = GetVehicleNumberPlateText(entity)
 	SetVehicleDeformation(entity, value)
 end)
 
@@ -33,55 +31,8 @@ exports('phonecheck', function()
         ESX.ShowNotification('Nincs nálad ~g~telefon')
         return false
     end
+    return false
 end)
-
-local entityEnumerator = {
-    __gc = function(enum)
-      if enum.destructor and enum.handle then
-        enum.destructor(enum.handle)
-      end
-      enum.destructor = nil
-      enum.handle = nil
-    end
-  }
-
-  local function EnumerateEntities(initFunc, moveFunc, disposeFunc)
-    return coroutine.wrap(function()
-      local iter, id = initFunc()
-      if not id or id == 0 then
-        disposeFunc(iter)
-        return
-      end
-    
-      local enum = {handle = iter, destructor = disposeFunc}
-      setmetatable(enum, entityEnumerator)
-      
-      local next = true
-      repeat
-        coroutine.yield(id)
-        next, id = moveFunc(iter)
-      until not next
-      
-      enum.destructor, enum.handle = nil, nil
-      disposeFunc(iter)
-    end)
-  end
-
-function EnumerateObjects()
-  return EnumerateEntities(FindFirstObject, FindNextObject, EndFindObject)
-end
-  
-function EnumeratePeds()
-  return EnumerateEntities(FindFirstPed, FindNextPed, EndFindPed)
-end
-  
-function EnumerateVehicles()
-  return EnumerateEntities(FindFirstVehicle, FindNextVehicle, EndFindVehicle)
-end
-  
-function EnumeratePickups()
-  return EnumerateEntities(FindFirstPickup, FindNextPickup, EndFindPickup)
-end
 
 ---@return boolean
 function ESX.IsPlayerLoaded()
@@ -94,6 +45,7 @@ function ESX.GetPlayerData()
 end
 
 function ESX.SearchInventory(items, count)
+    while not ESX.PlayerLoaded do Wait(50) end
     if type(items) == 'string' then
         items = {items}
     end
@@ -144,11 +96,11 @@ end
 ---@param type any
 ---@param length any
 function ESX.ShowNotification(message, type, length)
-    if Config.NativeNotify then 
+    if Config.NativeNotify then
     BeginTextCommandThefeedPost('STRING')
     AddTextComponentSubstringPlayerName(message)
     EndTextCommandThefeedPostTicker(0,1)
-    else 
+    else
       exports["esx_notify"]:Notify(type, length, message)
     end
 end
@@ -163,7 +115,7 @@ end
 
 
 function ESX.ShowAdvancedNotification(sender, subject, msg, textureDict, iconType, flash, saveToBrief, hudColorIndex)
-	if saveToBrief == nil then saveToBrief = true end
+	if not saveToBrief then saveToBrief = true end
 	AddTextEntry('esxAdvancedNotification', msg)
 	BeginTextCommandThefeedPost('esxAdvancedNotification')
 	if hudColorIndex then ThefeedSetNextPostBackgroundColor(hudColorIndex) end
@@ -220,9 +172,9 @@ if GetResourceState("esx_context") ~= "missing" then
     end
 
     function ESX.RefreshContext(...)
-       exports["esx_context"]:Refresh(...) 
+       exports["esx_context"]:Refresh(...)
     end
-else 
+else
     function ESX.OpenContext()
         print("[ERROR] Tried to open context menu, but esx_context is missing!")
     end
@@ -416,10 +368,9 @@ ESX.Game.Teleport = function(entity, coords, cb)
 end
 
 ESX.Game.SpawnObject = function(object, coords, cb, networked)
-    networked = networked == nil and true or networked
-    
+    networked = not networked and true or networked
+
     local model = type(object) == 'number' and object or joaat(object)
-    --local vector = type(coords) == "vector3" and coords or vec(coords.x, coords.y, coords.z)
     CreateThread(function()
         ESX.Streaming.RequestModel(model)
 
@@ -450,7 +401,6 @@ end
 ---@param cb function
 ESX.Game.SpawnVehicle = function(vehicle, coords, heading, cb)
     local model = type(vehicle) == 'number' and vehicle or joaat(vehicle)
-    --local vector = type(coords) == "vector3" and coords or vec(coords.x, coords.y, coords.z)
     if not IsModelInCdimage(model) then return end
 
     local playerCoords = GetEntityCoords(ESX.PlayerData.ped)
@@ -472,7 +422,7 @@ ESX.Game.SpawnVehicle = function(vehicle, coords, heading, cb)
 		SetVehicleHasBeenOwnedByPlayer(veh, true)
 		SetVehicleNeedsToBeHotwired(veh, false)
 		SetVehRadioStation(veh, 'OFF')
-                SetVehicleOnGroundProperly(veh)
+        SetVehicleOnGroundProperly(veh)
 		SetModelAsNoLongerNeeded(model)
 
 		if DoesEntityExist(veh) then
@@ -487,7 +437,7 @@ ESX.Game.SpawnVehicle = function(vehicle, coords, heading, cb)
 			    Wait(50)
 			end
 		end
-		if cb ~= nil then
+		if cb then
 			cb(veh)
             local elapsedTime = (GetGameTimer() - GU.Time)
             print(('[^2INFO^7] Spawn time %s ms'):format(elapsedTime))
@@ -527,7 +477,7 @@ ESX.Game.SpawnLocalVehicle = function(modelName, coords, heading, cb)
 			end
 		end
 
-		if cb ~= nil then
+		if cb then
 			cb(vehicle)
                 local elapsedTime = (GetGameTimer() - GU.Time)
                 print(('[^2INFO^7] Spawn time %s ms'):format(elapsedTime))
@@ -545,13 +495,13 @@ ESX.Game.SpawnPed = function(modelName, coords, heading, cb)
 	print('Spawning ped ' .. tostring(model) .. ' at ' .. tostring(vector4(coords.x, coords.y, coords.z, heading)))
 	local ped = CreatePed(0, model, coords.x, coords.y, coords.z, heading, true, false)
 	local id = NetworkGetNetworkIdFromEntity(ped)
-                print('Ped netid: ' ..id)
+        print('Ped netid: ' ..id)
 		SetNetworkIdCanMigrate(id, true)
-                SetNetworkIdExistsOnAllMachines(id, true)
+        SetNetworkIdExistsOnAllMachines(id, true)
 		SetModelAsNoLongerNeeded(model)
 
 		if DoesEntityExist(ped) then
-                        local x = 0
+            local x = 0
 			while not HasCollisionLoadedAroundEntity(ped) do
 			   RequestCollisionAtCoord(coords.x, coords.y, coords.z)
                     if x > 40 then
@@ -562,7 +512,7 @@ ESX.Game.SpawnPed = function(modelName, coords, heading, cb)
 			end
 		end
 
-		if cb ~= nil then
+		if cb then
 			cb(ped)
 		end
     end)
@@ -681,7 +631,7 @@ function ESX.Game.GetClosestEntity(entities, isPlayerEntities, coords, modelFilt
 	if modelFilter then
 		filteredEntities = {}
 
-		for k,entity in pairs(entities) do
+		for _,entity in pairs(entities) do
 			if modelFilter[GetEntityModel(entity)] then
 				filteredEntities[#filteredEntities + 1] = entity
 			end
@@ -713,7 +663,7 @@ function ESX.Game.GetVehicleInDirection()
         return entityHit, entityCoords
     end
 
-    return nil
+    return 0
 end
 
 
@@ -747,9 +697,9 @@ ESX.Game.GetVehicleProperties = function(vehicle)
     end
 
     local extras = {}
-    for extraId = 0, 20 do
-        if DoesExtraExist(vehicle, extraId) then
-            extras[tostring(extraId)] = IsVehicleExtraTurnedOn(vehicle, extraId)
+    for i = 0, 20 do
+        if DoesExtraExist(vehicle, i) then
+            extras[i] = IsVehicleExtraTurnedOn(vehicle, i)
         end
     end
 
@@ -759,43 +709,40 @@ ESX.Game.GetVehicleProperties = function(vehicle)
     end
 
     local doorsBroken, windowsBroken, tyreBurst = {}, {}, {}
-    local numWheels = tostring(GetVehicleNumberOfWheels(vehicle))
 
-    local TyresIndex = {           -- Wheel index list according to the number of vehicle wheels.
-        ['2'] = { 0, 4 },          -- Bike and cycle.
-        ['3'] = { 0, 1, 4, 5 },    -- Vehicle with 3 wheels (get for wheels because some 3 wheels vehicles have 2 wheels on front and one rear or the reverse).
-        ['4'] = { 0, 1, 4, 5 },    -- Vehicle with 4 wheels.
-        ['6'] = { 0, 1, 2, 3, 4, 5 } -- Vehicle with 6 wheels.
-    }
+    for i = 0, 7 do
+        tyreBurst[i] = IsVehicleTyreBurst(vehicle, i, false)
+    end
 
-    if TyresIndex[numWheels] then
-        for _, idx in pairs(TyresIndex[numWheels]) do
-            tyreBurst[tostring(idx)] = IsVehicleTyreBurst(vehicle, idx, false)
+    local w = 0
+
+    for i = 0, 7 do
+        RollUpWindow(vehicle, i)
+        if not IsVehicleWindowIntact(vehicle, i) then
+            w += 1
+            windowsBroken[w] = i
         end
     end
 
-    for windowId = 0, 7 do              -- 13
-        RollUpWindow(vehicle, windowId) --fix when you put the car away with the window down
-        windowsBroken[tostring(windowId)] = not IsVehicleWindowIntact(vehicle, windowId)
-    end
+    local d = 0
 
-    local numDoors = GetNumberOfVehicleDoors(vehicle)
-    if numDoors and numDoors > 0 then
-        for doorsId = 0, numDoors do
-            doorsBroken[tostring(doorsId)] = IsVehicleDoorDamaged(vehicle, doorsId)
+    for i = 0, 5 do
+        if IsVehicleDoorDamaged(vehicle, i) then
+            d += 1
+            doorsBroken[d] = i
         end
     end
-    local ent = Entity(vehicle).state
+
     return {
         model = GetEntityModel(vehicle),
         deformat = json.encode(GetVehicleDeformation(vehicle)),
-	--stancer = json.encode(ent.stancer),
+        --stancer = json.encode(ent.stancer),
         wheelData = {
-		frontCamber = exports['vstancer']:GetFrontCamber(vehicle)[1],
-		rearCamber = exports['vstancer']:GetRearCamber(vehicle)[1],
-		frontWidth = exports['vstancer']:GetFrontTrackWidth(vehicle)[1],
-		rearWidth = exports['vstancer']:GetRearTrackWidth(vehicle)[1]  
-	},
+		    frontCamber = exports['vstancer']:GetFrontCamber(vehicle)[1],
+		    rearCamber = exports['vstancer']:GetRearCamber(vehicle)[1],
+		    frontWidth = exports['vstancer']:GetFrontTrackWidth(vehicle)[1],
+		    rearWidth = exports['vstancer']:GetRearTrackWidth(vehicle)[1]
+        },
         doorsBroken = doorsBroken,
         windowsBroken = windowsBroken,
         tyreBurst = tyreBurst,
@@ -899,53 +846,53 @@ ESX.Game.SetVehicleProperties = function(vehicle, props)
     local pearlescentColor, wheelColor = GetVehicleExtraColours(vehicle)
     SetVehicleModKit(vehicle, 0)
 
-    if props.tyresCanBurst ~= nil then
+    if props.tyresCanBurst then
         SetVehicleTyresCanBurst(vehicle, props.tyresCanBurst)
     end
-    if props.customPrimaryColor ~= nil then
+    if props.customPrimaryColor then
         SetVehicleCustomPrimaryColour(vehicle, props.customPrimaryColor[1], props.customPrimaryColor[2],
             props.customPrimaryColor[3])
     end
-    if props.customSecondaryColor ~= nil then
+    if props.customSecondaryColor then
         SetVehicleCustomSecondaryColour(vehicle, props.customSecondaryColor[1], props.customSecondaryColor[2],
             props.customSecondaryColor[3])
     end
-    if props.color1 ~= nil then
+    if props.color1 then
         SetVehicleColours(vehicle, props.color1, colorSecondary)
     end
-    if props.color2 ~= nil then
+    if props.color2 then
         SetVehicleColours(vehicle, props.color1 or colorPrimary, props.color2)
     end
-    if props.pearlescentColor ~= nil then
+    if props.pearlescentColor then
         SetVehicleExtraColours(vehicle, props.pearlescentColor, wheelColor)
     end
 
-    if props.interiorColor ~= nil then
+    if props.interiorColor then
         SetVehicleInteriorColor(vehicle, props.interiorColor)
     end
 
-    if props.dashboardColor ~= nil then
+    if props.dashboardColor then
         SetVehicleDashboardColor(vehicle, props.dashboardColor)
     end
 
-    if props.wheelColor ~= nil then
+    if props.wheelColor then
         SetVehicleExtraColours(vehicle, props.pearlescentColor or pearlescentColor, props.wheelColor)
     end
-    if props.wheels ~= nil then
+    if props.wheels then
         SetVehicleWheelType(vehicle, props.wheels)
     end
-    if props.windowTint ~= nil then
+    if props.windowTint then
         SetVehicleWindowTint(vehicle, props.windowTint)
     end
 
-    if props.neonEnabled ~= nil then
+    if props.neonEnabled then
         SetVehicleNeonLightEnabled(vehicle, 0, props.neonEnabled[1])
         SetVehicleNeonLightEnabled(vehicle, 1, props.neonEnabled[2])
         SetVehicleNeonLightEnabled(vehicle, 2, props.neonEnabled[3])
         SetVehicleNeonLightEnabled(vehicle, 3, props.neonEnabled[4])
     end
 
-    if props.extras ~= nil then
+    if props.extras then
         for extraId, enabled in pairs(props.extras) do
             SetVehicleExtra(vehicle, tonumber(extraId), enabled and 0 or 1)
         end
@@ -955,236 +902,229 @@ ESX.Game.SetVehicleProperties = function(vehicle, props)
         SetDriftTyresEnabled(vehicle, true)
     end
 
-    if props.neonColor ~= nil then
+    if props.neonColor then
         SetVehicleNeonLightsColour(vehicle, props.neonColor[1], props.neonColor[2], props.neonColor[3])
     end
-    if props.xenonColor ~= nil then
+    if props.xenonColor then
         SetVehicleXenonLightsColor(vehicle, props.xenonColor)
     end
-    if props.customXenonColor ~= nil then
+    if props.customXenonColor then
         SetVehicleXenonLightsCustomColor(vehicle, props.customXenonColor[1], props.customXenonColor[2],
             props.customXenonColor[3])
     end
-    if props.modSmokeEnabled ~= nil then
+    if props.modSmokeEnabled then
         ToggleVehicleMod(vehicle, 20, true)
     end
-    if props.tyreSmokeColor ~= nil then
+    if props.tyreSmokeColor then
         SetVehicleTyreSmokeColor(vehicle, props.tyreSmokeColor[1], props.tyreSmokeColor[2], props.tyreSmokeColor[3])
     end
-    if props.modSpoilers ~= nil then
+    if props.modSpoilers then
         SetVehicleMod(vehicle, 0, props.modSpoilers, false)
     end
-    if props.modFrontBumper ~= nil then
+    if props.modFrontBumper then
         SetVehicleMod(vehicle, 1, props.modFrontBumper, false)
     end
-    if props.modRearBumper ~= nil then
+    if props.modRearBumper then
         SetVehicleMod(vehicle, 2, props.modRearBumper, false)
     end
-    if props.modSideSkirt ~= nil then
+    if props.modSideSkirt then
         SetVehicleMod(vehicle, 3, props.modSideSkirt, false)
     end
-    if props.modExhaust ~= nil then
+    if props.modExhaust then
         SetVehicleMod(vehicle, 4, props.modExhaust, false)
     end
-    if props.modFrame ~= nil then
+    if props.modFrame then
         SetVehicleMod(vehicle, 5, props.modFrame, false)
     end
-    if props.modGrille ~= nil then
+    if props.modGrille then
         SetVehicleMod(vehicle, 6, props.modGrille, false)
     end
-    if props.modHood ~= nil then
+    if props.modHood then
         SetVehicleMod(vehicle, 7, props.modHood, false)
     end
-    if props.modFender ~= nil then
+    if props.modFender then
         SetVehicleMod(vehicle, 8, props.modFender, false)
     end
-    if props.modRightFender ~= nil then
+    if props.modRightFender then
         SetVehicleMod(vehicle, 9, props.modRightFender, false)
     end
-    if props.modRoof ~= nil then
+    if props.modRoof then
         SetVehicleMod(vehicle, 10, props.modRoof, false)
     end
 
-    if props.modRoofLivery ~= nil then
+    if props.modRoofLivery then
         SetVehicleRoofLivery(vehicle, props.modRoofLivery)
     end
 
-    if props.modEngine ~= nil then
+    if props.modEngine then
         SetVehicleMod(vehicle, 11, props.modEngine, false)
     end
-    if props.modBrakes ~= nil then
+    if props.modBrakes then
         SetVehicleMod(vehicle, 12, props.modBrakes, false)
     end
-    if props.modTransmission ~= nil then
+    if props.modTransmission then
         SetVehicleMod(vehicle, 13, props.modTransmission, false)
     end
-    if props.modHorns ~= nil then
+    if props.modHorns then
         SetVehicleMod(vehicle, 14, props.modHorns, false)
     end
-    if props.modSuspension ~= nil then
+    if props.modSuspension then
         SetVehicleMod(vehicle, 15, props.modSuspension, false)
     end
-    if props.modArmor ~= nil then
+    if props.modArmor then
         SetVehicleMod(vehicle, 16, props.modArmor, false)
     end
-    if props.modTurbo ~= nil then
+    if props.modTurbo then
         ToggleVehicleMod(vehicle, 18, props.modTurbo)
     end
-    if props.modXenon ~= nil then
+    if props.modXenon then
         ToggleVehicleMod(vehicle, 22, props.modXenon)
     end
-    if props.modFrontWheels ~= nil then
+    if props.modFrontWheels then
         SetVehicleMod(vehicle, 23, props.modFrontWheels, props.modCustomFrontWheels)
     end
-    if props.modBackWheels ~= nil then
+    if props.modBackWheels then
         SetVehicleMod(vehicle, 24, props.modBackWheels, props.modCustomBackWheels)
     end
-    if props.modPlateHolder ~= nil then
+    if props.modPlateHolder then
         SetVehicleMod(vehicle, 25, props.modPlateHolder, false)
     end
-    if props.modVanityPlate ~= nil then
+    if props.modVanityPlate then
         SetVehicleMod(vehicle, 26, props.modVanityPlate, false)
     end
-    if props.modTrimA ~= nil then
+    if props.modTrimA then
         SetVehicleMod(vehicle, 27, props.modTrimA, false)
     end
-    if props.modOrnaments ~= nil then
+    if props.modOrnaments then
         SetVehicleMod(vehicle, 28, props.modOrnaments, false)
     end
-    if props.modDashboard ~= nil then
+    if props.modDashboard then
         SetVehicleMod(vehicle, 29, props.modDashboard, false)
     end
-    if props.modDial ~= nil then
+    if props.modDial then
         SetVehicleMod(vehicle, 30, props.modDial, false)
     end
-    if props.modDoorSpeaker ~= nil then
+    if props.modDoorSpeaker then
         SetVehicleMod(vehicle, 31, props.modDoorSpeaker, false)
     end
-    if props.modSeats ~= nil then
+    if props.modSeats then
         SetVehicleMod(vehicle, 32, props.modSeats, false)
     end
-    if props.modSteeringWheel ~= nil then
+    if props.modSteeringWheel then
         SetVehicleMod(vehicle, 33, props.modSteeringWheel, false)
     end
-    if props.modShifterLeavers ~= nil then
+    if props.modShifterLeavers then
         SetVehicleMod(vehicle, 34, props.modShifterLeavers, false)
     end
-    if props.modAPlate ~= nil then
+    if props.modAPlate then
         SetVehicleMod(vehicle, 35, props.modAPlate, false)
     end
-    if props.modSpeakers ~= nil then
+    if props.modSpeakers then
         SetVehicleMod(vehicle, 36, props.modSpeakers, false)
     end
-    if props.modTrunk ~= nil then
+    if props.modTrunk then
         SetVehicleMod(vehicle, 37, props.modTrunk, false)
     end
-    if props.modHydrolic ~= nil then
+    if props.modHydrolic then
         SetVehicleMod(vehicle, 38, props.modHydrolic, false)
     end
-    if props.modEngineBlock ~= nil then
+    if props.modEngineBlock then
         SetVehicleMod(vehicle, 39, props.modEngineBlock, false)
     end
-    if props.modAirFilter ~= nil then
+    if props.modAirFilter then
         SetVehicleMod(vehicle, 40, props.modAirFilter, false)
     end
-    if props.modStruts ~= nil then
+    if props.modStruts then
         SetVehicleMod(vehicle, 41, props.modStruts, false)
     end
-    if props.modArchCover ~= nil then
+    if props.modArchCover then
         SetVehicleMod(vehicle, 42, props.modArchCover, false)
     end
-    if props.modAerials ~= nil then
+    if props.modAerials then
         SetVehicleMod(vehicle, 43, props.modAerials, false)
     end
-    if props.modTrimB ~= nil then
+    if props.modTrimB then
         SetVehicleMod(vehicle, 44, props.modTrimB, false)
     end
-    if props.modTank ~= nil then
+    if props.modTank then
         SetVehicleMod(vehicle, 45, props.modTank, false)
     end
-    if props.modWindows ~= nil then
+    if props.modWindows then
         SetVehicleMod(vehicle, 46, props.modWindows, false)
     end
 
-    if props.modLivery ~= nil then
+    if props.modLivery then
         SetVehicleMod(vehicle, 48, props.modLivery, false)
         SetVehicleLivery(vehicle, props.modLivery)
     end
 
-    if props.windowsBroken ~= nil then
-        for k, v in pairs(props.windowsBroken) do
-            if v then
-                RemoveVehicleWindow(vehicle, tonumber(k))
-            end
+    if props.windowsBroken then
+        for i=1, #props.windowsBroken do
+            RemoveVehicleWindow(vehicle, props.windowsBroken[i])
         end
     end
 
-    if props.doorsBroken ~= nil then
-        for k, v in pairs(props.doorsBroken) do
-            if v then
-                SetVehicleDoorBroken(vehicle, tonumber(k), true)
-            end
+    if props.doorsBroken then
+        for i=1, #props.doorsBroken do
+            SetVehicleDoorBroken(vehicle, props.doorsBroken[i], true)
         end
     end
 
-        if props.tyreBurst then
-            for k, v in pairs(props.tyreBurst) do
-                local f = tonumber(k)
-                if v then
-                    if f == 4 then
-                       f = 2
-                       BreakOffVehicleWheel(vehicle, f, true, true, true, false)
-                    elseif f == 5 then
-                       f = 3
-                       BreakOffVehicleWheel(vehicle, f, true, true, true, false)
-                    end
-                    SetVehicleTyreBurst(vehicle, tonumber(k), true, 1000.0)
-                    BreakOffVehicleWheel(vehicle, tonumber(k), true, true, true, false)
+    if props.tyreBurst then
+        for k, v in pairs(props.tyreBurst) do
+            local f = tonumber(k)
+            if v then
+                if f == 4 then
+                    f = 2
+                    BreakOffVehicleWheel(vehicle, f, true, true, true, false)
+                elseif f == 5 then
+                    f = 3
+                    BreakOffVehicleWheel(vehicle, f, true, true, true, false)
                 end
+                SetVehicleTyreBurst(vehicle, tonumber(k), true, 1000.0)
+                BreakOffVehicleWheel(vehicle, tonumber(k), true, true, true, false)
             end
         end
+    end
 
-        if props.plate then
-            SetVehicleNumberPlateText(vehicle, props.plate)
+    if props.plate then
+        SetVehicleNumberPlateText(vehicle, props.plate)
+    end
+    if props.plateIndex then
+        SetVehicleNumberPlateTextIndex(vehicle, props.plateIndex)
+    end
+    if props.tankHealth then
+        SetVehiclePetrolTankHealth(vehicle, props.tankHealth + 0.0)
+    end
+    print("----------")
+    if Config.LegacyFuel then
+        if props.fuelLevel then
+	    exports['LegacyFuel']:SetFuel(vehicle, props.fuelLevel + 0.0)
+            print("Fuel: " ..props.fuelLevel)
         end
-        if props.plateIndex then
-            SetVehicleNumberPlateTextIndex(vehicle, props.plateIndex)
-        end
-
-        if props.tankHealth then
-            SetVehiclePetrolTankHealth(vehicle, props.tankHealth + 0.0)
-        end
-        print("----------")
-        if Config.LegacyFuel then
-           if props.fuelLevel then
-	       exports['LegacyFuel']:SetFuel(vehicle, props.fuelLevel + 0.0)
-               print("Fuel: " ..props.fuelLevel)
-           end
-        end
-        if props.dirtLevel then
-            SetVehicleDirtLevel(vehicle, props.dirtLevel + 0.0)
-        end
-
-        if props.bodyHealth then
-            SetVehicleBodyHealth(vehicle, props.bodyHealth + 0.0)
-            print("Body: " ..props.bodyHealth)
-        end
-
-        if props.engineHealth then
-            SetVehicleEngineHealth(vehicle, props.engineHealth + 0.0)
-            print("Engine: " ..props.engineHealth)
-        end
-        print("----------")
-        if props.deformat then
-           local deformation = json.decode(props.deformat)
-           Entity(vehicle).state:set('deformation', deformation, true)
-        end
-        if props.wheelData then
-                exports['vstancer']:SetFrontCamber(vehicle, props.wheelData["frontCamber"])
-                exports['vstancer']:SetRearCamber(vehicle, props.wheelData["rearCamber"])
-                exports['vstancer']:SetFrontTrackWidth(vehicle, props.wheelData["frontWidth"])
-                exports['vstancer']:SetRearTrackWidth(vehicle, props.wheelData["rearWidth"])
-        end
+    end
+    if props.dirtLevel then
+        SetVehicleDirtLevel(vehicle, props.dirtLevel + 0.0)
+    end
+    if props.bodyHealth then
+        SetVehicleBodyHealth(vehicle, props.bodyHealth + 0.0)
+        print("Body: " ..props.bodyHealth)
+    end
+    if props.engineHealth then
+        SetVehicleEngineHealth(vehicle, props.engineHealth + 0.0)
+        print("Engine: " ..props.engineHealth)
+    end
+    print("----------")
+    if props.deformat then
+        local deformation = json.decode(props.deformat)
+        Entity(vehicle).state:set('deformation', deformation, true)
+    end
+    if props.wheelData then
+        exports['vstancer']:SetFrontCamber(vehicle, props.wheelData["frontCamber"])
+        exports['vstancer']:SetRearCamber(vehicle, props.wheelData["rearCamber"])
+        exports['vstancer']:SetFrontTrackWidth(vehicle, props.wheelData["frontWidth"])
+        exports['vstancer']:SetRearTrackWidth(vehicle, props.wheelData["rearWidth"])
+    end
 	--[[if props.stancer then
 	    local stancer = json.decode(props.stancer)
 	    Entity(vehicle).state:set('stancer', stancer, true)
@@ -1192,8 +1132,6 @@ ESX.Game.SetVehicleProperties = function(vehicle, props)
 end
 
 function ESX.Game.Utils.DrawText3D(coords, text, size, font)
-    --local vector = type(coords) == "vector3" and coords or vector3(coords.x, coords.y, coords.z)
-
     local camCoords = GetFinalRenderedCamCoord()
     local distance = #(vector3(coords.x, coords.y, coords.z) - camCoords)
 
@@ -1497,6 +1435,28 @@ function ESX.ShowInventory()
         menu.close()
     end)
 end
+
+---@param account string Account name (money/bank/black_money)
+---@return table|nil
+function ESX.GetAccount(account)
+    for i = 1, #ESX.PlayerData.accounts, 1 do
+        if ESX.PlayerData.accounts[i].name == account then
+            return ESX.PlayerData.accounts[i]
+        end
+    end
+    return nil
+end
+
+AddEventHandler("onResourceStop", function(resourceName)
+    for i = 1, #ESX.UI.Menu.Opened, 1 do
+        if ESX.UI.Menu.Opened[i] then
+            if ESX.UI.Menu.Opened[i].resourceName == resourceName or ESX.UI.Menu.Opened[i].namespace == resourceName then
+                ESX.UI.Menu.Opened[i].close()
+                ESX.UI.Menu.Opened[i] = nil
+            end
+        end
+    end
+end)
 
 RegisterNetEvent('esx:showNotification')
 AddEventHandler('esx:showNotification', function(msg, type, length)
