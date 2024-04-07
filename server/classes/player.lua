@@ -86,7 +86,7 @@ function CreateExtendedPlayer(playerId, identifier, group, accounts, inventory, 
 	function self.setMoney(money)
 		_assert(type(money) == "number", "money should be number!")
 		money = ESX.Math.Round(money)
-		self.setAccountMoney('money', money)
+		self.setAccountMoney('money', money, 'something')
 	end
 
 	---@return number
@@ -652,7 +652,7 @@ function CreateExtendedPlayer(playerId, identifier, group, accounts, inventory, 
 	end
 
 	---@param weaponName string
-	---@return number, table | nil
+	---@return number|nil, table|nil
 	function self.getWeapon(weaponName)
 		for k, v in ipairs(self.loadout) do
 			if v.name == weaponName then
@@ -691,7 +691,7 @@ function CreateExtendedPlayer(playerId, identifier, group, accounts, inventory, 
 
 	---@param index any
 	---@param subIndex any
-	---@return table
+	---@return table|nil
 	function self.getMeta(index, subIndex)
 		if not (index) then return (self.metadata) end
 
