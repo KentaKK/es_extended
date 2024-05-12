@@ -207,8 +207,8 @@ function Core.SavePlayers(cb)
   if not next(xPlayers) then
     return
   end
-  
-  local startTime <const> = os.time()
+
+  local start = os.nanotime()
   local parameters = {}
 
   for _, xPlayer in pairs(ESX.Players) do
@@ -228,7 +228,7 @@ function Core.SavePlayers(cb)
 
   MySQL.prepare(
     "UPDATE `users` SET `accounts` = ?, `job` = ?, `job_grade` = ?, `group` = ?, `position` = ?, `inventory` = ?, `loadout` = ?, `metadata` = ? WHERE `identifier` = ?",
-    parameters, 
+    parameters,
     function(results)
       if not results then
         return
@@ -237,8 +237,7 @@ function Core.SavePlayers(cb)
       if type(cb) == 'function' then
         return cb()
       end
-      
-      print(('[^2INFO^7] Saved ^5%s^7 %s over ^5%s^7 ms'):format(#parameters, #parameters > 1 and 'players' or 'player', ESX.Math.Round((os.time() - startTime) / 1000000, 2)))
+      print(('[^2INFO^7] Saved ^5%s^7 %s over ^5%.4f ms^7'):format(#parameters, #parameters > 1 and 'players' or 'player', (os.nanotime() - start) / 1e6))
     end
   )
 end
@@ -266,10 +265,11 @@ end]]
 
 ---@param key string
 ---@param val string
----@return table
+---@return table|number
 function ESX.GetExtendedPlayers(key, val)
+  --if not key then return #GetPlayers() end
   local xPlayers = {}
-  for k, v in pairs(ESX.Players) do
+  for _, v in pairs(ESX.Players) do
     if key then
       if (key == 'job' and v.job.name == val) or v[key] == val then
         xPlayers[#xPlayers + 1] = v
@@ -292,16 +292,12 @@ function ESX.GetPlayerFromIdentifier(identifier)
 end
 
 function ESX.GetIdentifier(playerId)
-  local fxDk = GetConvarInt('sv_fxdkMode', 0) 
+  local fxDk = GetConvarInt('sv_fxdkMode', 0)
   if fxDk == 1 then
     return "ESX-DEBUG-LICENCE"
   end
-  for k, v in ipairs(GetPlayerIdentifiers(playerId)) do
-    if string.match(v, 'license:') then
-      local identifier = string.gsub(v, 'license:', '')
-      return identifier
-    end
-  end
+  local identifier = GetPlayerIdentifierByType(playerId, "license")
+  return identifier and identifier:gsub("license:", "")
 end
 
 ---@param model string|number
@@ -309,7 +305,7 @@ end
 ---@param cb function
 function ESX.GetVehicleType(model, player, cb)
   model = type(model) == 'string' and joaat(model) or model
-  
+
   if Core.vehicleTypesByModel[model] then
     return cb(Core.vehicleTypesByModel[model])
   end

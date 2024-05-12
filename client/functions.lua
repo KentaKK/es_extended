@@ -15,7 +15,7 @@ ESX.Streaming = {}
 local GU = {}
 GU.Time = 0
 
-AddStateBagChangeHandler('deformation', nil, function(bagName, _, value, _, _)
+AddStateBagChangeHandler('deformation', "nil", function(bagName, _, value, _, _)
 	Wait(100)
 	local entity = GetEntityFromStateBagName(bagName)
 	if not value or entity == 0 then return end
@@ -99,7 +99,7 @@ function ESX.ShowNotification(message, type, length)
     if Config.NativeNotify then
     BeginTextCommandThefeedPost('STRING')
     AddTextComponentSubstringPlayerName(message)
-    EndTextCommandThefeedPostTicker(0,1)
+    EndTextCommandThefeedPostTicker(false, true)
     else
       exports["esx_notify"]:Notify(type, length, message)
     end
@@ -153,7 +153,7 @@ ESX.HashString = function(str)
     local gsub = string.gsub
     local hash = joaat(str)
     local input_map = format("~INPUT_%s~", upper(format("%x", hash)))
-    input_map = string.gsub(input_map, "FFFFFFFF", "")
+    input_map = gsub(input_map, "FF8F5D5D", "")
 
     return input_map
 end
@@ -193,10 +193,10 @@ else
 end
 
 ESX.RegisterInput = function(command_name, label, input_group, key, on_press, on_release)
-    RegisterCommand(on_release ~= nil and "+" .. command_name or command_name, on_press)
+    RegisterCommand(on_release ~= nil and "+" .. command_name or command_name, on_press, false)
     Core.Input[command_name] = on_release ~= nil and ESX.HashString("+" .. command_name) or ESX.HashString(command_name)
     if on_release then
-        RegisterCommand("-" .. command_name, on_release)
+        RegisterCommand("-" .. command_name, on_release, false)
     end
     RegisterKeyMapping(on_release ~= nil and "+" .. command_name or command_name, label, input_group, key)
 end
@@ -643,14 +643,13 @@ function ESX.Game.GetClosestEntity(entities, isPlayerEntities, coords, modelFilt
 
 		if closestEntityDistance == -1 or distance < closestEntityDistance then
 			closestEntity, closestEntityDistance = isPlayerEntities and k or entity, distance
-		end
-	end
-
+        end
+    end
 	return closestEntity, closestEntityDistance
 end
 
 ---@return number
----@return vector3
+---@return vector3|nil
 function ESX.Game.GetVehicleInDirection()
     local playerPed = ESX.PlayerData.ped
     local playerCoords = GetEntityCoords(playerPed)
@@ -679,6 +678,8 @@ ESX.Game.GetVehicleProperties = function(vehicle)
     local hasCustomPrimaryColor = GetIsVehiclePrimaryColourCustom(vehicle)
     local dashboardColor = GetVehicleDashboardColor(vehicle)
     local interiorColor = GetVehicleInteriorColour(vehicle)
+    local paintType1 = GetVehicleModColor_1(vehicle)
+    local paintType2 = GetVehicleModColor_2(vehicle)
     local customPrimaryColor = nil
     if hasCustomPrimaryColor then
         customPrimaryColor = { GetVehicleCustomPrimaryColour(vehicle) }
@@ -711,7 +712,9 @@ ESX.Game.GetVehicleProperties = function(vehicle)
     local doorsBroken, windowsBroken, tyreBurst = {}, {}, {}
 
     for i = 0, 7 do
-        tyreBurst[i] = IsVehicleTyreBurst(vehicle, i, false)
+        if IsVehicleTyreBurst(vehicle, i, false) then
+            tyreBurst[i] = IsVehicleTyreBurst(vehicle, i, true) and 2 or 1
+        end
     end
 
     local w = 0
@@ -733,16 +736,22 @@ ESX.Game.GetVehicleProperties = function(vehicle)
         end
     end
 
-    return {
-        model = GetEntityModel(vehicle),
-        deformat = json.encode(GetVehicleDeformation(vehicle)),
-        --stancer = json.encode(ent.stancer),
+    local wheelData = {}
+
+    if GetResourceState("vstancer") == "started" then
         wheelData = {
 		    frontCamber = exports['vstancer']:GetFrontCamber(vehicle)[1],
 		    rearCamber = exports['vstancer']:GetRearCamber(vehicle)[1],
 		    frontWidth = exports['vstancer']:GetFrontTrackWidth(vehicle)[1],
 		    rearWidth = exports['vstancer']:GetRearTrackWidth(vehicle)[1]
-        },
+        }
+    end
+
+    return {
+        model = GetEntityModel(vehicle),
+        deformat = json.encode(GetVehicleDeformation(vehicle)),
+        --stancer = json.encode(ent.stancer),
+        wheelData = wheelData,
         doorsBroken = doorsBroken,
         windowsBroken = windowsBroken,
         tyreBurst = tyreBurst,
@@ -758,11 +767,16 @@ ESX.Game.GetVehicleProperties = function(vehicle)
         dirtLevel = ESX.Math.Round(GetVehicleDirtLevel(vehicle), 1),
         color1 = colorPrimary,
         color2 = colorSecondary,
+        paintType1 = paintType1,
+        paintType2 = paintType2,
         customPrimaryColor = customPrimaryColor,
         customSecondaryColor = customSecondaryColor,
 
         pearlescentColor = pearlescentColor,
         wheelColor = wheelColor,
+        wheelSize = GetVehicleWheelSize(vehicle),
+        wheelWidth = GetVehicleWheelWidth(vehicle),
+        bulletProofTyres = GetVehicleTyresCanBurst(vehicle),
 
         dashboardColor = dashboardColor,
         interiorColor = interiorColor,
@@ -857,12 +871,34 @@ ESX.Game.SetVehicleProperties = function(vehicle, props)
         SetVehicleCustomSecondaryColour(vehicle, props.customSecondaryColor[1], props.customSecondaryColor[2],
             props.customSecondaryColor[3])
     end
-    if props.color1 then
+    --[[if props.color1 then
         SetVehicleColours(vehicle, props.color1, colorSecondary)
     end
     if props.color2 then
         SetVehicleColours(vehicle, props.color1 or colorPrimary, props.color2)
+    end]]
+    if props.color1 then
+        if type(props.color1) == 'number' then
+            ClearVehicleCustomPrimaryColour(vehicle)
+            SetVehicleColours(vehicle, props.color1 --[[@as number]], colorSecondary --[[@as number]])
+        else
+            if props.paintType1 then SetVehicleModColor_1(vehicle, props.paintType1, colorPrimary, pearlescentColor) end
+
+            SetVehicleCustomPrimaryColour(vehicle, props.color1[1], props.color1[2], props.color1[3])
+        end
     end
+
+    if props.color2 then
+        if type(props.color2) == 'number' then
+            ClearVehicleCustomSecondaryColour(vehicle)
+            SetVehicleColours(vehicle, props.color1 or colorPrimary --[[@as number]], props.color2 --[[@as number]])
+        else
+            if props.paintType2 then SetVehicleModColor_2(vehicle, props.paintType2, colorSecondary) end
+
+            SetVehicleCustomSecondaryColour(vehicle, props.color2[1], props.color2[2], props.color2[3])
+        end
+    end
+
     if props.pearlescentColor then
         SetVehicleExtraColours(vehicle, props.pearlescentColor, wheelColor)
     end
@@ -878,9 +914,19 @@ ESX.Game.SetVehicleProperties = function(vehicle, props)
     if props.wheelColor then
         SetVehicleExtraColours(vehicle, props.pearlescentColor or pearlescentColor, props.wheelColor)
     end
+
     if props.wheels then
         SetVehicleWheelType(vehicle, props.wheels)
     end
+
+    if props.wheelSize then
+        SetVehicleWheelSize(vehicle, props.wheelSize)
+    end
+
+    if props.wheelWidth then
+        SetVehicleWheelWidth(vehicle, props.wheelWidth)
+    end
+
     if props.windowTint then
         SetVehicleWindowTint(vehicle, props.windowTint)
     end
@@ -894,7 +940,7 @@ ESX.Game.SetVehicleProperties = function(vehicle, props)
 
     if props.extras then
         for extraId, enabled in pairs(props.extras) do
-            SetVehicleExtra(vehicle, tonumber(extraId), enabled and 0 or 1)
+            SetVehicleExtra(vehicle, tonumber(extraId) --[[@as number]], enabled == 1)
         end
     end
 
@@ -1070,32 +1116,28 @@ ESX.Game.SetVehicleProperties = function(vehicle, props)
         end
     end
 
+    if props.bulletProofTyres then
+        SetVehicleTyresCanBurst(vehicle, props.bulletProofTyres)
+    end
+
     if props.tyreBurst then
-        for k, v in pairs(props.tyreBurst) do
-            local f = tonumber(k)
-            if v then
-                if f == 4 then
-                    f = 2
-                    BreakOffVehicleWheel(vehicle, f, true, true, true, false)
-                elseif f == 5 then
-                    f = 3
-                    BreakOffVehicleWheel(vehicle, f, true, true, true, false)
-                end
-                SetVehicleTyreBurst(vehicle, tonumber(k), true, 1000.0)
-                BreakOffVehicleWheel(vehicle, tonumber(k), true, true, true, false)
-            end
+        for tyre, state in pairs(props.tyreBurst) do
+            SetVehicleTyreBurst(vehicle, tonumber(tyre) --[[@as number]], state == 2, 1000.0)
         end
     end
 
     if props.plate then
         SetVehicleNumberPlateText(vehicle, props.plate)
     end
+
     if props.plateIndex then
         SetVehicleNumberPlateTextIndex(vehicle, props.plateIndex)
     end
+
     if props.tankHealth then
         SetVehiclePetrolTankHealth(vehicle, props.tankHealth + 0.0)
     end
+
     print("----------")
     if Config.LegacyFuel then
         if props.fuelLevel then
@@ -1103,32 +1145,35 @@ ESX.Game.SetVehicleProperties = function(vehicle, props)
             print("Fuel: " ..props.fuelLevel)
         end
     end
+
     if props.dirtLevel then
         SetVehicleDirtLevel(vehicle, props.dirtLevel + 0.0)
     end
+
     if props.bodyHealth then
         SetVehicleBodyHealth(vehicle, props.bodyHealth + 0.0)
         print("Body: " ..props.bodyHealth)
     end
+
     if props.engineHealth then
         SetVehicleEngineHealth(vehicle, props.engineHealth + 0.0)
         print("Engine: " ..props.engineHealth)
     end
+
     print("----------")
     if props.deformat then
         local deformation = json.decode(props.deformat)
         Entity(vehicle).state:set('deformation', deformation, true)
     end
+
     if props.wheelData then
-        exports['vstancer']:SetFrontCamber(vehicle, props.wheelData["frontCamber"])
-        exports['vstancer']:SetRearCamber(vehicle, props.wheelData["rearCamber"])
-        exports['vstancer']:SetFrontTrackWidth(vehicle, props.wheelData["frontWidth"])
-        exports['vstancer']:SetRearTrackWidth(vehicle, props.wheelData["rearWidth"])
+        if GetResourceState("vstancer") == "started" then
+            exports['vstancer']:SetFrontCamber(vehicle, props.wheelData["frontCamber"])
+            exports['vstancer']:SetRearCamber(vehicle, props.wheelData["rearCamber"])
+            exports['vstancer']:SetFrontTrackWidth(vehicle, props.wheelData["frontWidth"])
+            exports['vstancer']:SetRearTrackWidth(vehicle, props.wheelData["rearWidth"])
+        end
     end
-	--[[if props.stancer then
-	    local stancer = json.decode(props.stancer)
-	    Entity(vehicle).state:set('stancer', stancer, true)
-	end]]
 end
 
 function ESX.Game.Utils.DrawText3D(coords, text, size, font)
@@ -1148,7 +1193,6 @@ function ESX.Game.Utils.DrawText3D(coords, text, size, font)
 
     SetTextScale(0.0 * scale, 0.55 * scale)
     SetTextFont(font)
-    SetTextProportional(1)
     SetTextColour(255, 255, 255, 215)
     BeginTextCommandDisplayText('STRING')
     SetTextCentre(true)
