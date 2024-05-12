@@ -567,7 +567,8 @@ ESX.RegisterServerCallback('esx:getPlayerData', function(source, cb)
 		loadout = xPlayer.getLoadout(),
 		money = xPlayer.getMoney(),
 		position = xPlayer.getCoords(true),
-		metadata = xPlayer.getMeta()
+		metadata = xPlayer.getMeta(),
+                group = xPlayer.group
 	})
 end)
 
