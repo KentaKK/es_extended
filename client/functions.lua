@@ -750,7 +750,6 @@ ESX.Game.GetVehicleProperties = function(vehicle)
     return {
         model = GetEntityModel(vehicle),
         deformat = json.encode(GetVehicleDeformation(vehicle)),
-        --stancer = json.encode(ent.stancer),
         wheelData = wheelData,
         doorsBroken = doorsBroken,
         windowsBroken = windowsBroken,
@@ -871,12 +870,7 @@ ESX.Game.SetVehicleProperties = function(vehicle, props)
         SetVehicleCustomSecondaryColour(vehicle, props.customSecondaryColor[1], props.customSecondaryColor[2],
             props.customSecondaryColor[3])
     end
-    --[[if props.color1 then
-        SetVehicleColours(vehicle, props.color1, colorSecondary)
-    end
-    if props.color2 then
-        SetVehicleColours(vehicle, props.color1 or colorPrimary, props.color2)
-    end]]
+
     if props.color1 then
         if type(props.color1) == 'number' then
             ClearVehicleCustomPrimaryColour(vehicle)
@@ -1223,7 +1217,7 @@ function ESX.ShowInventory()
         end
     end
 
-    for k, v in ipairs(ESX.PlayerData.inventory) do
+    for _,v in ipairs(ESX.PlayerData.inventory) do
         if v.count > 0 then
             currentWeight = currentWeight + (v.weight * v.count)
 
@@ -1239,7 +1233,7 @@ function ESX.ShowInventory()
         end
     end
 
-    for k, v in ipairs(Config.Weapons) do
+    for _,v in ipairs(Config.Weapons) do
         local weaponHash = joaat(v.name)
 
         if HasPedGotWeapon(playerPed, weaponHash, false) then
