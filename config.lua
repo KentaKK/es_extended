@@ -36,13 +36,6 @@ Config.Identity                 = false -- Select a characters identity data bef
 Config.DistanceGive 		    = 4.0 -- Max distance when giving items, weapons etc.
 Config.OnDuty                   = true -- Default state of the on duty system
 Config.NoclipSpeed              = 4.0 -- change it to change the speed in noclip
-Config.adminRanks = { -- change this as your server ranking ( default are : superadmin | admin | moderator )
-	'superadmin',
-	'admin',
-	'moderator',
-}
-Config.admin_groups = {"superadmin"} -- groups that can use admin commands
-
 Config.DisableHealthRegen         = true -- Player will no longer regenerate health
 Config.DisableVehicleRewards      = false -- Disables Player Recieving weapons from vehicles
 Config.DisableNPCDrops            = true -- stops NPCs from dropping weapons on death

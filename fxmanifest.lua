@@ -4,7 +4,7 @@ use_experimental_fxv2_oal 'yes'
 lua54 'yes'
 description 'ES Extended'
 
-version '2.0.1'
+version '2.0.3'
 
 shared_scripts {
 	'locale.lua',
@@ -37,6 +37,7 @@ client_scripts {
 	'client/deformation.lua',
 	'client/common.lua',
 	'client/functions.lua',
+	'client/npwd.lua',
 	'client/wrapper.lua',
 	'client/modules/callback.lua',
 	'client/main.lua',
@@ -69,6 +70,7 @@ files {
 }
 
 dependencies {
+	'/native:0x6AE51D4B',
 	'oxmysql',
 	'spawnmanager',
 }
