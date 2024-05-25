@@ -15,13 +15,6 @@ ESX.Streaming = {}
 local GU = {}
 GU.Time = 0
 
-AddStateBagChangeHandler('deformation', "nil", function(bagName, _, value, _, _)
-	Wait(100)
-	local entity = GetEntityFromStateBagName(bagName)
-	if not value or entity == 0 then return end
-	SetVehicleDeformation(entity, value)
-end)
-
 ---@return boolean
 exports('phonecheck', function()
     local count = exports.ox_inventory:Search('count', 'phone')
