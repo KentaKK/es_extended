@@ -1,5 +1,12 @@
 local pickups = {}
 
+AddStateBagChangeHandler('deformation', nil, function(bagName, _, value, _, _)
+	Wait(100)
+	local entity = GetEntityFromStateBagName(bagName)
+	if not value or entity == 0 then return end
+	SetVehicleDeformation(entity, value)
+end)
+
 AddStateBagChangeHandler('metadata', 'player:' .. tostring(GetPlayerServerId(PlayerId())), function(_, key, val)
 	ESX.SetPlayerData(key, val)
 end)
@@ -153,7 +160,7 @@ AddEventHandler('esx:playerLoaded', function(xPlayer, isNew, skin)
 	end
 end)
 
-RegisterCommand("pgroup", function(source, args, rawCommand)
+RegisterCommand("pgroup", function()
     print(ESX.PlayerData.group)
 end, false)
 
